@@ -1,0 +1,321 @@
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+
+    --primary: 222.2 47.4% 11.2%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 210 40% 96.1%;
+    --secondary-foreground: 222.2 47.4% 11.2%;
+
+    --muted: 210 40% 96.1%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+
+    --accent: 210 40% 96.1%;
+    --accent-foreground: 222.2 47.4% 11.2%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 222.2 84% 4.9%;
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+
+    --primary: 210 40% 98%;
+    --primary-foreground: 222.2 47.4% 11.2%;
+
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 212.7 26.8% 83.9%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Inter', sans-serif;
+  }
+}
+
+@layer utilities {
+  .font-handwritten {
+    font-family: 'Caveat', cursive;
+  }
+  .chelsea-market-regular {
+    font-family: "Chelsea Market", system-ui;
+    font-weight: 400;
+    font-style: normal;
+  }
+  .knewave-regular {
+    font-family: "Knewave", system-ui;
+    font-weight: 400;
+    font-style: normal;
+  }
+  .patrick-hand-sc-regular {
+    font-family: "Patrick Hand SC", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffeef1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #f9c2cd;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2b99e3;
+}
+
+/* Falling Realistic Cookies Animation */
+.falling-cookie {
+  position: absolute;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  animation: fallingCookie linear infinite;
+  /* Cookie texture overlay */
+  background-image: radial-gradient(circle at 30% 30%, rgba(255, 255, 255, 0.3) 2px, transparent 2px);
+  background-size: 8px 8px;
+}
+
+/* Individual cookie styles with realistic colors */
+.cookie-1 {
+  width: 18px;
+  height: 18px;
+  left: 10%;
+  animation-duration: 8s;
+  animation-delay: 0s;
+  opacity: 0.9;
+  background: linear-gradient(135deg, #D2691E 0%, #CD853F 50%, #DEB887 100%);
+  border-radius: 45% 55% 50% 50%;
+}
+
+.cookie-2 {
+  width: 16px;
+  height: 16px;
+  left: 25%;
+  animation-duration: 10s;
+  animation-delay: 2s;
+  opacity: 0.85;
+  background: linear-gradient(135deg, #8B4513 0%, #A0522D 50%, #D2691E 100%);
+  border-radius: 40% 60% 55% 45%;
+}
+
+.cookie-3 {
+  width: 20px;
+  height: 18px;
+  left: 40%;
+  animation-duration: 9s;
+  animation-delay: 4s;
+  opacity: 0.9;
+  background: linear-gradient(135deg, #F4A460 0%, #DEB887 50%, #D2691E 100%);
+  border-radius: 50% 45% 60% 40%;
+}
+
+.cookie-4 {
+  width: 14px;
+  height: 14px;
+  left: 55%;
+  animation-duration: 11s;
+  animation-delay: 1s;
+  opacity: 0.8;
+  background: linear-gradient(135deg, #CD853F 0%, #D2691E 50%, #A0522D 100%);
+  border-radius: 60% 40% 50% 50%;
+}
+
+.cookie-5 {
+  width: 19px;
+  height: 17px;
+  left: 70%;
+  animation-duration: 12s;
+  animation-delay: 6s;
+  opacity: 0.9;
+  background: linear-gradient(135deg, #DEB887 0%, #F4A460 50%, #CD853F 100%);
+  border-radius: 35% 65% 45% 55%;
+}
+
+.cookie-6 {
+  width: 22px;
+  height: 20px;
+  left: 85%;
+  animation-duration: 13s;
+  animation-delay: 3s;
+  opacity: 0.95;
+  background: linear-gradient(135deg, #8B4513 0%, #8B4513 50%, #D2691E 100%);
+  border-radius: 50% 50% 45% 55%;
+}
+
+.cookie-7 {
+  width: 15px;
+  height: 15px;
+  left: 15%;
+  animation-duration: 7s;
+  animation-delay: 8s;
+  opacity: 0.85;
+  background: linear-gradient(135deg, #D2691E 0%, #F4A460 50%, #DEB887 100%);
+  border-radius: 55% 45% 60% 40%;
+}
+
+.cookie-8 {
+  width: 17px;
+  height: 19px;
+  left: 75%;
+  animation-duration: 14s;
+  animation-delay: 5s;
+  opacity: 0.9;
+  background: linear-gradient(135deg, #CD853F 0%, #CD853F 50%, #F4A460 100%);
+  border-radius: 40% 60% 50% 50%;
+}
+
+/* Falling animation with realistic cookie behavior */
+@keyframes fallingCookie {
+  0% {
+    transform: translateY(-100px) rotate(0deg) scale(1);
+    opacity: 0.9;
+  }
+  15% {
+    transform: translateY(15vh) rotate(45deg) scale(1.05);
+    opacity: 1;
+  }
+  30% {
+    transform: translateY(30vh) rotate(90deg) scale(0.98);
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateY(50vh) rotate(180deg) scale(1.02);
+    opacity: 0.9;
+  }
+  70% {
+    transform: translateY(70vh) rotate(270deg) scale(0.95);
+    opacity: 0.8;
+  }
+  85% {
+    transform: translateY(85vh) rotate(360deg) scale(1.01);
+    opacity: 0.6;
+  }
+  100% {
+    transform: translateY(110vh) rotate(420deg) scale(0.9);
+    opacity: 0;
+  }
+}
+
+/* Card hover animations matching the design pattern */
+.card {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.card:hover {
+  box-shadow: 0px 30px 18px -8px rgba(0, 0, 0, 0.1);
+  transform: scale(1.03, 1.03);
+}
+
+.card__img--hover {
+  transition: 0.2s all ease-out;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  width: 100%;
+  border-top-left-radius: 1.5rem;
+  border-top-right-radius: 1.5rem;
+}
+
+.card__info-hover {
+  position: absolute;
+  padding: 16px;
+  width: 100%;
+  opacity: 0;
+  top: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  border-radius: 1.5rem 1.5rem 0 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
+}
+
+.card:hover .card__img--hover {
+  height: 100%;
+  opacity: 0.3;
+}
+
+.card:hover .card__info-hover {
+  opacity: 1;
+}
+
+.card__like {
+  width: 18px;
+  height: 18px;
+  transition: all 0.3s ease;
+}
+
+/* Order Form Background Texture */
+.order-form-texture {
+  background-color: #DFDBE5;
+  background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+.cookie-texture {
+  /* background-color: #DFDBE5; */
+  background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}

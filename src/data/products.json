@@ -1,0 +1,138 @@
+{
+  "cookies": [
+    {
+      "id": "choco-almond-crunch",
+      "name": "Choco Almond Crunch",
+      "description": "Crunchy, nutty, chocolate-forward.",
+      "image": "/images/products/almondd.png",
+      "variants": [
+        { "size": "Large 400gr", "price": 220000 },
+        { "size": "Medium 150gr", "price": 85000 },
+        { "size": "Small 100gr", "price": 65000 },
+        { "size": "Mini 30gr", "price": 20000 }
+      ],
+      "ingredients": ["Flour", "Australian Butter", "Brown Sugar", "Chocolate chips", "Almond"],
+      "isNew": false
+    },
+    {
+      "id": "heavenly-bites",
+      "name": "Heavenly Bites",
+      "description": "Sweet cookies with Oreo crumb magic.",
+      "image": "/images/products/heaven.png",
+      "variants": [
+        { "size": "Large 400gr", "price": 220000 },
+        { "size": "Medium 150gr", "price": 85000 },
+        { "size": "Small 100gr", "price": 65000 },
+        { "size": "Mini 30gr", "price": 20000 }
+      ],
+      "ingredients": ["Flour", "Australian Butter", "Brown Sugar", "Oreo crumbs", "Chocolate chips"],
+      "isNew": false
+    },
+    {
+      "id": "oatmeal-raisin",
+      "name": "Oatmeal Raisin",
+      "description": "Chewy, warm spices, classic favorite.",
+      "image": "/images/products/oatmeal.png",
+      "variants": [
+        { "size": "Large 400gr", "price": 220000 },
+        { "size": "Medium 150gr", "price": 85000 },
+        { "size": "Small 100gr", "price": 65000 },
+        { "size": "Mini 30gr", "price": 20000 }
+      ],
+      "ingredients": ["Oats", "Raisin", "Australian Butter", "Brown Sugar", "Eggs"],
+      "isNew": false
+    },
+    {
+      "id": "choco-cheese-almond",
+      "name": "Choco Cheese Almond",
+      "description": "Sweet-salty mix with crunchy almonds.",
+      "image": "/images/products/cheesy.png",
+      "variants": [
+        { "size": "Large 400gr", "price": 220000 },
+        { "size": "Medium 150gr", "price": 85000 },
+        { "size": "Small 100gr", "price": 65000 },
+        { "size": "Mini 30gr", "price": 20000 }
+      ],
+      "ingredients": ["Chocolate chips", "Australian Butter", "Brown Sugar", "Cheese", "Almond"],
+      "isNew": true
+    }
+  ],
+  "juice": [
+    {
+      "id": "mango",
+      "name": "Mango",
+      "description": "Rich mango juice with fun bites of chia seeds and nata de coco.",
+      "image": "/images/products/mangga.png",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Mango juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": false
+    },
+    {
+      "id": "guava",
+      "name": "Guava",
+      "description": "Fresh guava tang with chewy nata de coco and chia seeds.",
+      "image": "/images/products/jamboe.png",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Guava juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": false
+    },
+    {
+      "id": "strawberry",
+      "name": "Strawberry",
+      "description": "Bright strawberry sip with chia seeds and nata de coco.",
+      "image": "/images/products/stroberi.png",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Strawberry juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": false
+    },
+    {
+      "id": "soursop",
+      "name": "Soursop",
+      "description": "Creamy tropical soursop with fun nata de coco bites.",
+      "image": "/images/products/sirsak.png",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Soursop juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": false
+    },
+    {
+      "id": "avocado-coffee",
+      "name": "Avocado Coffee",
+      "description": "Avocado coffee dessert drink with creamy texture and sweet aroma.",
+      "image": "/images/products/alpukat.png",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Avocado", "Coffee", "Creamer", "Brown sugar"],
+      "toppings": [],
+      "isNew": true
+    }
+  ],
+  "macaroni": [
+    {
+      "id": "macaroni-schotel",
+      "name": "Macaroni Schotel",
+      "description": "Creamy & cheesy baked macaroni cups with a crispy outer layer.",
+      "image": "/images/products/sahroni.png",
+      "variants": [
+        { "size": "2 pcs", "price": 40000 },
+        { "size": "4 pcs", "price": 80000 },
+        { "size": "9 pcs", "price": 180000 }
+      ],
+      "ingredients": ["Cheddar Cheese", "Red Cheddar Cheese", "Smoked beef", "Chicken breast"],
+      "size": "Cup Ø 8cm • tall 3.5cm",
+      "isNew": false
+    }
+  ]
+}
