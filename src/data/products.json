@@ -2,7 +2,7 @@
   "cookies": [
     {
       "id": "choco-almond-crunch",
-      "name": "Choco Almond Crunch",
+      "name": "Choco Almond",
       "description": "Crunchy, nutty, chocolate-forward.",
       "image": "/images/products/almondd.png",
       "variants": [
@@ -44,7 +44,7 @@
     },
     {
       "id": "choco-cheese-almond",
-      "name": "Choco Cheese Almond",
+      "name": "Cheese Almond",
       "description": "Sweet-salty mix with crunchy almonds.",
       "image": "/images/products/cheesy.png",
       "variants": [

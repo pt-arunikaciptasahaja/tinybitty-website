@@ -41,12 +41,15 @@ export default function OrderForm() {
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [customerName, setCustomerName] = useState('');
   const [timer, setTimer] = useState(3);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [orderData, setOrderData] = useState<OrderFormData | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderFormSchema),
+    mode: 'onChange',        // ✅ validate while typing
+    reValidateMode: 'onChange',
     defaultValues: {
       name: '',
       phone: '',
@@ -176,24 +179,23 @@ export default function OrderForm() {
     setCustomerName(data.name);
     setOrderTotal(getTotalPrice());
 
-    // Show thank you modal and start timer
+    // Show confirmation modal first
+    setShowConfirmationModal(true);
+  };
+
+  const handleConfirmOrder = () => {
+    // Close confirmation modal and show thank you modal
+    setShowConfirmationModal(false);
     setShowThankYouModal(true);
     setTimer(3);
   };
 
-  // Check if form is valid for button state
-  const isFormValid = () => {
-    const values = form.getValues();
-    return (
-      cart.length > 0 &&
-      values.name?.trim().length >= 2 &&
-      values.phone?.trim().length >= 10 &&
-      values.address?.trim().length >= 10 &&
-      deliveryMethod &&
-      paymentMethod &&
-      deliveryInfo?.isValid
-    );
+  const handleEditOrder = () => {
+    // Close confirmation modal to allow editing
+    setShowConfirmationModal(false);
   };
+
+  const { isValid } = form.formState;
 
   return (
     <section id="order" className="py-16 order-form-texture rounded-3xl">
@@ -229,23 +231,39 @@ export default function OrderForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="phone"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#11110a] font-semibold">WhatsApp Number</FormLabel>
-                      <FormControl>
-                        <Input
-                          placeholder="08123456789"
-                          {...field}
-                          className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="phone"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#11110a] font-semibold">
+                      WhatsApp Number
+                    </FormLabel>
+                    <FormControl>
+                      <Input
+                        placeholder="08123456789"
+                        inputMode="numeric"
+                        pattern="[0-9]*"
+                        maxLength={15} // ✅ hard cap for typing
+                        className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]"
+                        value={field.value}
+                        onChange={(e) => {
+                          // only digits
+                          const onlyDigits = e.target.value.replace(/\D/g, '');
+                          field.onChange(onlyDigits);
+                        }}
+                        onBlur={field.onBlur}
+                        name={field.name}
+                        ref={field.ref}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-[#11110a]/60 mt-1">
+                      Hanya nomor Indonesia (0 atau 62 di depan), tanpa spasi atau simbol.
+                    </p>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
                 <FormField
                   control={form.control}
@@ -278,28 +296,33 @@ export default function OrderForm() {
                   )}
                 />
 
-                <FormField
-                  control={form.control}
-                  name="deliveryMethod"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#11110a] font-semibold">Delivery Method</FormLabel>
-                      <Select onValueChange={field.onChange} defaultValue={field.value}>
-                        <FormControl>
-                          <SelectTrigger className="rounded-xl border-[#a3e2f5]/30">
-                            <SelectValue placeholder="Select delivery method" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent>
-                          <SelectItem value="gosendInstant">GoSend Instant</SelectItem>
-                          <SelectItem value="grab">Grab Express</SelectItem>
-                          <SelectItem value="paxel">Paxel</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+              <FormField
+                control={form.control}
+                name="deliveryMethod"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#11110a] font-semibold">
+                      Delivery Method
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="rounded-xl border-[#a3e2f5]/30">
+                          <SelectValue placeholder="Select delivery method" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {/* ⬇️ value must match the enum string */}
+                        <SelectItem value="gosend">GoSend Instant</SelectItem>
+                        <SelectItem value="grab">Grab Express</SelectItem>
+                        <SelectItem value="paxel">Paxel</SelectItem>
+                        {/* if you use pickup later */}
+                        {/* <SelectItem value="pickup">Self Pickup</SelectItem> */}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
                 {/* Delivery Cost Display */}
                 {deliveryInfo && (
@@ -426,17 +449,24 @@ export default function OrderForm() {
                   </Card>
                 )}
 
-                <Button
-                  type="submit"
-                  disabled={!isFormValid()}
-                  className={`w-full transition-all duration-300 rounded-xl py-6 text-lg font-semibold flex items-center justify-center gap-2 ${isFormValid()
-                      ? 'bg-[#edadc3] hover:bg-[#edadc3]/90 text-white shadow-lg hover:shadow-xl'
-                      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                    }`}
-                >
-                  <MessageCircle className="w-5 h-5" />
-                  Order via WhatsApp
-                </Button>
+              {cart.length === 0 && (
+                <div className="text-xs text-red-500 flex items-center gap-1">
+                  <AlertCircle className="w-4 h-4" />
+                  <span>Keranjang kamu masih kosong, silakan pilih produk dulu ya 😊</span>
+                </div>
+              )}
+              <Button
+                type="submit"
+                disabled={!isValid || !deliveryInfo?.isValid}
+                className={`w-full transition-all duration-300 rounded-xl py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
+                  isValid && deliveryInfo?.isValid
+                    ? 'bg-[#edadc3] hover:bg-[#edadc3]/90 text-white shadow-lg hover:shadow-xl'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                }`}
+              >
+                <MessageCircle className="w-5 h-5" />
+                Order via WhatsApp
+              </Button>
               </form>
             </Form>
           </CardContent>
@@ -505,6 +535,161 @@ export default function OrderForm() {
                 />
               </div>
             </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Order Confirmation Modal */}
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+      <DialogContent
+    className="
+      sm:max-w-2xl
+      bg-white
+      border-2 border-[#a3e2f5]/30
+      rounded-3xl
+      shadow-2xl
+      p-0
+      overflow-hidden
+      max-h-[80vh]       /* ⬅️ cap height */
+      flex flex-col      /* ⬅️ header + scrollable body */
+    "
+  >
+    {/* Header (fixed) */}
+    <div className="bg-[#553d8f]/10 border-b-2 border-[#a3e2f5]/30 px-6 py-6 flex-shrink-0">
+      <DialogHeader>
+        <DialogTitle className="text-2xl font-bold text-[#11110a] flex items-center gap-2">
+          <CheckCircle2 className="w-8 h-8 text-[#553d8f]" />
+          Review Your Order
+        </DialogTitle>
+        <DialogDescription className="text-[#11110a]/70">
+          Please review your order details before we proceed
+        </DialogDescription>
+      </DialogHeader>
+    </div>
+
+    {/* Body (scrollable) */}
+    <div className="px-6 py-6 overflow-y-auto flex-1">
+    {orderData && (
+        <div className="space-y-4">
+          {/* Customer Details */}
+          <div className="bg-[#a3e2f5]/10 rounded-2xl p-4">
+                  <h3 className="font-semibold text-[#11110a] mb-3 flex items-center gap-2">
+                    <MessageCircle className="w-5 h-5 text-[#553d8f]" />
+                    Customer Details
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-[#11110a]/70">Name:</span>
+                      <div className="font-medium text-[#11110a]">{orderData.name}</div>
+                    </div>
+                    <div>
+                      <span className="text-[#11110a]/70">WhatsApp:</span>
+                      <div className="font-medium text-[#11110a]">{orderData.phone}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <span className="text-[#11110a]/70">Address:</span>
+                      <div className="font-medium text-[#11110a]">{orderData.address}</div>
+                    </div>
+                    <div>
+                      <span className="text-[#11110a]/70">Delivery:</span>
+                      <div className="font-medium text-[#11110a]">
+                        {deliveryMethod === 'gosend' && 'GoSend Instant'}
+                        {deliveryMethod === 'grab' && 'Grab Express'}
+                        {deliveryMethod === 'paxel' && 'Paxel'}
+                        {deliveryMethod === 'pickup' && 'Self Pickup'}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[#11110a]/70">Payment:</span>
+                      <div className="font-medium text-[#11110a]">Bank Transfer</div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Order Items */}
+          <div className="bg-white rounded-2xl border-2 border-[#a3e2f5]/30 p-4">
+            <h3 className="font-semibold text-[#11110a] mb-3 flex items-center gap-2">
+              🛒 Order Items ({cart.length} items)
+            </h3>
+            {/* you can remove the inner max-h if you want outer scroll only */}
+            <div className="space-y-3">
+              {cart.map((item) => (
+                <div
+                  key={`${item.productId}-${item.variant.size}`}
+                  className="flex items-center gap-3 p-3 bg-[#f5fbf8] rounded-xl"
+                >
+                        <div
+                          className="w-12 h-12 bg-cover bg-center bg-no-repeat rounded-xl flex-shrink-0"
+                          style={{ backgroundImage: `url(${item.image})` }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-[#11110a] text-sm truncate">{item.productName}</h4>
+                          <p className="text-xs text-[#11110a]/70">{item.variant.size}</p>
+                          <p className="text-xs text-[#553d8f] font-medium">
+                            {item.quantity}x Rp {item.variant.price.toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-[#11110a]">
+                            Rp {(item.variant.price * item.quantity).toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Order Total */}
+                {deliveryInfo && deliveryInfo.isValid && (
+                  <div className="bg-[#553d8f]/5 rounded-2xl p-4">
+                    <h3 className="font-semibold text-[#11110a] mb-3">Order Summary</h3>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#11110a]/70">Products Subtotal</span>
+                        <span className="text-[#11110a]">Rp {getTotalPrice().toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-[#11110a]/70">Delivery Cost</span>
+                        <span className="text-[#11110a]">Rp {deliveryInfo.cost.toLocaleString('id-ID')}</span>
+                      </div>
+                      <div className="border-t border-[#a3e2f5]/30 pt-2">
+                        <div className="flex justify-between font-bold text-lg">
+                          <span className="text-[#11110a]">Total</span>
+                          <span className="text-[#553d8f]">
+                            Rp {(getTotalPrice() + deliveryInfo.cost).toLocaleString('id-ID')}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleEditOrder}
+                    variant="outline"
+                    className="flex-1 border-2 border-[#a3e2f5] text-[#11110a] hover:bg-[#a3e2f5]/10 py-3 rounded-xl font-medium"
+                  >
+                    Edit Order
+                  </Button>
+                  <Button
+                    onClick={handleConfirmOrder}
+                    className="flex-1 bg-[#f9c2cd] hover:bg-[#f9c2cd]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+                  >
+                    <MessageCircle className="w-5 h-5" />
+                    Confirm & Continue
+                  </Button>
+                </div>
+
+                {orderData.notes && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4">
+                    <h4 className="font-medium text-[#11110a] mb-2">📝 Special Notes</h4>
+                    <p className="text-sm text-[#11110a]/80">{orderData.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>

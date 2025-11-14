@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -97,6 +97,11 @@
   }
   .patrick-hand-sc-regular {
     font-family: "Patrick Hand SC", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+  .bebas-neue-regular {
+    font-family: "Bebas Neue", sans-serif;
     font-weight: 400;
     font-style: normal;
   }
@@ -256,57 +261,10 @@ html {
   }
 }
 
-/* Card hover animations matching the design pattern */
+/* Card hover animations - Removed for mobile performance */
 .card {
-  transition: all 0.4s cubic-bezier(0.175, 0.885, 0, 1);
   position: relative;
   overflow: hidden;
-}
-
-.card:hover {
-  box-shadow: 0px 30px 18px -8px rgba(0, 0, 0, 0.1);
-  transform: scale(1.03, 1.03);
-}
-
-.card__img--hover {
-  transition: 0.2s all ease-out;
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  width: 100%;
-  border-top-left-radius: 1.5rem;
-  border-top-right-radius: 1.5rem;
-}
-
-.card__info-hover {
-  position: absolute;
-  padding: 16px;
-  width: 100%;
-  opacity: 0;
-  top: 0;
-  transition: opacity 0.3s ease;
-  z-index: 10;
-  border-radius: 1.5rem 1.5rem 0 0;
-  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.5), transparent);
-}
-
-.card:hover .card__img--hover {
-  height: 100%;
-  opacity: 0.3;
-}
-
-.card:hover .card__info-hover {
-  opacity: 1;
-}
-
-.card__like {
-  width: 18px;
-  height: 18px;
-  transition: all 0.3s ease;
 }
 
 /* Order Form Background Texture */

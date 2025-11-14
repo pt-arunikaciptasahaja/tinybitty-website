@@ -7,7 +7,11 @@ import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { useToast } from '@/components/ui/use-toast';
 
-export default function CartSheet() {
+interface CartSheetProps {
+  children?: React.ReactNode;
+}
+
+export default function CartSheet({ children }: CartSheetProps) {
   const { cart, updateQuantity, removeFromCart, getTotalPrice, getTotalItems } = useCart();
   const { toast } = useToast();
   const [open, setOpen] = useState(false);
@@ -49,10 +53,10 @@ export default function CartSheet() {
     const deliveryValue = selectTriggers[0] ? getSelectValue(selectTriggers[0]) : '';
     const paymentValue = selectTriggers[1] ? getSelectValue(selectTriggers[1]) : '';
 
-    return name.length >= 2 && 
-           phone.length >= 10 && 
-           address.length >= 10 && 
-           deliveryValue.length > 0 && 
+    return name.length >= 2 &&
+           phone.length >= 10 &&
+           address.length >= 10 &&
+           deliveryValue.length > 0 &&
            paymentValue.length > 0;
   };
 
@@ -125,19 +129,24 @@ export default function CartSheet() {
     }, 100);
   };
 
+  // If children are provided, wrap them in a SheetTrigger
+  const triggerContent = children || (
+    <Button
+      size="lg"
+      className="fixed bottom-6 right-6 z-40 bg-[#f9c2cd] hover:bg-[#f9c2cd]/90 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-full px-6 py-6 flex items-center gap-2"
+    >
+      <ShoppingCart className="w-5 h-5" />
+      <span className="font-semibold">Cart</span>
+      {getTotalItems() > 0 && (
+        <Badge className="bg-white text-[#f9c2cd] ml-1">{getTotalItems()}</Badge>
+      )}
+    </Button>
+  );
+
   return (
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
-        <Button
-          size="lg"
-          className="fixed bottom-6 right-6 z-40 bg-[#f9c2cd] hover:bg-[#f9c2cd]/90 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 rounded-full px-6 py-6 flex items-center gap-2"
-        >
-          <ShoppingCart className="w-5 h-5" />
-          <span className="font-semibold">Cart</span>
-          {getTotalItems() > 0 && (
-            <Badge className="bg-white text-[#f9c2cd] ml-1">{getTotalItems()}</Badge>
-          )}
-        </Button>
+        {triggerContent}
       </SheetTrigger>
       <SheetContent className="w-full sm:max-w-lg bg-[#ffeef1]">
         <SheetHeader>

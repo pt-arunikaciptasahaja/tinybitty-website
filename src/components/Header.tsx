@@ -1,42 +1,150 @@
-import { Instagram, MessageCircle } from 'lucide-react';
+import { useState } from 'react';
+import { ShoppingCart, Menu, X } from 'lucide-react';
+import CartSheet from './CartSheet';
+import { Badge } from '@/components/ui/badge';
+import { useCart } from '@/contexts/CartContext';
+import { Link } from 'react-router-dom';
 
 export default function Header() {
+  const { getTotalItems } = useCart();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   return (
-    <header className="sticky top-0 z-50 bg-[#f5fbf8] backdrop-blur-sm border-b border-[#a3e2f5]/20 shadow-sm">
-      <div className="container mx-auto px-4 py-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/logotiny.png"
-              alt="Tiny Bitty - Freshly Baked Happiness"
-              className="h-20 md:h-28 w-auto object-contain"
-              style={{
-                filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
-              }}
-            />
+    <header className="fixed top-4 left-4 right-4 z-50">
+      <div className="container mx-auto">
+        <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-4 py-3">
+          <div className="flex items-center justify-between">
+            <Link to="/" className="flex items-center gap-3">
+              <img
+                src="/logotiny.png"
+                alt="Tiny Bitty - Freshly Baked Happiness"
+                className="h-16 md:h-20 w-auto object-contain"
+                style={{
+                  filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
+                }}
+              />
+            </Link>
+            
+            {/* Desktop Navigation */}
+            <nav className="hidden md:flex items-center gap-6">
+              <a
+                href="#products"
+                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+              >
+                Products
+              </a>
+              <Link
+                to="/faq"
+                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+              >
+                FAQ
+              </Link>
+              <Link
+                to="/ingredients"
+                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+              >
+                Ingredients
+              </Link>
+              <Link
+                to="/our-story"
+                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+              >
+                Our Story
+              </Link>
+              <a
+                href="#order"
+                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+              >
+                Order
+              </a>
+              
+              {/* Cart Icon */}
+              <CartSheet>
+                <div className="relative p-2 rounded-full hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+                  <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-1 -right-1 bg-[#f9c2cd] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
+                </div>
+              </CartSheet>
+            </nav>
+
+            {/* Mobile Menu Button */}
+            <div className="md:hidden flex items-center gap-2">
+              {/* Mobile Cart Icon */}
+              <CartSheet>
+                <div className="relative p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+                  <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
+                  {getTotalItems() > 0 && (
+                    <Badge className="absolute -top-1 -right-1 bg-[#f9c2cd] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                      {getTotalItems()}
+                    </Badge>
+                  )}
+                </div>
+              </CartSheet>
+              
+              {/* Burger Menu Button */}
+              <button
+                onClick={toggleMenu}
+                className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
+              >
+                {isMenuOpen ? (
+                  <X className="w-6 h-6 text-[#553d8f] transition-transform duration-200" />
+                ) : (
+                  <Menu className="w-6 h-6 text-[#553d8f] transition-transform duration-200" />
+                )}
+              </button>
+            </div>
           </div>
-          <nav className="flex items-center gap-4">
-            <a
-              href="#products"
-              className="hidden md:inline-block text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors"
-            >
-              Products
-            </a>
-            <a
-              href="#order"
-              className="hidden md:inline-block text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors"
-            >
-              Order
-            </a>
-            <a
-              href="https://instagram.com/tiny.bitty/"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#553d8f] hover:text-[#553d8f]/80 transition-colors"
-            >
-              <Instagram className="w-10 h-10 stroke-2 fill: var(--color-red-600)" />
-            </a>
-          </nav>
+
+          {/* Mobile Menu */}
+          <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
+            isMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+          }`}>
+            <div className="mt-4 pb-4 border-t border-white/20 relative z-10">
+              <nav className="flex flex-col gap-4 mt-4">
+                <a
+                  href="#products"
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  onClick={toggleMenu}
+                >
+                  Products
+                </a>
+                <Link
+                  to="/faq"
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  onClick={toggleMenu}
+                >
+                  FAQ
+                </Link>
+                <Link
+                  to="/ingredients"
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  onClick={toggleMenu}
+                >
+                  Ingredients
+                </Link>
+                <Link
+                  to="/our-story"
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  onClick={toggleMenu}
+                >
+                  Our Story
+                </Link>
+                <a
+                  href="#order"
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  onClick={toggleMenu}
+                >
+                  Order
+                </a>
+              </nav>
+            </div>
+          </div>
         </div>
       </div>
     </header>
