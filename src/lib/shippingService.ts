@@ -50,25 +50,25 @@ export async function calculateShippingCost(
       case 'gosend':
       case 'gosendInstant':
         selectedRate = shippingRates.gosend_instant;
-        estimatedTime = '30-60 menit';
+        estimatedTime = '1-3 jam';
         break;
       case 'grab':
         selectedRate = shippingRates.grabexpress_instant;
-        estimatedTime = '30-60 menit';
+        estimatedTime = '1-3 jam';
         break;
       case 'paxel':
         // Paxel doesn't have real-time calculation in the new engine
         // Use GoSend Same Day as fallback with distance-based pricing
         selectedRate = shippingRates.gosend_same_day;
-        estimatedTime = '1-2 jam';
+        estimatedTime = '1-3 jam';
         break;
       case 'gosendSameDay':
         selectedRate = shippingRates.gosend_same_day;
-        estimatedTime = '1-2 jam';
+        estimatedTime = '3-6 jam'; // Same Day takes longer but costs less
         break;
       default:
         selectedRate = shippingRates.gosend_instant;
-        estimatedTime = '30-60 menit';
+        estimatedTime = '1-3 jam';
     }
     
     // If service is unavailable

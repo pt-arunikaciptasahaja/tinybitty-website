@@ -354,15 +354,19 @@ export const calculateDeliveryCost = (
   // Final calculation
   const cost = Math.round(baseRate + weightCharge + timeSurcharge);
   
-  // Estimate delivery time (more realistic for 2024/2025)
+  // Estimate delivery time based on delivery method (dynamic like price)
   const getEstimatedTime = (): string => {
-    switch (zone.distance) {
-      case 'near':
-        return deliveryMethod === 'gosendInstant' ? '30-60 menit' : '1-2 jam';
-      case 'medium':
-        return deliveryMethod === 'gosendInstant' ? '1-2 jam' : '2-4 jam';
-      case 'far':
-        return deliveryMethod === 'gosendInstant' ? '2-4 jam' : '4-8 jam';
+    switch (deliveryMethod.toLowerCase()) {
+      case 'gosend':
+      case 'gosendinstant':
+        return '1-3 jam';
+      case 'gosendsameday':
+        return '3-6 jam'; // Same Day takes longer but costs less
+      case 'grab':
+      case 'grabexpress':
+        return '1-4 jam';
+      case 'paxel':
+        return '2-6 jam';
       default:
         return '1-3 jam';
     }

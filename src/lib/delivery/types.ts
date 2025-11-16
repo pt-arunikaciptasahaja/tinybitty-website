@@ -7,6 +7,7 @@ export interface DeliveryZone {
   postalCodes?: string[];
   baseRates: {
     gosendInstant: number;
+    gosendSameDay: number;
     grab: number;
     paxel: number;
   };

@@ -101,7 +101,7 @@ export class GrabExpressScraper {
     try {
       // Try different response formats
       let price: number | null = null;
-      let eta: string = '1-2 jam';
+      let eta: string = '1-3 jam'; // Updated to match new method-based ETA
 
       // Format 1: Direct price and eta
       if (data.price && typeof data.price === 'number') {

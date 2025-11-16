@@ -74,6 +74,8 @@ function getBaseRate(zone: DeliveryZone, method: string): number {
     case 'gosendinstant':
     case 'gosend':
       return baseRates.gosendInstant;
+    case 'gosendsameday':
+      return baseRates.gosendSameDay;
     case 'grabexpress':
     case 'grab':
       return baseRates.grab;
@@ -89,12 +91,12 @@ function getBaseRate(zone: DeliveryZone, method: string): number {
  * Calculate weight surcharge
  */
 function calculateWeightCharge(totalWeight: number): number {
-  if (totalWeight <= 3) {
+  if (totalWeight <= 2) {
     return 0;
   }
   
-  // Rp 15,000 per kg over 3kg
-  return (totalWeight - 3) * 15000;
+  // Rp 10,000 per kg over 2kg (more reasonable rates)
+  return (totalWeight - 2) * 10000;
 }
 
 /**
@@ -103,9 +105,9 @@ function calculateWeightCharge(totalWeight: number): number {
 function calculateTimeSurcharge(baseRate: number): number {
   const currentHour = new Date().getHours();
   
-  // Peak hours: 5-8 PM (17:00-20:00)
-  if (currentHour >= 17 && currentHour <= 20) {
-    return baseRate * 0.1; // 10% peak surcharge
+  // Peak hours: 6-8 PM (18:00-20:00)
+  if (currentHour >= 18 && currentHour <= 20) {
+    return baseRate * 0.05; // 5% peak surcharge (more reasonable)
   }
   
   return 0;
@@ -186,6 +188,9 @@ function emergencyFallback(
   
   // Adjust based on method
   switch (method.toLowerCase()) {
+    case 'gosendsameday':
+      baseRate = emergencyZone.baseRates.gosendSameDay;
+      break;
     case 'grabexpress':
     case 'grab':
       baseRate = emergencyZone.baseRates.grab;

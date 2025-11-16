@@ -16,6 +16,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 32000,    // Updated base rates for 2025
+      gosendSameDay: 24000,    // Same Day - lower cost
       grab: 29000,
       paxel: 24000
     },
@@ -38,6 +39,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 45000,
+      gosendSameDay: 35000,    // Same Day - lower cost
       grab: 48000,
       paxel: 40000
     },
@@ -57,6 +59,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 48000,
+      gosendSameDay: 38000,    // Same Day - lower cost
       grab: 52000,
       paxel: 44000
     },
@@ -76,13 +79,14 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 52000,
+      gosendSameDay: 42000,    // Same Day - lower cost
       grab: 56000,
       paxel: 52000
     },
     distance: 'medium'
   },
   {
-    name: 'Tangerang & Sekitarnya',
+    name: 'Tangerang & Sekitanya',
     cities: ['tangerang', 'tangerang selatan', 'cilegon', 'serang', 'tangerang Selatan'],
     districts: [
       'tigaraksa', 'legok', 'pamarin', 'kroncong', 'cikande',
@@ -94,6 +98,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 63000,
+      gosendSameDay: 53000,    // Same Day - lower cost
       grab: 68000,
       paxel: 60000
     },
@@ -114,6 +119,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 57000,
+      gosendSameDay: 47000,    // Same Day - lower cost
       grab: 60000,
       paxel: 52000
     },
@@ -131,6 +137,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 38000,
+      gosendSameDay: 30000,    // Same Day - lower cost
       grab: 41000,
       paxel: 33000
     },
@@ -149,6 +156,7 @@ export const deliveryZones: DeliveryZone[] = [
     ],
     baseRates: {
       gosendInstant: 82000,
+      gosendSameDay: 70000,    // Same Day - lower cost
       grab: 90000,
       paxel: 75000
     },
@@ -272,13 +280,18 @@ export const calculateConfidence = (zone: DeliveryZone, address: string): 'high'
  * Get estimated delivery time based on zone and method
  */
 export const getEstimatedTime = (zone: DeliveryZone, method: string): string => {
-  switch (zone.distance) {
-    case 'near':
-      return method === 'gosendInstant' ? '30-60 menit' : '1-2 jam';
-    case 'medium':
-      return method === 'gosendInstant' ? '1-2 jam' : '2-4 jam';
-    case 'far':
-      return method === 'gosendInstant' ? '2-4 jam' : '4-8 jam';
+  // ETA based on delivery method only (not zone distance)
+  switch (method.toLowerCase()) {
+    case 'gosend':
+    case 'gosendinstant':
+      return '1-3 jam';
+    case 'gosendsameday':
+      return '3-6 jam'; // Same Day takes longer but costs less
+    case 'grab':
+    case 'grabexpress':
+      return '1-3 jam';
+    case 'paxel':
+      return '2-6 jam';
     default:
       return '1-3 jam';
   }

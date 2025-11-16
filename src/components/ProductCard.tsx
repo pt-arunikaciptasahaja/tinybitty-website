@@ -56,64 +56,58 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
   const getSizeMeta = (size: string) => {
     const s = size.toLowerCase();
   
-    if (s.includes('mini')) {
+    // 🔹 For cookies with grams (Large 400gr, Medium 150gr, etc)
+    if (/g[r]?/i.test(size)) {
+      // Extract grams
+      const gramsMatch = size.match(/(\d+\s?g[r]?)/i);
+      const grams = gramsMatch ? gramsMatch[1].replace(/\s+/g, '') : '';
+      
+      // Determine size code (L, M, S, Mini)
+      let code = '';
+      let badgeClass = '';
+      
+      if (s.includes('mini')) {
+        code = 'Mini';
+        badgeClass = 'bg-[#ffe4f0] text-[#b83263]';
+      } else if (s.startsWith('s') || s.includes('small')) {
+        code = 'S';
+        badgeClass = 'bg-[#e0f2fe] text-[#0369a1]';
+      } else if (s.startsWith('m') || s.includes('medium')) {
+        code = 'M';
+        badgeClass = 'bg-[#dcfce7] text-[#166534]';
+      } else if (s.startsWith('l') || s.includes('large')) {
+        code = 'L';
+        badgeClass = 'bg-[#fef9c3] text-[#854d0e]';
+      }
+      
       return {
-        code: 'Mini',
-        label: 'Mini',
-        badgeClass: 'bg-[#ffe4f0] text-[#b83263]',
+        code: code,               // badge: L / M / S / Mini
+        label: grams,             // label: "400gr", "150gr", etc
+        badgeClass: badgeClass,
       };
     }
-  
-    if (s.startsWith('s') || s.includes('small')) {
-      return {
-        code: 'S',
-        label: 'Small',
-        badgeClass: 'bg-[#e0f2fe] text-[#0369a1]',
-      };
-    }
-  
-    if (s.startsWith('m') || s.includes('medium')) {
-      return {
-        code: 'M',
-        label: 'Medium',
-        badgeClass: 'bg-[#dcfce7] text-[#166534]',
-      };
-    }
-  
-    if (s.startsWith('l') || s.includes('large')) {
-      return {
-        code: 'L',
-        label: 'Large',
-        badgeClass: 'bg-[#fef9c3] text-[#854d0e]',
-      };
-    }
-  
-    // 🔹 NEW: for "2 pcs", "4 pcs", etc
+    
+    // 🔹 For "2 pcs", "4 pcs", etc (macaroni)
     if (s.includes('pcs')) {
       const numMatch = size.match(/\d+/);
       const num = numMatch ? numMatch[0] : size.charAt(0);
   
       return {
         code: num,                // badge: 2 / 4 / 9
-        label: `${num} pcs`,      // label: "2 pcs"
+        label: 'pcs',             // label: "pcs"
         badgeClass: 'bg-[#e0f2fe] text-[#1d4ed8]',
       };
     }
   
-    // fallback
+    // fallback for other sizes (like juice "250ml")
     return {
-      code: size.charAt(0).toUpperCase(),
+      code: size,                 // show full size for single-size products
       label: size,
       badgeClass: 'bg-gray-100 text-gray-700',
     };
   };
   
 
-  const extractGrams = (size: string) => {
-    // Matches: 30gr / 100gr / 150g / 400gr / 50 g
-    const match = size.match(/(\d+\s?g[r]?)/i);
-    return match ? match[1].replace(/\s+/g, '') : size; 
-  };
 
   return (
     <Card
@@ -177,108 +171,105 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             {product.description}
           </p>
 
-          {/* Size select – iOS pill style */}
+          {/* Size section - dropdown for multi-size, plain text for single-size */}
           <div className="mt-2">
             <label className="text-[11px] font-semibold tracking-wide text-[#11110a]/85 mb-1.5 block">
               Size
             </label>
 
-            <Select
-              value={selectedVariantIndex.toString()}
-              onValueChange={(value) => setSelectedVariantIndex(parseInt(value))}
-            >
-              <SelectTrigger
-                className="
-                  w-full h-10
-                  rounded-full
-                  border border-[#e5e7eb]
-                  bg-[#f9fafb]
-                  px-3
-                  text-xs
-                  flex items-center justify-between gap-2
-                  shadow-none
-                  ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0
-                  data-[state=open]:bg-white
-                  data-[state=open]:border-[#a3e2f5]
-                  transition-colors
-                "
+            {isMultiSize ? (
+              /* Dropdown for multi-size products (cookies, macaroni) */
+              <Select
+                value={selectedVariantIndex.toString()}
+                onValueChange={(value) => setSelectedVariantIndex(parseInt(value))}
               >
-                <SelectValue placeholder="Pilih ukuran" />
-              </SelectTrigger>
+                <SelectTrigger
+                  className="
+                    w-full h-10
+                    rounded-full
+                    border border-[#e5e7eb]
+                    bg-[#f9fafb]
+                    px-3
+                    text-xs
+                    flex items-center justify-between gap-2
+                    shadow-none
+                    ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0
+                    data-[state=open]:bg-white
+                    data-[state=open]:border-[#a3e2f5]
+                    transition-colors
+                  "
+                >
+                  <SelectValue placeholder="Pilih ukuran" />
+                </SelectTrigger>
 
-              <SelectContent
-                position="popper"
-                side="top"
-                sideOffset={6}
-                className="
-                  z-50
-                  max-w-[280px]
-                  rounded-2xl
-                  border border-[#e5e7eb]
-                  bg-white
-                  shadow-lg
-                  p-1.5
-                "
-              >
+                <SelectContent
+                  position="popper"
+                  side="top"
+                  sideOffset={6}
+                  className="
+                    z-50
+                    max-w-[280px]
+                    rounded-2xl
+                    border border-[#e5e7eb]
+                    bg-white
+                    shadow-lg
+                    p-1.5
+                  "
+                >
 
-                {product.variants.map((variant, index) => {
-                    // 👇 detect if this size uses grams (for cookies)
-                    const hasGrams = /g[r]?/i.test(variant.size);
+                  {product.variants.map((variant, index) => {
+                      const meta = getSizeMeta(variant.size);
 
-                    // juice: handled above with !isMultiSize, so here it's cookies & macaroni
-                    const meta = getSizeMeta(variant.size);
+                      return (
+                        <SelectItem
+                          key={index}
+                          value={index.toString()}
+                          className="
+                            text-xs
+                            py-1.5 px-2
+                            rounded-full
+                            data-[state=checked]:bg-[#e0f2fe]
+                            data-[state=checked]:text-[#0f172a]
+                            data-[highlighted]:bg-[#f3f4f6]
+                            data-[highlighted]:text-[#111827]
+                            cursor-pointer
+                            focus:bg-[#f3f4f6]
+                            focus:text-[#111827]
+                          "
+                        >
+                          <div className="flex items-center gap-2.5">
+                            {/* Size icon pill */}
+                            <div
+                              className={`
+                                flex items-center justify-center
+                                w-7 h-7
+                                rounded-full
+                                text-[11px] font-semibold
+                                ${meta.badgeClass}
+                              `}
+                            >
+                              {meta.code}
+                            </div>
 
-                    return (
-                      <SelectItem
-                        key={index}
-                        value={index.toString()}
-                        className="
-                          text-xs
-                          py-1.5 px-2
-                          rounded-full
-                          data-[state=checked]:bg-[#e0f2fe]
-                          data-[state=checked]:text-[#0f172a]
-                          data-[highlighted]:bg-[#f3f4f6]
-                          data-[highlighted]:text-[#111827]
-                          cursor-pointer
-                          focus:bg-[#f3f4f6]
-                          focus:text-[#111827]
-                        "
-                      >
-                        <div className="flex items-center gap-2.5">
-                          {/* Size icon pill */}
-                          <div
-                            className={`
-                              flex items-center justify-center
-                              w-7 h-7
-                              rounded-full
-                              text-[11px] font-semibold
-                              ${meta.badgeClass}
-                            `}
-                          >
-                            {meta.code}
-                          </div>
-
-                          {/* Texts */}
-                          <div className="flex flex-col leading-tight">
-                            <span className="text-[13px] font-semibold text-[#11110a]">
-                              {meta.label}
-                            </span>
-
-                            {/* Only show second line for gram-based sizes (cookies) */}
-                            {hasGrams && (
-                              <span className="text-[11px] text-[#6b7280]">
-                                {extractGrams(variant.size)}
+                            {/* Texts - for cookies show only grams, for macaroni show only number */}
+                            <div className="flex flex-col leading-tight">
+                              <span className="text-[13px] font-semibold text-[#11110a]">
+                                {meta.label}
                               </span>
-                            )}
+                            </div>
                           </div>
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
+                        </SelectItem>
+                      );
+                    })}
 
-              </SelectContent>
-            </Select>
+                </SelectContent>
+              </Select>
+            ) : (
+              /* Plain text for single-size products (juice) */
+              <div className="flex items-center justify-center w-16 h-8 rounded-full bg-[#e0f2fe] text-[#1d4ed8] text-[11px] font-semibold">
+                {selectedVariant.size}
+              </div>
+            )}
           </div>
 
         </div>

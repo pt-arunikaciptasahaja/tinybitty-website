@@ -1,11 +1,7 @@
-// Main delivery calculator that coordinates scrapers and fallback
-// Implements the core workflow: validate address → try scrapers → fallback if needed
+// Main delivery calculator using custom zone-based formula
+// Implements the core workflow: validate address → use custom zone-based calculation
 
-import { ScraperResult, DeliveryCalculation } from '../types';
-import { goSendScraper } from '../scrapers/gosend';
-import { grabExpressScraper } from '../scrapers/grab';
-import { paxelScraper } from '../scrapers/paxel';
-import { DeliveryParser } from './parser';
+import { DeliveryCalculation } from '../types';
 import { fallbackCost, FallbackResult } from './fallback';
 import { validateAddress } from '../zones/deliveryZones';
 
@@ -13,8 +9,7 @@ export class DeliveryCalculator {
   /**
    * Main calculation workflow
    * 1. Validate address
-   * 2. Try scrapers in priority order
-   * 3. Use fallback if scrapers fail
+   * 2. Use custom zone-based formula
    */
   static async calculate(
     address: string,
@@ -28,99 +23,13 @@ export class DeliveryCalculator {
       throw new Error('Invalid address: unable to identify delivery zone');
     }
 
-    // Step 2: Try to get live pricing from scrapers
-    const liveResult = await this.tryScrapers(address, method, cart, forceProvider);
-    
-    if (liveResult) {
-      return liveResult;
-    }
-
-    // Step 3: Fallback to zone-based calculation
-    console.log(`[Calculator] Using fallback for ${address} with ${method}`);
+    // Step 2: Use our custom zone-based formula directly
+    console.log(`[Calculator] Using custom formula for ${address} with ${method}`);
     return this.calculateFallback(address, method, cart);
   }
 
   /**
-   * Try scrapers in priority order
-   */
-  private static async tryScrapers(
-    address: string,
-    method: string,
-    cart: any[],
-    forceProvider?: 'gosend' | 'grab' | 'paxel'
-  ): Promise<DeliveryCalculation | null> {
-    
-    const providers = this.getProviderPriority(method, forceProvider);
-    
-    for (const provider of providers) {
-      try {
-        console.log(`[Calculator] Trying ${provider} for ${address}`);
-        
-        const scraperResult = await this.getScraperResult(provider, address, cart);
-        
-        if (scraperResult) {
-          // Parse and validate result
-          const parsed = DeliveryParser.parseScraperResult(scraperResult, address, cart);
-          const validation = DeliveryParser.validateResult(parsed, address);
-          
-          if (validation.isValid && parsed.confidence >= 0.5) {
-            console.log(`[Calculator] ${provider} succeeded with ${Math.round(parsed.confidence * 100)}% confidence`);
-            
-            return {
-              cost: parsed.price,
-              provider: scraperResult.provider,
-              zone: {} as any, // Will be populated by fallback if needed
-              isLive: true,
-              estimated: false,
-              breakdown: {
-                baseRate: parsed.adjustments.basePrice,
-                distanceMultiplier: 1,
-                weightCharge: parsed.adjustments.weightCharge || 0,
-                surcharges: parsed.adjustments.surcharge || 0
-              }
-            };
-          } else {
-            console.warn(`[Calculator] ${provider} result invalid or low confidence:`, validation.issues);
-          }
-        }
-        
-      } catch (error) {
-        console.warn(`[Calculator] ${provider} failed:`, error);
-        continue; // Try next provider
-      }
-    }
-    
-    return null; // All scrapers failed
-  }
-
-  /**
-   * Get scraper result for specific provider
-   */
-  private static async getScraperResult(
-    provider: 'gosend' | 'grab' | 'paxel',
-    address: string,
-    cart: any[]
-  ): Promise<ScraperResult | null> {
-    
-    try {
-      switch (provider) {
-        case 'gosend':
-          return await goSendScraper.scrapePrice(address, cart);
-        case 'grab':
-          return await grabExpressScraper.scrapePrice(address, cart);
-        case 'paxel':
-          return await paxelScraper.scrapePrice(address, cart);
-        default:
-          return null;
-      }
-    } catch (error) {
-      console.error(`[Calculator] ${provider} scraper error:`, error);
-      return null;
-    }
-  }
-
-  /**
-   * Calculate using fallback zones
+   * Calculate using custom zone-based formula
    */
   private static calculateFallback(
     address: string,
@@ -134,38 +43,10 @@ export class DeliveryCalculator {
       cost: fallbackResult.cost,
       provider: this.getProviderFromMethod(method),
       zone: fallbackResult.zone,
-      isLive: false,
+      isLive: false, // Using our custom formula, not live data
       estimated: true,
       breakdown: fallbackResult.breakdown
     };
-  }
-
-  /**
-   * Get provider priority based on method and user preference
-   */
-  private static getProviderPriority(
-    method: string,
-    forceProvider?: 'gosend' | 'grab' | 'paxel'
-  ): ('gosend' | 'grab' | 'paxel')[] {
-    
-    // If user has forced a provider, only try that one
-    if (forceProvider) {
-      return [forceProvider];
-    }
-    
-    // Default priority based on method
-    switch (method.toLowerCase()) {
-      case 'gosendinstant':
-      case 'gosend':
-        return ['gosend', 'grab', 'paxel'];
-      case 'grabexpress':
-      case 'grab':
-        return ['grab', 'gosend', 'paxel'];
-      case 'paxel':
-        return ['paxel', 'gosend', 'grab'];
-      default:
-        return ['gosend', 'grab', 'paxel'];
-    }
   }
 
   /**
@@ -208,9 +89,9 @@ export class DeliveryCalculator {
           return { method, result };
         } catch (error) {
           console.error(`[Calculator] Batch calculation failed for ${method}:`, error);
-          return { 
-            method, 
-            result: await this.createErrorResult(address, method, error) 
+          return {
+            method,
+            result: await this.createErrorResult(address, method, error)
           };
         }
       });
@@ -234,7 +115,6 @@ export class DeliveryCalculator {
   ): Promise<DeliveryCalculation> {
     
     try {
-      // Try cached result first or quick scrape
       return await this.calculate(address, method, cart);
     } catch (error) {
       // If calculation fails, create a basic estimate
@@ -275,7 +155,7 @@ export class DeliveryCalculator {
           name: 'Unknown',
           cities: [],
           districts: [],
-          baseRates: { gosendInstant: 50000, grab: 55000, paxel: 45000 },
+          baseRates: { gosendInstant: 50000, gosendSameDay: 35000, grab: 55000, paxel: 45000 },
           distance: 'medium'
         },
         isLive: false,

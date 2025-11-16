@@ -37,13 +37,13 @@ export default function ProductSection({
             <img
               src={icon}
               alt={`${title} icon`}
-              className="w-48 h-48 md:w-52 md:h-52 object-contain mx-auto -mb-2"
+              className="w-80 h-80 md:w-72 md:h-72 object-contain mx-auto -mb-4"
             />
           ) : (
             <div className="text-5xl -mb-2">{icon}</div>
           )}
         </div>
-          <h2 className="text-3xl md:text-4xl font-bold text-[#553d8f] mb-1 knewave-regular">
+          <h2 className="text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 -mt-[110px] knewave-regular">
             {title}
           </h2>
           <p className="text-gray-600 text-base md:text-lg font-semibold max-w-2xl mx-auto patrick-hand-sc-regular">

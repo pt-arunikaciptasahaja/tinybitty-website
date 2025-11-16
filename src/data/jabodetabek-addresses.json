@@ -5,7 +5,6 @@
     "36": "Banten"
   },
   "kota": {
-    "31.01": "Kabupaten Administrasi Kepulauan Seribu",
     "31.71": "Kota Administrasi Jakarta Pusat",
     "31.72": "Kota Administrasi Jakarta Utara",
     "31.73": "Kota Administrasi Jakarta Barat",
@@ -21,8 +20,6 @@
     "36.74": "Kota Tangerang Selatan"
   },
   "kecamatan": {
-    "31.01.01": "Kepulauan Seribu Utara",
-    "31.01.02": "Kepulauan Seribu Selatan",
     "31.71.01": "Gambir",
     "31.71.02": "Sawah Besar",
     "31.71.03": "Kemayoran",
@@ -157,12 +154,6 @@
     "36.74.07": "Setu"
   },
   "kelurahan": {
-    "31.01.01.1001": "Pulau Panggang",
-    "31.01.01.1002": "Pulau Kelapa",
-    "31.01.01.1003": "Pulau Harapan",
-    "31.01.02.1001": "Pulau Untung Jawa",
-    "31.01.02.1002": "Pulau Tidung",
-    "31.01.02.1003": "Pulau Pari",
     "31.71.01.1001": "Gambir",
     "31.71.01.1002": "Cideng",
     "31.71.01.1003": "Petojo Utara",

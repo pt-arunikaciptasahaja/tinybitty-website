@@ -18,21 +18,21 @@ export default function Home() {
       <main id="products">
         <ProductSection
           title="Cookies"
-          description="Crispy and delicious dry cookies, perfect for snacks or gifts"
+          description="Kue kering lezat yang crunchy, ideal untuk cemilan harian atau sebagai hampers istimewa."
           products={productsData.cookies}
           icon="/cookies-icon.png"
         />
         
         <ProductSection
           title="Tiny Juice"
-          description="Fresh juice without preservatives, made from quality selected fruits"
+          description="Jus alami tanpa pengawet, diolah dari buah segar berkualitas—cocok diminum kapan pun kamu butuh penyegar yang alami."
           products={productsData.juice}
           icon="/juice-icon.png"
         />
         
         <ProductSection
           title="Macaroni Schotel"
-          description="Baked macaroni with creamy and savory cheese sauce"
+          description="Macaroni panggang dengan saus keju gurih dan super creamy—sempurna untuk makan siang, makan malam, atau sekadar craving sesuatu yang enak."
           products={productsData.macaroni}
           icon="/mac-icon.png"
         />
