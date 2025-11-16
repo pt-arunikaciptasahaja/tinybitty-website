@@ -51,8 +51,8 @@ export default function ProductSection({
           </p>
         </div>
 
-        {/* Vertical list like Nakedpress */}
-        <div className="flex flex-col gap-4 md:gap-5">
+        {/* Compact grid layout for desktop */}
+        <div className="grid grid-cols-1 gap-4 md:gap-5 lg:gap-4 lg:grid-cols-2 xl:grid-cols-3">
           {products.map((product) => (
             <ProductCard key={product.id} product={product} />
           ))}

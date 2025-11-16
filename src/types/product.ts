@@ -23,7 +23,14 @@ export interface CartItem {
 export interface OrderFormData {
   name: string;
   phone: string;
-  address: string;
+  // Legacy single address field for backward compatibility
+  address?: string;
+  // New structured address fields
+  provinsi?: string;
+  kota?: string;
+  kecamatan?: string;
+  kelurahan?: string;
+  detailedAddress?: string; // For street, building number, etc.
   deliveryMethod: 'gosend' | 'grab' | 'paxel' | 'pickup';
   paymentMethod: 'transfer' | 'cod' | 'ewallet';
   notes?: string;

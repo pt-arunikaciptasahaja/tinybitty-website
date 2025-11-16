@@ -16,6 +16,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from '@/components/ui/use-toast';
 import Lottie from 'lottie-react';
 import deliveryAnimation from '@/data/delivery-man-bike.json';
+import wilayahData from '@/data/jabodetabek-addresses.json';
 import { MessageCircle, CheckCircle2, Clock, Truck, MapPin, Timer, AlertCircle } from 'lucide-react';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
@@ -45,6 +46,11 @@ export default function OrderForm() {
   const [orderData, setOrderData] = useState<OrderFormData | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
+  
+  // Address dropdown options
+  const [availableKota, setAvailableKota] = useState<Record<string, string>>({});
+  const [availableKecamatan, setAvailableKecamatan] = useState<Record<string, string>>({});
+  const [availableKelurahan, setAvailableKelurahan] = useState<Record<string, string>>({});
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderFormSchema),
@@ -53,7 +59,14 @@ export default function OrderForm() {
     defaultValues: {
       name: '',
       phone: '',
+      // Legacy field (will be deprecated)
       address: '',
+      // New structured address fields
+      provinsi: '',
+      kota: '',
+      kecamatan: '',
+      kelurahan: '',
+      detailedAddress: '',
       deliveryMethod: undefined,
       paymentMethod: undefined,
       notes: '',
@@ -61,15 +74,109 @@ export default function OrderForm() {
   });
 
   // Watch for changes in address and delivery method to calculate delivery cost
-  const address = form.watch('address');
+  const selectedProvinsi = form.watch('provinsi');
+  const selectedKota = form.watch('kota');
+  const selectedKecamatan = form.watch('kecamatan');
+  const selectedKelurahan = form.watch('kelurahan');
+  const detailedAddress = form.watch('detailedAddress');
   const deliveryMethod = form.watch('deliveryMethod');
   const paymentMethod = form.watch('paymentMethod');
 
+  // Helper function to generate full address string for delivery calculation
+  const generateFullAddress = () => {
+    const parts = [];
+    
+    if (selectedProvinsi && wilayahData.provinsi[selectedProvinsi]) {
+      parts.push(wilayahData.provinsi[selectedProvinsi]);
+    }
+    if (selectedKota && wilayahData.kota[selectedKota]) {
+      parts.push(wilayahData.kota[selectedKota]);
+    }
+    if (selectedKecamatan && wilayahData.kecamatan[selectedKecamatan]) {
+      parts.push(wilayahData.kecamatan[selectedKecamatan]);
+    }
+    if (selectedKelurahan && wilayahData.kelurahan[selectedKelurahan]) {
+      parts.push(wilayahData.kelurahan[selectedKelurahan]);
+    }
+    if (detailedAddress && detailedAddress.trim()) {
+      parts.push(detailedAddress.trim());
+    }
+    
+    return parts.join(', ');
+  };
+
+  // Helper function to update dropdown options based on selection
+  const updateDropdownOptions = () => {
+    if (selectedProvinsi) {
+      // Filter kota based on selected provinsi
+      const filteredKota: Record<string, string> = {};
+      Object.entries(wilayahData.kota).forEach(([code, name]) => {
+        if (code.startsWith(selectedProvinsi)) {
+          filteredKota[code] = name;
+        }
+      });
+      setAvailableKota(filteredKota);
+      
+      // Reset dependent dropdowns
+      if (!selectedKota || !filteredKota[selectedKota]) {
+        form.setValue('kota', '');
+      }
+    } else {
+      setAvailableKota({});
+      form.setValue('kota', '');
+    }
+
+    if (selectedKota) {
+      // Filter kecamatan based on selected kota
+      const filteredKecamatan: Record<string, string> = {};
+      Object.entries(wilayahData.kecamatan).forEach(([code, name]) => {
+        if (code.startsWith(selectedKota)) {
+          filteredKecamatan[code] = name;
+        }
+      });
+      setAvailableKecamatan(filteredKecamatan);
+      
+      // Reset dependent dropdowns
+      if (!selectedKecamatan || !filteredKecamatan[selectedKecamatan]) {
+        form.setValue('kecamatan', '');
+      }
+    } else {
+      setAvailableKecamatan({});
+      form.setValue('kecamatan', '');
+    }
+
+    if (selectedKecamatan) {
+      // Filter kelurahan based on selected kecamatan
+      const filteredKelurahan: Record<string, string> = {};
+      Object.entries(wilayahData.kelurahan).forEach(([code, name]) => {
+        if (code.startsWith(selectedKecamatan)) {
+          filteredKelurahan[code] = name;
+        }
+      });
+      setAvailableKelurahan(filteredKelurahan);
+      
+      // Reset dependent dropdown
+      if (!selectedKelurahan || !filteredKelurahan[selectedKelurahan]) {
+        form.setValue('kelurahan', '');
+      }
+    } else {
+      setAvailableKelurahan({});
+      form.setValue('kelurahan', '');
+    }
+  };
+
+  // Update dropdown options when province changes
+  useEffect(() => {
+    updateDropdownOptions();
+  }, [selectedProvinsi, selectedKota, selectedKecamatan]);
+
   // Calculate delivery cost when address or delivery method changes
   useEffect(() => {
-    if (address && address.trim().length >= 3) {
+    const fullAddress = generateFullAddress();
+    
+    if (fullAddress && fullAddress.length >= 10) {
       // Check address validity first
-      const isValid = validateAddress(address);
+      const isValid = validateAddress(fullAddress);
 
       if (!isValid) {
         setDeliveryInfo({
@@ -79,14 +186,14 @@ export default function OrderForm() {
           formattedCost: 'Invalid',
           confidence: 'invalid',
           isValid: false,
-          validationError: 'Please enter a valid city or area name (e.g., Jakarta, Depok, Bogor)'
+          validationError: 'Please select a valid address from the dropdown menus'
         });
         return;
       }
 
       // Address is valid, calculate delivery
       if (deliveryMethod) {
-        const calculation = calculateDeliveryCost(address, deliveryMethod, cart, getTotalPrice());
+        const calculation = calculateDeliveryCost(fullAddress, deliveryMethod, cart, getTotalPrice());
         setDeliveryInfo({
           cost: calculation.cost,
           zone: calculation.zone.name,
@@ -109,7 +216,7 @@ export default function OrderForm() {
     } else {
       setDeliveryInfo(null);
     }
-  }, [address, deliveryMethod, cart, getTotalPrice, paymentMethod]);
+  }, [selectedProvinsi, selectedKota, selectedKecamatan, selectedKelurahan, detailedAddress, deliveryMethod, cart, getTotalPrice, paymentMethod]);
 
   // Timer effect for thank you modal
   useEffect(() => {
@@ -155,10 +262,11 @@ export default function OrderForm() {
     }
 
     // Check if address is valid
-    if (!validateAddress(data.address)) {
+    const fullAddress = generateFullAddress();
+    if (!validateAddress(fullAddress)) {
       toast({
         title: 'Invalid Address',
-        description: 'Please enter a valid city or area name (e.g., Jakarta, Depok, Bogor)',
+        description: 'Please complete all address fields',
         variant: 'destructive',
       });
       return;
@@ -198,7 +306,7 @@ export default function OrderForm() {
   const { isValid } = form.formState;
 
   return (
-    <section id="order" className="py-16 order-form-texture rounded-3xl">
+    <section id="order" className="mb-12 md:mb-16 py-16 order-form-texture rounded-3xl">
       <div className="container mx-auto px-4 max-w-3xl">
         <Card className="border-2 border-[#a3e2f5]/30 shadow-2xl rounded-3xl overflow-hidden">
           <CardHeader className="bg-[#edadc3]/10 border-b border-[#a3e2f5]/30">
@@ -265,36 +373,149 @@ export default function OrderForm() {
                 )}
               />
 
-                <FormField
-                  control={form.control}
-                  name="address"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel className="text-[#11110a] font-semibold">Full Address</FormLabel>
-                      <FormControl>
-                        <Textarea
-                          placeholder="Street 123, Jakarta, Indonesia"
-                          {...field}
-                          className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f] min-h-[100px]"
-                        />
-                      </FormControl>
-                      <div className="text-xs text-[#11110a]/60 mt-1">
-                        💡 Tip: Include your city/area (e.g., Jakarta, Depok, Bogor, Tangerang)
-                      </div>
-                      <div className="text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg mt-2">
-                        ℹ️ Note: Delivery costs shown are estimates. Final costs will be confirmed via WhatsApp.
-                      </div>
-                      <FormMessage />
-                      {/* Custom validation error for address */}
-                      {deliveryInfo && !deliveryInfo.isValid && deliveryInfo.validationError && (
-                        <div className="flex items-center gap-2 text-red-600 text-sm mt-2">
-                          <AlertCircle className="w-4 h-4" />
-                          <span>{deliveryInfo.validationError}</span>
-                        </div>
-                      )}
-                    </FormItem>
+                {/* Structured Address Selection */}
+                <div className="space-y-4">
+                  <div className="text-[#11110a] font-semibold mb-2">📍 Complete Address</div>
+                  
+                  {/* Provinsi Dropdown */}
+                  <FormField
+                    control={form.control}
+                    name="provinsi"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Provinsi</FormLabel>
+                        <Select onValueChange={field.onChange} defaultValue={field.value}>
+                          <FormControl>
+                            <SelectTrigger className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]">
+                              <SelectValue placeholder="Pilih Provinsi" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(wilayahData.provinsi).map(([code, name]) => (
+                              <SelectItem key={code} value={code}>{name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Kota Dropdown */}
+                  <FormField
+                    control={form.control}
+                    name="kota"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kota/Kabupaten</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={!selectedProvinsi}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]">
+                              <SelectValue placeholder="Pilih Kota/Kabupaten" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(availableKota).map(([code, name]) => (
+                              <SelectItem key={code} value={code}>{name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Kecamatan Dropdown */}
+                  <FormField
+                    control={form.control}
+                    name="kecamatan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kecamatan</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={!selectedKota}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]">
+                              <SelectValue placeholder="Pilih Kecamatan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(availableKecamatan).map(([code, name]) => (
+                              <SelectItem key={code} value={code}>{name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Kelurahan Dropdown */}
+                  <FormField
+                    control={form.control}
+                    name="kelurahan"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Kelurahan</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={!selectedKecamatan}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]">
+                              <SelectValue placeholder="Pilih Kelurahan" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            {Object.entries(availableKelurahan).map(([code, name]) => (
+                              <SelectItem key={code} value={code}>{name}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Detailed Address Input */}
+                  <FormField
+                    control={form.control}
+                    name="detailedAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Detail Alamat (Jalan, Nomor Rumah, dll)</FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Jl. Raya examples No. 123 RT 001 RW 002"
+                            {...field}
+                            className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f] min-h-[80px]"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <div className="text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
+                    ℹ️ Note: Delivery costs shown are estimates. Final costs will be confirmed via WhatsApp.
+                  </div>
+                  
+                  {/* Custom validation error for address */}
+                  {deliveryInfo && !deliveryInfo.isValid && deliveryInfo.validationError && (
+                    <div className="flex items-center gap-2 text-red-600 text-sm">
+                      <AlertCircle className="w-4 h-4" />
+                      <span>{deliveryInfo.validationError}</span>
+                    </div>
                   )}
-                />
+                </div>
 
               <FormField
                 control={form.control}

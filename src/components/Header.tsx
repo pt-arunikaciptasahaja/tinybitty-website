@@ -12,8 +12,8 @@ export default function Header() {
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
 
   return (
-    <header className="fixed top-4 left-4 right-4 z-50">
-      <div className="container mx-auto">
+    <header className="fixed top-4 left-0 right-0 z-50">
+      <div className="mx-4 md:mx-8 lg:mx-12 xl:mx-16">
         <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-4 py-3">
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
@@ -31,31 +31,31 @@ export default function Header() {
             <nav className="hidden md:flex items-center gap-6">
               <a
                 href="#products"
-                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+                className="text-sm font-medium text-[#11110a] nav-link-hover"
               >
                 Products
               </a>
               <Link
                 to="/faq"
-                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+                className="text-sm font-medium text-[#11110a] nav-link-hover"
               >
                 FAQ
               </Link>
               <Link
                 to="/ingredients"
-                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+                className="text-sm font-medium text-[#11110a] nav-link-hover"
               >
                 Ingredients
               </Link>
               <Link
                 to="/our-story"
-                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+                className="text-sm font-medium text-[#11110a] nav-link-hover"
               >
                 Our Story
               </Link>
               <a
                 href="#order"
-                className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-colors duration-200"
+                className="text-sm font-medium text-[#11110a] nav-link-hover"
               >
                 Order
               </a>

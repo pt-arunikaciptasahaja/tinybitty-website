@@ -14,7 +14,15 @@ export const orderFormSchema = z.object({
       { message: 'Gunakan nomor Indonesia yang dimulai dengan 0 atau 62' }
     ),
 
-  address: z.string().min(10, 'Alamat minimal 10 karakter'),
+  // Legacy single address field for backward compatibility
+  address: z.string().optional(),
+  
+  // New structured address fields
+  provinsi: z.string().min(1, 'Provinsi wajib dipilih'),
+  kota: z.string().min(1, 'Kota/Kabupaten wajib dipilih'),
+  kecamatan: z.string().min(1, 'Kecamatan wajib dipilih'),
+  kelurahan: z.string().min(1, 'Kelurahan wajib dipilih'),
+  detailedAddress: z.string().min(5, 'Detail alamat (jalan, nomor rumah) minimal 5 karakter'),
 
   deliveryMethod: z.enum(['gosend', 'grab', 'paxel', 'pickup'], {
     required_error: 'Pilih metode pengiriman',

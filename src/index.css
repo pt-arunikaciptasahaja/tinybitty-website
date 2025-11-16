@@ -6,13 +6,13 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
+    --background: 210 12% 96.9%;
     --foreground: 222.2 84% 4.9%;
 
-    --card: 0 0% 100%;
+    --card: 210 12% 96.9%;
     --card-foreground: 222.2 84% 4.9%;
 
-    --popover: 0 0% 100%;
+    --popover: 210 12% 96.9%;
     --popover-foreground: 222.2 84% 4.9%;
 
     --primary: 222.2 47.4% 11.2%;
@@ -35,6 +35,8 @@
     --ring: 222.2 84% 4.9%;
 
     --radius: 0.75rem;
+
+    --mobile-header-height: 128px;
   }
 
   .dark {
@@ -105,6 +107,61 @@
     font-weight: 400;
     font-style: normal;
   }
+}
+
+/* Header navigation hover effect */
+.nav-link-hover {
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+.nav-link-hover::after {
+  content: '';
+  position: absolute;
+  width: 0;
+  height: 2px;
+  bottom: -2px;
+  left: 50%;
+  background-color: #553d8f;
+  transition: all 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.nav-link-hover:hover::after {
+  width: 100%;
+}
+
+.nav-link-hover:hover {
+  color: #553d8f;
+}
+
+/* Running text ticker */
+.running-text-container {
+  background: linear-gradient(90deg, #f5f7f7 0%, #ffe4e1 25%, #ffe4e1 75%, #f5f7f7 100%);
+  border-top: 2px solid #ff993c;
+  border-bottom: 2px solid #ff993c;
+  box-shadow: 0 4px 20px rgba(255, 153, 60, 0.1);
+}
+
+.running-text-item {
+  display: inline-block;
+  white-space: nowrap;
+  user-select: none;
+  cursor: default;
+}
+
+.running-text-item:hover {
+  animation-play-state: paused;
+}
+
+/* Enhanced star animation for running text */
+@keyframes sparkle {
+  0%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
+  50% { transform: rotate(180deg) scale(1.2); opacity: 0.8; }
+}
+
+.star-animation {
+  animation: sparkle 2s ease-in-out infinite;
 }
 
 /* Smooth scrolling */
@@ -276,4 +333,41 @@ html {
 .cookie-texture {
   /* background-color: #DFDBE5; */
   background-image: url("data:image/svg+xml,%3Csvg width='52' height='26' viewBox='0 0 52 26' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%239C92AC' fill-opacity='0.4'%3E%3Cpath d='M10 10c0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6h2c0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4 3.314 0 6 2.686 6 6 0 2.21 1.79 4 4 4v2c-3.314 0-6-2.686-6-6 0-2.21-1.79-4-4-4-3.314 0-6-2.686-6-6zm25.464-1.95l8.486 8.486-1.414 1.414-8.486-8.486 1.414-1.414z' /%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* Apply mask only on mobile */
+.hero-mask {
+  mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+}
+
+@media (min-width: 768px) {
+  .hero-mask {
+    mask-image: none;
+    -webkit-mask-image: none;
+  }
+}
+
+.drop-outline {
+  text-shadow:
+    2px 2px 0 #fff,
+    -2px 2px 0 #fff,
+    2px -2px 0 #fff,
+    -2px -2px 0 #fff;
+}
+
+.no-outline {
+  text-shadow: none !important;
+  filter: none !important;
+}
+
+/* Cookie emoji bounce */
+.emoji-bounce {
+  display: inline-block;
+  animation: bounce 0.6s infinite ease-in-out;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
 }

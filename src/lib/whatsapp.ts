@@ -1,4 +1,5 @@
 import { CartItem, OrderFormData } from '@/types/product';
+import wilayahData from '@/data/jabodetabek-addresses.json';
 
 export const buildWhatsAppMessage = (
   orderData: OrderFormData,
@@ -21,7 +22,35 @@ export const buildWhatsAppMessage = (
   message += `**Data Pelanggan**\n`;
   message += `* Nama: ${orderData.name}\n`;
   message += `* No. HP: ${orderData.phone}\n`;
-  message += `* Alamat: ${orderData.address}\n\n`;
+  
+  // Build structured address for WhatsApp message
+  const buildAddressFromData = (data: OrderFormData): string => {
+    const parts = [];
+    
+    if (data.provinsi && wilayahData.provinsi[data.provinsi]) {
+      parts.push(wilayahData.provinsi[data.provinsi]);
+    }
+    
+    if (data.kota && wilayahData.kota[data.kota]) {
+      parts.push(wilayahData.kota[data.kota]);
+    }
+    
+    if (data.kecamatan && wilayahData.kecamatan[data.kecamatan]) {
+      parts.push(wilayahData.kecamatan[data.kecamatan]);
+    }
+    
+    if (data.kelurahan && wilayahData.kelurahan[data.kelurahan]) {
+      parts.push(wilayahData.kelurahan[data.kelurahan]);
+    }
+    
+    if (data.detailedAddress) {
+      parts.push(data.detailedAddress);
+    }
+    
+    return parts.join(', ');
+  };
+  
+  message += `* Alamat: ${buildAddressFromData(orderData)}\n\n`;
 
   message += `**Detail Pesanan**\n`;
   cart.forEach((item, index) => {

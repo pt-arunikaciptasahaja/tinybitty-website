@@ -1,5 +1,6 @@
 import Header from './Header';
 import Hero from './Hero';
+import RunningText from './RunningText';
 import ProductSection from './ProductSection';
 import OrderForm from './OrderForm';
 import Footer from './Footer';
@@ -8,11 +9,13 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen px-4 md:px-8 lg:px-12 xl:px-16" style={{ backgroundColor: '#f5f7f7' }}>
       <Header />
       <Hero />
       
-      <main id="products" className="container mx-auto px-4">
+      <RunningText />
+      
+      <main id="products">
         <ProductSection
           title="Cookies"
           description="Crispy and delicious dry cookies, perfect for snacks or gifts"
@@ -35,11 +38,7 @@ export default function Home() {
         />
       </main>
 
-      <section id="order" className="py-4 bg-gray-50">
-        <div className="container mx-auto px-4">
-          <OrderForm />
-        </div>
-      </section>
+      <OrderForm />
 
       <Footer />
       <Toaster />
