@@ -44,13 +44,13 @@ export default function Hero() {
             </p>
 
             <div className="flex justify-center">
-              <Button
-                onClick={() => document.getElementById('order')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#553d8f] hover:bg-[#553d8f]/90 text-white px-6 py-2.5 rounded-full font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                Order Now!
-              </Button>
-            </div>
+                        <Button
+                          onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
+                          className="bg-[#553d8f] hover:bg-[#553d8f]/90 text-white px-6 py-2.5 rounded-full font-medium text-sm shadow-lg hover:shadow-xl transition-all duration-300"
+                        >
+                          Order Now!
+                        </Button>
+                      </div>
           </div>
         </div>
       </div>

@@ -21,7 +21,7 @@ export const orderFormSchema = z.object({
   provinsi: z.string().min(1, 'Provinsi wajib dipilih'),
   kota: z.string().min(1, 'Kota/Kabupaten wajib dipilih'),
   kecamatan: z.string().min(1, 'Kecamatan wajib dipilih'),
-  kelurahan: z.string().min(1, 'Kelurahan wajib dipilih'),
+  kelurahan: z.string().optional(),
   detailedAddress: z.string().min(5, 'Detail alamat (jalan, nomor rumah) minimal 5 karakter'),
 
   deliveryMethod: z.enum(['gosend', 'grab', 'paxel', 'pickup'], {

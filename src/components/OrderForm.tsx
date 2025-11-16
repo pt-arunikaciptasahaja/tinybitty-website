@@ -6,6 +6,7 @@ import { OrderFormData } from '@/types/product';
 import { useCart } from '@/contexts/CartContext';
 import { buildWhatsAppMessage, sendWhatsAppOrder } from '@/lib/whatsapp';
 import { calculateDeliveryCost, formatDeliveryCost, getDeliveryInfo, validateAddress } from '@/lib/deliveryCalculator';
+import { calculateShippingCost, getQuickShippingEstimate } from '@/lib/shippingService';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -41,7 +42,7 @@ export default function OrderForm() {
   const { toast } = useToast();
   const [showThankYouModal, setShowThankYouModal] = useState(false);
   const [customerName, setCustomerName] = useState('');
-  const [timer, setTimer] = useState(3);
+  const [timer, setTimer] = useState(5);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
   const [orderData, setOrderData] = useState<OrderFormData | null>(null);
   const [orderTotal, setOrderTotal] = useState(0);
@@ -81,6 +82,33 @@ export default function OrderForm() {
   const detailedAddress = form.watch('detailedAddress');
   const deliveryMethod = form.watch('deliveryMethod');
   const paymentMethod = form.watch('paymentMethod');
+
+  // Async function to calculate shipping cost using the new distance-based engine
+  const calculateShippingCosts = async (fullAddress: string, method: string) => {
+    try {
+      const calculation = await calculateShippingCost(fullAddress, method, cart);
+      return {
+        cost: calculation.cost,
+        zone: calculation.zone.name,
+        time: calculation.estimatedTime,
+        formattedCost: formatDeliveryCost(calculation.cost),
+        confidence: calculation.confidence,
+        isValid: calculation.isValidAddress
+      };
+    } catch (error) {
+      console.error('Error calculating shipping cost:', error);
+      // Fallback to the old calculation method
+      const fallbackCalculation = calculateDeliveryCost(fullAddress, method, cart, getTotalPrice());
+      return {
+        cost: fallbackCalculation.cost,
+        zone: fallbackCalculation.zone.name,
+        time: fallbackCalculation.estimatedTime,
+        formattedCost: formatDeliveryCost(fallbackCalculation.cost),
+        confidence: fallbackCalculation.confidence,
+        isValid: fallbackCalculation.isValidAddress
+      };
+    }
+  };
 
   // Helper function to generate full address string for delivery calculation
   const generateFullAddress = () => {
@@ -179,7 +207,7 @@ export default function OrderForm() {
       const isValid = validateAddress(fullAddress);
 
       if (!isValid) {
-        setDeliveryInfo({
+        const info = {
           cost: 0,
           zone: '',
           time: '',
@@ -187,23 +215,27 @@ export default function OrderForm() {
           confidence: 'invalid',
           isValid: false,
           validationError: 'Please select a valid address from the dropdown menus'
-        });
+        };
+        setDeliveryInfo(info);
+        (window as any).__deliveryInfo = info;
         return;
       }
 
       // Address is valid, calculate delivery
       if (deliveryMethod) {
         const calculation = calculateDeliveryCost(fullAddress, deliveryMethod, cart, getTotalPrice());
-        setDeliveryInfo({
+        const info = {
           cost: calculation.cost,
           zone: calculation.zone.name,
           time: calculation.estimatedTime,
           formattedCost: formatDeliveryCost(calculation.cost),
           confidence: calculation.confidence,
           isValid: true
-        });
+        };
+        setDeliveryInfo(info);
+        (window as any).__deliveryInfo = info;
       } else {
-        setDeliveryInfo({
+        const info = {
           cost: 0,
           zone: '',
           time: '',
@@ -211,10 +243,14 @@ export default function OrderForm() {
           confidence: 'invalid',
           isValid: false,
           validationError: 'Please select a delivery method'
-        });
+        };
+        setDeliveryInfo(info);
+        (window as any).__deliveryInfo = info;
       }
     } else {
-      setDeliveryInfo(null);
+      const info = null;
+      setDeliveryInfo(info);
+      (window as any).__deliveryInfo = null;
     }
   }, [selectedProvinsi, selectedKota, selectedKecamatan, selectedKelurahan, detailedAddress, deliveryMethod, cart, getTotalPrice, paymentMethod]);
 
@@ -232,12 +268,23 @@ export default function OrderForm() {
               const message = buildWhatsAppMessage(orderData, cart, totalWithDelivery, deliveryInfo?.cost || 0);
               sendWhatsAppOrder(message, WHATSAPP_NUMBER);
               setShowThankYouModal(false);
-              setTimer(3);
+              setTimer(5);
               setOrderData(null);
               setOrderTotal(0);
               setDeliveryInfo(null);
               clearCart();
               form.reset();
+              
+              // Add page action after WhatsApp redirect
+              setTimeout(() => {
+                // Scroll to top of page
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                
+                // Optionally reload the page after a short delay
+                setTimeout(() => {
+                  window.location.reload();
+                }, 2000);
+              }, 1000);
             }
             return 0;
           }
@@ -295,7 +342,7 @@ export default function OrderForm() {
     // Close confirmation modal and show thank you modal
     setShowConfirmationModal(false);
     setShowThankYouModal(true);
-    setTimer(3);
+    setTimer(5);
   };
 
   const handleEditOrder = () => {
@@ -303,7 +350,21 @@ export default function OrderForm() {
     setShowConfirmationModal(false);
   };
 
-  const { isValid } = form.formState;
+  const { isValid, errors } = form.formState;
+
+  // Count required fields that are completed
+  const completedFields = [
+    form.watch('name'),
+    form.watch('phone'),
+    form.watch('provinsi'),
+    form.watch('kota'),
+    form.watch('kecamatan'),
+    form.watch('detailedAddress'),
+    form.watch('deliveryMethod'),
+    form.watch('paymentMethod'),
+  ].filter(field => field && field.toString().trim() !== '').length;
+
+  const totalRequiredFields = 8;
 
   return (
     <section id="order" className="mb-12 md:mb-16 py-16 order-form-texture rounded-3xl">
@@ -314,8 +375,24 @@ export default function OrderForm() {
               <MessageCircle className="w-8 h-8 text-[#edadc3]" />
               Order Form
             </CardTitle>
+            {/* Progress Indicator */}
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-sm text-[#11110a]/70 mb-2">
+                <span>Form Progress</span>
+                <span>{completedFields}/{totalRequiredFields} completed</span>
+              </div>
+              <div className="w-full bg-[#a3e2f5]/20 rounded-full h-2">
+                <div
+                  className="bg-[#edadc3] h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${(completedFields / totalRequiredFields) * 100}%` }}
+                ></div>
+              </div>
+            </div>
             <CardDescription className="text-[#11110a]/70">
-              Fill in your details and we will contact you via WhatsApp
+              {completedFields === totalRequiredFields
+                ? 'Data kamu sudah lengkap, yuk di order sekarang!'
+                : 'Mohon lengkapi data kamu dulu ya, kami akan menghubungi kamu lewat WhatsApp secepatnya.'
+              }
             </CardDescription>
           </CardHeader>
           <CardContent className="p-6 md:p-8">
@@ -463,15 +540,26 @@ export default function OrderForm() {
                     name="kelurahan"
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Kelurahan</FormLabel>
+                        <FormLabel className="flex items-center gap-2">
+                          Kelurahan
+                          <span className="text-xs text-gray-500 font-normal">(Opsional)</span>
+                        </FormLabel>
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
-                          disabled={!selectedKecamatan}
+                          disabled={!selectedKecamatan || Object.keys(availableKelurahan).length === 0}
                         >
                           <FormControl>
-                            <SelectTrigger className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f]">
-                              <SelectValue placeholder="Pilih Kelurahan" />
+                            <SelectTrigger className={`rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f] ${
+                              !selectedKecamatan ? 'bg-gray-50' : ''
+                            }`}>
+                              <SelectValue placeholder={
+                                !selectedKecamatan
+                                  ? "Pilih kecamatan terlebih dahulu"
+                                  : Object.keys(availableKelurahan).length > 0
+                                  ? "Pilih kelurahan (Opsional)"
+                                  : "Data kelurahan tidak tersedia"
+                              } />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -480,6 +568,16 @@ export default function OrderForm() {
                             ))}
                           </SelectContent>
                         </Select>
+                        {selectedKecamatan && Object.keys(availableKelurahan).length === 0 && (
+                          <p className="text-xs text-blue-600 bg-blue-50 px-3 py-2 rounded-lg">
+                            ℹ️ Data kelurahan tidak tersedia untuk wilayah ini. Silakan isi detail alamat di bawah untuk lokasi yang lebih spesifik.
+                          </p>
+                        )}
+                        {Object.keys(availableKelurahan).length > 0 && (
+                          <p className="text-xs text-gray-500">
+                            Tip: Pilih kelurahan untuk alamat yang lebih spesifik, atau kosongkan dan gunakan detail alamat di bawah.
+                          </p>
+                        )}
                         <FormMessage />
                       </FormItem>
                     )}
@@ -494,7 +592,7 @@ export default function OrderForm() {
                         <FormLabel>Detail Alamat (Jalan, Nomor Rumah, dll)</FormLabel>
                         <FormControl>
                           <Textarea
-                            placeholder="Jl. Raya examples No. 123 RT 001 RW 002"
+                            placeholder="Jl. Denpasar No. 123 RT 001 RW 002"
                             {...field}
                             className="rounded-xl border-[#a3e2f5]/30 focus:border-[#553d8f] min-h-[80px]"
                           />
@@ -670,17 +768,38 @@ export default function OrderForm() {
                   </Card>
                 )}
 
+              {/* Validation Summary */}
+              {Object.keys(errors).length > 0 && cart.length > 0 && (
+                <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                  <div className="flex items-center gap-2 text-red-700 font-semibold mb-3">
+                    <AlertCircle className="w-5 h-5" />
+                    <span>Kolom yang perlu dilengkapi:</span>
+                  </div>
+                  <div className="space-y-2 text-sm text-red-600">
+                    {errors.name && <div>• Nama lengkap</div>}
+                    {errors.phone && <div>• Nomor WhatsApp</div>}
+                    {!selectedProvinsi && <div>• Provinsi</div>}
+                    {!selectedKota && <div>• Kota/Kabupaten</div>}
+                    {!selectedKecamatan && <div>• Kecamatan</div>}
+                    {!detailedAddress?.trim() && <div>• Detail alamat</div>}
+                    {!deliveryMethod && <div>• Metode pengiriman</div>}
+                    {!paymentMethod && <div>• Metode pembayaran</div>}
+                  </div>
+                </div>
+              )}
+
               {cart.length === 0 && (
                 <div className="text-xs text-red-500 flex items-center gap-1">
                   <AlertCircle className="w-4 h-4" />
                   <span>Keranjang kamu masih kosong, silakan pilih produk dulu ya 😊</span>
                 </div>
               )}
+              
               <Button
                 type="submit"
-                disabled={!isValid || !deliveryInfo?.isValid}
+                disabled={!isValid || !deliveryInfo?.isValid || cart.length === 0}
                 className={`w-full transition-all duration-300 rounded-xl py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
-                  isValid && deliveryInfo?.isValid
+                  isValid && deliveryInfo?.isValid && cart.length > 0
                     ? 'bg-[#edadc3] hover:bg-[#edadc3]/90 text-white shadow-lg hover:shadow-xl'
                     : 'bg-gray-300 text-gray-500 cursor-not-allowed'
                 }`}
@@ -708,7 +827,7 @@ export default function OrderForm() {
             </DialogTitle>
 
             <DialogDescription className="text-[#11110a]/70 text-sm">
-              Pesanan manis kamu sudah kami terima. ✨
+              Pesanan kamu sudah kami terima. ✨
             </DialogDescription>
           </div>
 
@@ -732,7 +851,7 @@ export default function OrderForm() {
                 <div className="w-full bg-[#a3e2f5]/30 rounded-full h-2 mb-2">
                   <div
                     className="bg-[#edadc3] h-2 rounded-full transition-all duration-1000 ease-linear"
-                    style={{ width: `${((3 - timer) / 3) * 100}%` }}
+                    style={{ width: `${((5 - timer) / 5) * 100}%` }}
                   ></div>
                 </div>
 
@@ -743,7 +862,7 @@ export default function OrderForm() {
               </div>
 
               <p className="text-[#11110a]/70 text-xs">
-                Terima kasih sudah mempercayai Tiny Bitty untuk menemani hari manismu! 💖
+                Terima kasih sudah mempercayai Tiny Bitty untuk menemani hari-harimu! 💖
               </p>
             </div>
 
@@ -762,38 +881,38 @@ export default function OrderForm() {
 
       {/* Order Confirmation Modal */}
       <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-      <DialogContent
-    className="
-      sm:max-w-2xl
-      bg-white
-      border-2 border-[#a3e2f5]/30
-      rounded-3xl
-      shadow-2xl
-      p-0
-      overflow-hidden
-      max-h-[80vh]       /* ⬅️ cap height */
-      flex flex-col      /* ⬅️ header + scrollable body */
-    "
-  >
-    {/* Header (fixed) */}
-    <div className="bg-[#553d8f]/10 border-b-2 border-[#a3e2f5]/30 px-6 py-6 flex-shrink-0">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold text-[#11110a] flex items-center gap-2">
-          <CheckCircle2 className="w-8 h-8 text-[#553d8f]" />
-          Review Your Order
-        </DialogTitle>
-        <DialogDescription className="text-[#11110a]/70">
-          Please review your order details before we proceed
-        </DialogDescription>
-      </DialogHeader>
-    </div>
+        <DialogContent
+          className="
+            sm:max-w-2xl
+            bg-white
+            border-2 border-[#a3e2f5]/30
+            rounded-3xl
+            shadow-2xl
+            p-0
+            overflow-hidden
+            max-h-[80vh]       /* ⬅️ cap height */
+            flex flex-col      /* ⬅️ header + scrollable body */
+          "
+        >
+          {/* Header (fixed) */}
+          <div className="bg-[#553d8f]/10 border-b-2 border-[#a3e2f5]/30 px-6 py-6 flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-[#11110a] flex items-center gap-2">
+                <CheckCircle2 className="w-8 h-8 text-[#553d8f]" />
+                Review Your Order
+              </DialogTitle>
+              <DialogDescription className="text-[#11110a]/70">
+                Please review your order details before we proceed
+              </DialogDescription>
+            </DialogHeader>
+          </div>
 
-    {/* Body (scrollable) */}
-    <div className="px-6 py-6 overflow-y-auto flex-1">
-    {orderData && (
-        <div className="space-y-4">
-          {/* Customer Details */}
-          <div className="bg-[#a3e2f5]/10 rounded-2xl p-4">
+          {/* Body (scrollable) */}
+          <div className="px-6 py-6 overflow-y-auto flex-1">
+            {orderData && (
+              <div className="space-y-4">
+                {/* Customer Details */}
+                <div className="bg-[#a3e2f5]/10 rounded-2xl p-4">
                   <h3 className="font-semibold text-[#11110a] mb-3 flex items-center gap-2">
                     <MessageCircle className="w-5 h-5 text-[#553d8f]" />
                     Customer Details
@@ -828,17 +947,17 @@ export default function OrderForm() {
                 </div>
 
                 {/* Order Items */}
-          <div className="bg-white rounded-2xl border-2 border-[#a3e2f5]/30 p-4">
-            <h3 className="font-semibold text-[#11110a] mb-3 flex items-center gap-2">
-              🛒 Order Items ({cart.length} items)
-            </h3>
-            {/* you can remove the inner max-h if you want outer scroll only */}
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div
-                  key={`${item.productId}-${item.variant.size}`}
-                  className="flex items-center gap-3 p-3 bg-[#f5fbf8] rounded-xl"
-                >
+                <div className="bg-white rounded-2xl border-2 border-[#a3e2f5]/30 p-4">
+                  <h3 className="font-semibold text-[#11110a] mb-3 flex items-center gap-2">
+                    🛒 Order Items ({cart.length} items)
+                  </h3>
+                  {/* you can remove the inner max-h if you want outer scroll only */}
+                  <div className="space-y-3">
+                    {cart.map((item) => (
+                      <div
+                        key={`${item.productId}-${item.variant.size}`}
+                        className="flex items-center gap-3 p-3 bg-[#f5fbf8] rounded-xl"
+                      >
                         <div
                           className="w-12 h-12 bg-cover bg-center bg-no-repeat rounded-xl flex-shrink-0"
                           style={{ backgroundImage: `url(${item.image})` }}

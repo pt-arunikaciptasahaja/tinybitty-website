@@ -23,16 +23,16 @@ export default function CartSheet({ children }: CartSheetProps) {
     const form = formSection.querySelector('form');
     if (!form) return false;
 
-    // Check text inputs
+    // Check text inputs for new structured form
     const nameInput = form.querySelector<HTMLInputElement>('input[name="name"]');
     const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]');
-    const addressTextarea = form.querySelector<HTMLTextAreaElement>('textarea[name="address"]');
+    const detailedAddressTextarea = form.querySelector<HTMLTextAreaElement>('textarea[name="detailedAddress"]');
 
     const name = nameInput?.value.trim() || '';
     const phone = phoneInput?.value.trim() || '';
-    const address = addressTextarea?.value.trim() || '';
+    const detailedAddress = detailedAddressTextarea?.value.trim() || '';
 
-    // Check selects - find all Select triggers
+    // Check selects - find all Select triggers for structured address + delivery + payment
     const selectTriggers = form.querySelectorAll('button[role="combobox"]');
     
     // Get text from SelectValue or from trigger (excluding placeholder)
@@ -44,18 +44,26 @@ export default function CartSheet({ children }: CartSheetProps) {
       }
       // Fallback to trigger text, but exclude placeholder
       const text = trigger.textContent?.trim() || '';
-      if (text.includes('Select delivery') || text.includes('Select payment')) {
+      if (text.includes('Select') || text.includes('Pilih')) {
         return '';
       }
       return text;
     };
 
-    const deliveryValue = selectTriggers[0] ? getSelectValue(selectTriggers[0]) : '';
-    const paymentValue = selectTriggers[1] ? getSelectValue(selectTriggers[1]) : '';
+    // Map select values: provinsi, kota, kecamatan, kelurahan, deliveryMethod, paymentMethod
+    const provinsiValue = selectTriggers[0] ? getSelectValue(selectTriggers[0]) : '';
+    const kotaValue = selectTriggers[1] ? getSelectValue(selectTriggers[1]) : '';
+    const kecamatanValue = selectTriggers[2] ? getSelectValue(selectTriggers[2]) : '';
+    const kelurahanValue = selectTriggers[3] ? getSelectValue(selectTriggers[3]) : ''; // Optional
+    const deliveryValue = selectTriggers[4] ? getSelectValue(selectTriggers[4]) : '';
+    const paymentValue = selectTriggers[5] ? getSelectValue(selectTriggers[5]) : '';
 
     return name.length >= 2 &&
            phone.length >= 10 &&
-           address.length >= 10 &&
+           provinsiValue.length > 0 &&
+           kotaValue.length > 0 &&
+           kecamatanValue.length > 0 &&
+           detailedAddress.length >= 10 &&
            deliveryValue.length > 0 &&
            paymentValue.length > 0;
   };
@@ -63,10 +71,11 @@ export default function CartSheet({ children }: CartSheetProps) {
   const scrollToOrderForm = () => {
     const isFormFilled = checkFormFilled();
     
+    // Always close the cart sheet first
+    setOpen(false);
+    
+    // Show warning toast if form is incomplete
     if (!isFormFilled) {
-      // Close the cart sheet
-      setOpen(false);
-      
       toast({
         title: 'Form incomplete',
         description: 'Please complete all order data first',
@@ -74,7 +83,7 @@ export default function CartSheet({ children }: CartSheetProps) {
       });
     }
 
-    // Scroll to form regardless, but show warning if incomplete
+    // Scroll to form after closing modal
     setTimeout(() => {
       const orderSection = document.getElementById('order');
       if (orderSection) {
@@ -87,12 +96,12 @@ export default function CartSheet({ children }: CartSheetProps) {
             if (form) {
               const nameInput = form.querySelector<HTMLInputElement>('input[name="name"]');
               const phoneInput = form.querySelector<HTMLInputElement>('input[name="phone"]');
-              const addressTextarea = form.querySelector<HTMLTextAreaElement>('textarea[name="address"]');
+              const detailedAddressTextarea = form.querySelector<HTMLTextAreaElement>('textarea[name="detailedAddress"]');
               const selectTriggers = form.querySelectorAll<HTMLButtonElement>('button[role="combobox"]');
               
               // Focus and highlight first empty input
               let focused = false;
-              [nameInput, phoneInput, addressTextarea].forEach((input) => {
+              [nameInput, phoneInput, detailedAddressTextarea].forEach((input) => {
                 if (input && !input.value.trim()) {
                   if (!focused) {
                     input.focus();
@@ -105,14 +114,18 @@ export default function CartSheet({ children }: CartSheetProps) {
                 }
               });
 
-              // Highlight empty selects
-              selectTriggers.forEach((trigger) => {
+              // Highlight empty selects (provinsi, kota, kecamatan, kelurahan, delivery, payment)
+              selectTriggers.forEach((trigger, index) => {
                 const text = trigger.textContent?.trim() || '';
-                if (text.includes('Select delivery') || text.includes('Select payment')) {
-                  trigger.classList.add('ring-2', 'ring-red-500', 'border-red-500');
-                  setTimeout(() => {
-                    trigger.classList.remove('ring-2', 'ring-red-500', 'border-red-500');
-                  }, 2000);
+                // Highlight required selects: provinsi(0), kota(1), kecamatan(2), delivery(4), payment(5)
+                if (text.includes('Select') || text.includes('Pilih')) {
+                  // Skip kelurahan(3) as it's optional
+                  if (index !== 3) {
+                    trigger.classList.add('ring-2', 'ring-red-500', 'border-red-500');
+                    setTimeout(() => {
+                      trigger.classList.remove('ring-2', 'ring-red-500', 'border-red-500');
+                    }, 2000);
+                  }
                 }
               });
             }
@@ -148,7 +161,7 @@ export default function CartSheet({ children }: CartSheetProps) {
       <SheetTrigger asChild>
         {triggerContent}
       </SheetTrigger>
-      <SheetContent className="w-full sm:max-w-lg bg-[#ffeef1]">
+      <SheetContent className="w-full sm:max-w-lg bg-[#ffeef1] flex flex-col">
         <SheetHeader>
           <SheetTitle className="text-2xl font-bold text-gray-800">Review Your Order</SheetTitle>
           <SheetDescription>
@@ -171,86 +184,114 @@ export default function CartSheet({ children }: CartSheetProps) {
           </div>
         ) : (
           <>
-            <ScrollArea className="h-[calc(100vh-280px)] mt-6">
-              <div className="space-y-4">
-                {cart.map((item) => (
-                  <div
-                    key={`${item.productId}-${item.variant.size}`}
-                    className="bg-white rounded-2xl p-4 shadow-md border border-[#f9c2cd]/20"
-                  >
-                    <div className="flex gap-4">
-                      {/* Product image container - matching product card style */}
-                      <div className="relative flex-shrink-0">
-                        <div
-                          className="w-20 h-20 bg-cover bg-center bg-no-repeat rounded-xl"
-                          style={{ backgroundImage: `url(${item.image})` }}
-                        />
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-semibold text-gray-800 truncate">{item.productName}</h4>
-                        <p className="text-sm text-gray-600">{item.variant.size}</p>
-                        <div className="flex items-center justify-between mt-2">
-                          <div>
-                            <p className="text-xs text-gray-500">Unit price</p>
-                            <p className="text-sm font-semibold text-[#f9c2cd]">
-                              Rp {item.variant.price.toLocaleString('id-ID')}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-xs text-gray-500">Subtotal</p>
-                            <p className="text-sm font-bold text-gray-800">
-                              Rp {(item.variant.price * item.quantity).toLocaleString('id-ID')}
-                            </p>
+            <div className="flex-1 min-h-0">
+              <ScrollArea className="h-full">
+                <div className="space-y-4 pr-4">
+                  {cart.map((item) => (
+                    <div
+                      key={`${item.productId}-${item.variant.size}`}
+                      className="bg-white rounded-2xl p-4 shadow-md border border-[#f9c2cd]/20"
+                    >
+                      <div className="flex gap-4">
+                        {/* Product image container - matching product card style */}
+                        <div className="relative flex-shrink-0">
+                          <div
+                            className="w-20 h-20 bg-cover bg-center bg-no-repeat rounded-xl"
+                            style={{ backgroundImage: `url(${item.image})` }}
+                          />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-semibold text-gray-800 truncate">{item.productName}</h4>
+                          <p className="text-sm text-gray-600">{item.variant.size}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <div>
+                              <p className="text-xs text-gray-500">Unit price</p>
+                              <p className="text-sm font-semibold text-[#f9c2cd]">
+                                Rp {item.variant.price.toLocaleString('id-ID')}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-xs text-gray-500">Subtotal</p>
+                              <p className="text-sm font-bold text-gray-800">
+                                Rp {(item.variant.price * item.quantity).toLocaleString('id-ID')}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#f9c2cd]/20">
-                      <div className="flex items-center gap-2">
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#f9c2cd]/20">
+                        <div className="flex items-center gap-2">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => updateQuantity(item.productId, item.variant.size, item.quantity - 1)}
+                            className="h-8 w-8 rounded-full border-[#f9c2cd]/30 hover:bg-[#f9c2cd]/10"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </Button>
+                          <span className="w-10 text-center font-semibold text-gray-800">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            onClick={() => updateQuantity(item.productId, item.variant.size, item.quantity + 1)}
+                            className="h-8 w-8 rounded-full border-[#f9c2cd]/30 hover:bg-[#f9c2cd]/10"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </Button>
+                        </div>
                         <Button
-                          variant="outline"
+                          variant="ghost"
                           size="icon"
-                          onClick={() => updateQuantity(item.productId, item.variant.size, item.quantity - 1)}
-                          className="h-8 w-8 rounded-full border-[#f9c2cd]/30 hover:bg-[#f9c2cd]/10"
+                          onClick={() => removeFromCart(item.productId, item.variant.size)}
+                          className="text-red-500 hover:text-red-600 hover:bg-red-50"
                         >
-                          <Minus className="w-3 h-3" />
-                        </Button>
-                        <span className="w-10 text-center font-semibold text-gray-800">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          onClick={() => updateQuantity(item.productId, item.variant.size, item.quantity + 1)}
-                          className="h-8 w-8 rounded-full border-[#f9c2cd]/30 hover:bg-[#f9c2cd]/10"
-                        >
-                          <Plus className="w-3 h-3" />
+                          <Trash2 className="w-4 h-4" />
                         </Button>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => removeFromCart(item.productId, item.variant.size)}
-                        className="text-red-500 hover:text-red-600 hover:bg-red-50"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </Button>
                     </div>
-                  </div>
-                ))}
-              </div>
-            </ScrollArea>
+                  ))}
+                </div>
+              </ScrollArea>
+            </div>
 
-            <div className="absolute bottom-0 left-0 right-0 p-6 bg-[#ffeef1] border-t-2 border-[#f9c2cd]/30 shadow-lg">
+            <div className="border-t-2 border-[#f9c2cd]/30 bg-[#ffeef1] p-6 -mx-6 mt-auto">
               <div className="space-y-3 mb-4">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-gray-600">Total Items</span>
                   <span className="font-semibold text-gray-800">{getTotalItems()} item</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-gray-800">Total Payment</span>
+                  <span className="text-lg font-semibold text-gray-800">Subtotal</span>
                   <span className="text-2xl font-bold text-[#f9c2cd]">
                     Rp {getTotalPrice().toLocaleString('id-ID')}
                   </span>
                 </div>
+                {/* Show estimated total with delivery if form has valid address */}
+                {(() => {
+                  // Try to get delivery cost from OrderForm
+                  const deliveryInfo = (window as any).__deliveryInfo;
+                  if (deliveryInfo && deliveryInfo.isValid && deliveryInfo.cost > 0) {
+                    const total = getTotalPrice() + deliveryInfo.cost;
+                    return (
+                      <div className="mt-2 p-3 bg-white/70 rounded-xl border border-[#f9c2cd]/20">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Products Subtotal</span>
+                          <span className="text-gray-800">Rp {getTotalPrice().toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-gray-600">Estimated Delivery ({deliveryInfo.zone})</span>
+                          <span className="text-gray-800">Rp {deliveryInfo.cost.toLocaleString('id-ID')}</span>
+                        </div>
+                        <div className="flex items-center justify-between border-t border-[#f9c2cd]/20 pt-2 mt-2">
+                          <span className="font-semibold text-gray-800">Estimated Total</span>
+                          <span className="font-bold text-[#f9c2cd]">Rp {total.toLocaleString('id-ID')}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-1">*Final cost will be confirmed via WhatsApp</p>
+                      </div>
+                    );
+                  }
+                  return null;
+                })()}
               </div>
               <Button
                 onClick={scrollToOrderForm}
