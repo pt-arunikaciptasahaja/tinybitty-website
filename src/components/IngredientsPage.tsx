@@ -5,26 +5,26 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function IngredientsPage() {
   return (
-    <div className="min-h-screen bg-[#fffdf8]">
+    <div className="min-h-screen px-4 md:px-8 lg:px-12 xl:px-16" style={{ backgroundColor: '#f5f7f7' }}>
       <Header />
 
-      <main className="pt-32 pb-16">
-        <div className="container mx-auto px-4 space-y-10 md:space-y-12">
-          {/* Page intro */}
-          <div className="text-center max-w-3xl mx-auto">
-            <span className="inline-block px-4 py-1.5 rounded-full bg-[#edadc3]/20 text-sm text-[#553d8f] patrick-hand-sc-regular mb-3">
-              🥚 Our Ingredients Story
-            </span>
-            <h1 className="text-3xl md:text-5xl bebas-neue-regular text-[#553d8f] mb-3">
-              Our Premium Ingredients
-            </h1>
-            <p className="text-base md:text-lg text-gray-600 max-w-2xl mx-auto patrick-hand-sc-regular">
-              Peek behind the oven: see what goes into every Tiny Bitty cookie and why each bite
-              tastes like home.
-            </p>
-          </div>
+      <main className="content-section">
+        {/* Page intro */}
+        <div className="card-standard text-center max-w-3xl mx-auto mb-12 mt-16">
+          <span className="badge badge-secondary mb-4">
+            🥚 Our Ingredients Story
+          </span>
+          <h1 className="heading-lg mb-4">
+            Our Premium Ingredients
+          </h1>
+          <p className="body-lg max-w-2xl mx-auto">
+            Peek behind the oven: see what goes into every Tiny Bitty cookie and why each bite
+            tastes like home.
+          </p>
+        </div>
 
-          {/* Main ingredients section */}
+        {/* Main ingredients section */}
+        <div className="card-elevated">
           <Ingredients />
         </div>
       </main>

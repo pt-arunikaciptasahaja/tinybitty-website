@@ -1044,7 +1044,9 @@ export default function OrderForm() {
                 }`}
               >
                 <MessageCircle className="w-5 h-5" />
-                {currentStep < 4 ? `Continue to Step ${currentStep + 1}` : 'Order via WhatsApp'}
+                {currentStep < 4 ?
+                 `Continue to Step ${currentStep + 1}` 
+                 : 'Order via WhatsApp'}
               </Button>
               </form>
             </Form>

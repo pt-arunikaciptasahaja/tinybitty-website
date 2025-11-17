@@ -43,12 +43,12 @@ export default function ProductSection({
             <div className="text-5xl -mb-2">{icon}</div>
           )}
         </div>
-          <h2 className="text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 -mt-[110px] knewave-regular">
+          <h2 className={`text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 ${title === 'Tiny Juice' ? '-mt-[45px]' : '-mt-[85px]'} knewave-regular`}>
             {title}
           </h2>
-          <p className="text-gray-600 text-base md:text-lg font-semibold max-w-2xl mx-auto patrick-hand-sc-regular">
+          {/* <p className="text-gray-600 text-base md:text-lg font-semibold max-w-2xl mx-auto patrick-hand-sc-regular">
             {description}
-          </p>
+          </p> */}
         </div>
 
         {/* Compact grid layout for desktop */}

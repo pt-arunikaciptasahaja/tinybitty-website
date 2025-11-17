@@ -3,13 +3,30 @@ import { ShoppingCart, Menu, X } from 'lucide-react';
 import CartSheet from './CartSheet';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Header() {
   const { getTotalItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const navigate = useNavigate();
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  const handleNavigation = (hash: string) => {
+    // Navigate to homepage
+    navigate('/');
+    
+    // Wait a moment for navigation to complete, then scroll to section
+    setTimeout(() => {
+      const element = document.querySelector(hash);
+      if (element) {
+        element.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }, 100);
+  };
 
   return (
     <header className="fixed top-4 left-0 right-0 z-50">
@@ -18,23 +35,23 @@ export default function Header() {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
               <img
-                src="/logotiny.png"
+                src="/logo-purple.png"
                 alt="Tiny Bitty - Freshly Baked Happiness"
                 className="h-16 md:h-20 w-auto object-contain"
-                style={{
-                  filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
-                }}
+                // style={{
+                //   filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
+                // }}
               />
             </Link>
             
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
-              <a
-                href="#products"
-                className="text-sm font-medium text-[#11110a] nav-link-hover"
+              <button
+                onClick={() => handleNavigation('#products')}
+                className="text-sm font-medium text-[#11110a] nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Products
-              </a>
+              </button>
               <Link
                 to="/faq"
                 className="text-sm font-medium text-[#11110a] nav-link-hover"
@@ -53,12 +70,12 @@ export default function Header() {
               >
                 Our Story
               </Link>
-              <a
-                href="#order"
-                className="text-sm font-medium text-[#11110a] nav-link-hover"
+              <button
+                onClick={() => handleNavigation('#order')}
+                className="text-sm font-medium text-[#11110a] nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Order
-              </a>
+              </button>
               
               {/* Cart Icon */}
               <CartSheet>
@@ -107,13 +124,15 @@ export default function Header() {
           }`}>
             <div className="mt-4 pb-4 border-t border-white/20 relative z-10">
               <nav className="flex flex-col gap-4 mt-4">
-                <a
-                  href="#products"
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
-                  onClick={toggleMenu}
+                <button
+                  onClick={() => {
+                    handleNavigation('#products');
+                    toggleMenu();
+                  }}
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Products
-                </a>
+                </button>
                 <Link
                   to="/faq"
                   className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
@@ -135,13 +154,15 @@ export default function Header() {
                 >
                   Our Story
                 </Link>
-                <a
-                  href="#order"
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
-                  onClick={toggleMenu}
+                <button
+                  onClick={() => {
+                    handleNavigation('#order');
+                    toggleMenu();
+                  }}
+                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Order
-                </a>
+                </button>
               </nav>
             </div>
           </div>

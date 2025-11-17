@@ -27,7 +27,7 @@ export default function Home() {
           title="Tiny Juice"
           description="Jus alami tanpa pengawet, diolah dari buah segar berkualitas—cocok diminum kapan pun kamu butuh penyegar yang alami."
           products={productsData.juice}
-          icon="/juice-icon.png"
+          icon="/curut.png"
         />
         
         <ProductSection

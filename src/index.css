@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Rubik+Moonrocks&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Rubik+Moonrocks&display=swap&family=Poiret+One&display=swap&family=Delius&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,36 +6,56 @@
 
 @layer base {
   :root {
-    --background: 210 12% 96.9%;
-    --foreground: 222.2 84% 4.9%;
+    /* Pastel Lilac Design System */
+    --background: 245 17% 97%;
+    --foreground: 247 38% 15%;
+    --card: 245 17% 99%;
+    --card-foreground: 247 38% 15%;
+    --popover: 245 17% 99%;
+    --popover-foreground: 247 38% 15%;
 
-    --card: 210 12% 96.9%;
-    --card-foreground: 222.2 84% 4.9%;
+    /* Primary Lilac Colors */
+    --primary: 253 35% 27%;
+    --primary-foreground: 253 35% 97%;
+    --primary-light: 253 35% 40%;
+    --primary-dark: 253 35% 20%;
 
-    --popover: 210 12% 96.9%;
-    --popover-foreground: 222.2 84% 4.9%;
+    /* Secondary Pastel Colors */
+    --secondary: 344 67% 87%;
+    --secondary-foreground: 253 35% 27%;
+    --secondary-light: 344 67% 92%;
+    --secondary-dark: 344 67% 82%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --accent: 184 67% 85%;
+    --accent-foreground: 253 35% 27%;
+    --accent-light: 184 67% 92%;
+    --accent-dark: 184 67% 82%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-
+    /* Supporting Colors */
+    --muted: 42 20% 95%;
+    --muted-foreground: 253 35% 40%;
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive-foreground: 253 35% 97%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
-
+    /* System Colors */
+    --border: 253 35% 85%;
+    --input: 253 35% 95%;
+    --ring: 253 35% 40%;
     --radius: 0.75rem;
 
+    /* Page Layout Variables */
+    --page-wrapper-padding: 1rem;
+    --page-wrapper-padding-sm: 2rem;
+    --page-wrapper-padding-md: 2rem;
+    --page-wrapper-padding-lg: 3rem;
+    --page-wrapper-padding-xl: 4rem;
+    
+    /* Content Spacing */
+    --content-spacing: 2rem;
+    --content-spacing-lg: 3rem;
+    --content-spacing-xl: 4rem;
+    
+    /* Mobile Header */
     --mobile-header-height: 128px;
   }
 
@@ -78,8 +98,115 @@
     @apply bg-background text-foreground;
     font-family: 'Inter', sans-serif;
   }
-  h1, h2, h3, h4, h5, h6 {
-    font-family: 'Inter', sans-serif;
+  
+  /* Typography Hierarchy */
+  .heading-xl {
+    @apply bebas-neue-regular text-4xl md:text-6xl lg:text-7xl text-primary leading-tight tracking-wide;
+  }
+  
+  .heading-lg {
+    @apply bebas-neue-regular text-3xl md:text-5xl lg:text-6xl text-primary leading-tight tracking-wide;
+  }
+  
+  .heading-md {
+    @apply bebas-neue-regular text-2xl md:text-4xl lg:text-5xl text-primary leading-tight;
+  }
+  
+  .heading-sm {
+    @apply bebas-neue-regular text-xl md:text-2xl lg:text-3xl text-primary leading-tight;
+  }
+  
+  .body-lg {
+    @apply text-lg md:text-xl text-muted-foreground leading-relaxed;
+  }
+  
+  .body-base {
+    @apply text-base text-muted-foreground leading-relaxed;
+  }
+  
+  .body-sm {
+    @apply text-sm text-muted-foreground leading-relaxed;
+  }
+  
+  .badge {
+    @apply inline-block px-3 py-1.5 rounded-full text-sm font-medium;
+  }
+  
+  .badge-primary {
+    @apply bg-primary/10 text-primary border border-primary/20;
+  }
+  
+  .badge-secondary {
+    @apply bg-secondary/20 text-primary border border-secondary/30;
+  }
+}
+
+/* Standardized Button System */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary text-primary-foreground hover:bg-primary-light shadow-lg hover:shadow-xl;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-secondary text-secondary-foreground hover:bg-secondary-light border border-secondary;
+  }
+  
+  .btn-outline {
+    @apply btn bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground;
+  }
+  
+  .btn-ghost {
+    @apply btn bg-transparent text-primary hover:bg-primary/10;
+  }
+  
+  /* Button Sizes */
+  .btn-sm {
+    @apply px-4 py-2 text-sm;
+  }
+  
+  .btn-base {
+    @apply px-6 py-2.5 text-sm;
+  }
+  
+  .btn-lg {
+    @apply px-8 py-3 text-base;
+  }
+  
+  .btn-xl {
+    @apply px-10 py-4 text-lg;
+  }
+  
+  /* Page Wrapper System */
+  .page-wrapper {
+    @apply min-h-screen;
+  }
+  
+  .page-content {
+    @apply px-4 md:px-8 lg:px-12 xl:px-16;
+  }
+  
+  .container-standard {
+    @apply container mx-auto;
+  }
+  
+  .content-section {
+    @apply py-12 md:py-16 lg:py-20;
+  }
+  
+  .content-spacing {
+    @apply space-y-8 md:space-y-12 lg:space-y-16;
+  }
+  
+  .card-standard {
+    @apply bg-card rounded-2xl shadow-lg border border-border p-6 md:p-8;
+  }
+  
+  .card-elevated {
+    @apply card-standard shadow-xl hover:shadow-2xl transition-shadow duration-300;
   }
 }
 
@@ -112,6 +239,17 @@
     font-weight: 400;
     font-style: normal;
   }
+  .poiret-one-regular {
+    font-family: "Poiret One", sans-serif;
+    font-weight: 400;
+    font-style: normal;
+  }
+  .delius-regular {
+    font-family: "Delius", cursive;
+    font-weight: 400;
+    font-style: normal;
+  }
+  
 }
 
 /* Header navigation hover effect */
@@ -376,3 +514,4 @@ html {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-6px); }
 }
+

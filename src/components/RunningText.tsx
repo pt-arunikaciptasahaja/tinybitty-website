@@ -10,27 +10,28 @@ const bottomText = [
 
 export default function RunningText() {
   return (
-    <div className="overflow-hidden py-3 md:py-6 mb-12 md:mb-16 rounded-xl bg-[#553d8f]">
+    <div className="overflow-hidden py-3 md:py-6 mb-6 md:mb-6 rounded-xl bg-[#f5f7f7">
       {/* LEFT → RIGHT */}
       <Marquee
         items={upperText}
         size="text-xl md:text-4xl"
-        speed={35}
+        speed={12}
         direction="right"
       />
 
       {/* RIGHT → LEFT */}
       <Marquee
         items={bottomText}
-        size="text-base md:text-2xl"
-        speed={45}
+        size="md:text-2xl"
+        className="text-white md:text-2xl bg-[#553D8F] px-2 rounded-full"
+        speed={15}
         direction="left"
       />
     </div>
   );
 }
 
-function Marquee({ items, size, speed, direction }: any) {
+function Marquee({ items, size, speed, direction, className }: any) {
   // Standard distance (move 1 of 3 blocks)
   const distance = "66.666%";
 
@@ -52,22 +53,22 @@ function Marquee({ items, size, speed, direction }: any) {
         }}
       >
         {/* Triple block for seamless loop */}
-        <Block items={items} size={size} />
-        <Block items={items} size={size} />
-        <Block items={items} size={size} />
+        <Block items={items} size={size} className={className} />
+        <Block items={items} size={size} className={className} />
+        <Block items={items} size={size} className={className} />
       </motion.div>
     </div>
   );
 }
 
-function Block({ items, size }: any) {
+function Block({ items, size, className }: any) {
   return (
-    <div className="flex mx-4 md:mx-6 gap-8 md:gap-12">
+    <div className="flex mx-4 md:mx-6 gap-8 md:gap-6">
       {items.map((item: string, i: number) => (
         <span
           key={i}
-          className={`text-white font-extrabold tracking-wider ${size}`}
-          style={{ fontFamily: "Nunito, sans-serif" }}
+          className={`font-extrabold tracking-wider ${size} ${className || 'text-[#553D8F]'}`}
+          style={{ fontFamily: "Nunito, sans-serif", fontWeight: 900 }}
         >
           {item}
         </span>
