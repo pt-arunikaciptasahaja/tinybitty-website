@@ -1,180 +1,145 @@
-# 🛵 Shipping Rate Engine – Cursor Instructions
-Update and manage the shipping cost engine using the following specifications.
-The goal: given a destination address, generate real-world shipping rates using
-public routing and deterministic courier formulas.
+1. Geocoding Rules
 
-This prompt REPLACES all previous shipping-related instructions.
+Use Kelurahan-level addresses only.
+Ignore street names, building names, or house numbers.
 
----
+Valid examples:
 
-## 1. ORIGIN (Store Location)
-Always use this fixed origin point:
+Pulo, Kebayoran Baru, Jakarta Selatan
 
-**Origin Address**
-Depok, Sukmajaya 16411
+Cempaka Putih, Jakarta Pusat
 
-Geocode this address via:
-https://nominatim.openstreetmap.org/search?format=json&q=<address>
+Lenteng Agung, Jagakarsa, Jakarta Selatan
 
-Cache the coordinates.
+Invalid examples (must be stripped):
 
----
+Jalan Mawar No. 12, Pulo…
 
-## 2. DISTANCE CALCULATION (REQUIRED)
-To compute driving distance between origin and destination, use OSRM:
+Gg. Haji Ipin…
 
-GET:
-http://router.project-osrm.org/route/v1/driving/<ORIGIN_LON>,<ORIGIN_LAT>;<DEST_LON>,<DEST_LAT>?overview=false
+asdsadasd ← return “address not found”
 
-Parse:
-- routes[0].distance (meters → convert to km)
-- routes[0].duration optional
-
-Create util:
-`/lib/shipping/distance.ts`
-
-```ts
-export async function getDistanceKm(origin: string, destination: string): Promise<number> {
-  // geocode origin → lon/lat
-  // geocode destination → lon/lat
-  // call OSRM
-  // return distance in km (number, float)
-}
-Add geocode cache to reduce API load.
-
-3. SHIPPING FORMULAS
-A. GoSend Instant
-Rate: Rp 2.500 / km
-
-Minimum charge: Rp 20.000
-
-Maximum distance: 20 km
-
-If distance > 20, return unavailable.
-
-Formula:
-
-ini
-Copy code
-price = max(20000, distance_km * 2500)
-B. GoSend Same Day
-Base: Rp 13.000
-
-Additional: Rp 2.000 / km
-
-Minimum: Rp 20.000
-
-Max distance: 40 km (if >40 → unavailable)
-
-Formula:
-
-ini
-Copy code
-price = max(20000, 13000 + (distance_km * 2000))
-C. GrabExpress Instant
-Base fee: Rp 10.000
-
-Per km: Rp 2.700
-
-Minimum: Rp 20.000
-
-Maximum distance: 30 km (if >30 → unavailable)
-
-Formula:
-
-ini
-Copy code
-price = max(20000, 10000 + (distance_km * 2700))
-4. TYPE DEFINITIONS
-Create:
-/lib/shipping/types.ts
-
-ts
-Copy code
-export type ShippingAvailable = {
-  available: true;
-  price: number;
-};
-
-export type ShippingUnavailable = {
-  available: false;
-  reason: string;
-};
-
-export type ShippingResult = ShippingAvailable | ShippingUnavailable;
-
-export interface ShippingRates {
-  distance_km: number;
-  gosend_instant: ShippingResult;
-  gosend_same_day: ShippingResult;
-  grabexpress_instant: ShippingResult;
-}
-5. MAIN SHIPPING ENGINE
-Create:
-/lib/shipping/calculate.ts
-
-Implement:
-
-ts
-Copy code
-export async function calculateShipping(destination: string): Promise<ShippingRates>;
 Behavior:
 
-Compute distance.
+If user enters a full address: strip down to Kelurahan + Kecamatan + Kota + Province
 
-Apply formulas for each courier.
+If geocode fails after retries → return error:
 
-Return exactly this object shape:
+"error": "ADDRESS_NOT_FOUND"
 
-json
-Copy code
+📍 2. Origin Address (Constant)
+
+Use Pesona Mungil, Pesona Khayangan, Mekar Jaya, Depok
+Coordinates fixed.
+
+🧭 3. Distance Calculation
+
+Use OSRM or Haversine to compute approximate distance.
+
+Return JSON:
+
 {
-  "distance_km": 17.3,
-  "gosend_instant": { "available": true, "price": 20000 },
-  "gosend_same_day": { "available": true, "price": 24600 },
-  "grabexpress_instant": { "available": true, "price": 25700 }
+  "distance_km": 23.1
 }
-If unavailable:
 
-json
-Copy code
-{ "available": false, "reason": "Distance exceeds 20 km limit" }
-6. SHIPPING API ENDPOINT
-Create file:
-/app/api/shipping/quote/route.ts
 
-Route:
-GET /api/shipping/quote?destination=<string>
+Distance is rounded to one decimal place.
 
-Return application/json:
+💰 4. Delivery Pricing — Now Uses RANGES
 
-json
-Copy code
+Because distances are estimated (Kelurahan-level), the pricing must also be estimated, not exact.
+
+Base formulas (same as before):
+
+GoSend Instant: distance_km × 4000
+
+GoSend Same Day: distance_km × 3000
+
+GrabExpress Instant: distance_km × 4200
+
+📏 5. Price Range Rules (NEW)
+Generate a range instead of a single number:
+
+Lower bound:
+price × 0.95 (−5%)
+
+Upper bound:
+price × 1.10 (+10%)
+
+Example:
+
+If GoSend Instant = 40,000:
+
+Range returned:
+
+GoSend Instant: 38,000 - 44,000
+
+📤 6. JSON Response Format (UPDATED)
 {
-  "distance_km": <number>,
-  "gosend_instant": { ... },
-  "gosend_same_day": { ... },
-  "grabexpress_instant": { ... }
+  "distance_km": 23.1,
+  "gosend_instant_range": {
+    "min": 38000,
+    "max": 44000
+  },
+  "gosend_same_day_range": {
+    "min": 28500,
+    "max": 33000
+  },
+  "grabexpress_instant_range": {
+    "min": 39900,
+    "max": 46200
+  }
 }
-Validation:
 
-If destination missing → return 400 error.
+⚠️ 7. Error Handling Rules
+If address cannot be geocoded:
 
-7. CODE STYLE REQUIREMENTS
-Use TypeScript.
+Return:
 
-Use async/await everywhere.
+{
+  "error": "ADDRESS_NOT_FOUND",
+  "message": "Alamat tidak ditemukan. Harap gunakan nama kelurahan yang valid."
+}
 
-Keep functions pure and testable.
+If distance cannot be computed:
+{
+  "error": "DISTANCE_CALCULATION_FAILED"
+}
 
-Implement geocode caching (simple in-memory Map).
+🖥️ 8. Frontend Behavior (UX Rules)
+On success:
 
-Handle OSRM errors gracefully.
+Display:
 
-Do not depend on paid APIs.
+Estimated distance
 
-Structure code clean, modular, predictable.
+Price range for each courier:
 
-All output must match the exact JSON shape above.
+“GoSend Instant: 38rb – 44rb”
 
-END OF PROMPT
+“GrabExpress: 40rb – 46rb”
+
+On invalid address:
+
+Show message:
+
+“Alamat tidak ditemukan. Gunakan nama kelurahan yang valid (contoh: Pulo, Kebayoran Baru).”
+
+On missing kelurahan:
+
+Ask user:
+
+“Tolong masukkan nama kelurahan untuk estimasi ongkir.”
+
+🌐 9. Required Data Flow
+
+Clean user input → extract Kelurahan + Kecamatan + Kota + Province
+
+Geocode cleaned address
+
+Calculate distance
+
+Calculate base pricing
+
+Generate price ranges
+

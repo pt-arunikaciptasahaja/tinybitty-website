@@ -33,15 +33,16 @@ export default function ProductSection({
       <div className={`cookie-texture rounded-3xl md:rounded-[2rem] p-6 md:p-8 lg:p-10 ${getBackgroundClass(title)}`}>
         <div className="text-center mb-6">
         <div className="mb-1">
-          {icon.startsWith('/') ? (
-            <img
-              src={icon}
-              alt={`${title} icon`}
-              className="w-80 h-80 md:w-72 md:h-72 object-contain mx-auto -mb-4"
-            />
-          ) : (
-            <div className="text-5xl -mb-2">{icon}</div>
-          )}
+          <div
+            className={`mx-auto -mb-4 bg-contain bg-center bg-no-repeat ${
+              title === 'Cookies'
+                ? 'w-60 h-60 md:w-48 md:h-48'
+                : 'w-80 h-80 md:w-72 md:h-72'
+            }`}
+            style={{
+              backgroundImage: `url("${icon}")`,
+            }}
+          />
         </div>
           <h2 className={`text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 ${title === 'Tiny Juice' ? '-mt-[45px]' : '-mt-[85px]'} knewave-regular`}>
             {title}

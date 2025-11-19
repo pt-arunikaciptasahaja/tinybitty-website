@@ -4,7 +4,7 @@
       "id": "choco-almond-crunch",
       "name": "Choco Almond",
       "description": "Crunchy, nutty, chocolate-forward.",
-      "image": "/images/products/almondd.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575760/almondd_v75yxv.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
         { "size": "Medium 150gr", "price": 85000 },
@@ -18,7 +18,7 @@
       "id": "heavenly-bites",
       "name": "Heavenly Bites",
       "description": "Sweet cookies with Oreo crumb magic.",
-      "image": "/images/products/heaven.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575761/heaven_y9sj24.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
         { "size": "Medium 150gr", "price": 85000 },
@@ -32,7 +32,7 @@
       "id": "oatmeal-raisin",
       "name": "Oatmeal Raisin",
       "description": "Chewy, warm spices, classic favorite.",
-      "image": "/images/products/oatmeal.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575769/oatmeal_spzisq.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
         { "size": "Medium 150gr", "price": 85000 },
@@ -46,7 +46,7 @@
       "id": "choco-cheese-almond",
       "name": "Cheese Almond",
       "description": "Sweet-salty mix with crunchy almonds.",
-      "image": "/images/products/cheesy.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575763/cheesy_soullc.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
         { "size": "Medium 150gr", "price": 85000 },
@@ -62,7 +62,7 @@
       "id": "mango",
       "name": "Mango",
       "description": "Rich mango juice with fun bites of chia seeds and nata de coco.",
-      "image": "/images/products/mangga.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575759/mangga_j5ypyx.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -74,7 +74,7 @@
       "id": "guava",
       "name": "Guava",
       "description": "Fresh guava tang with chewy nata de coco and chia seeds.",
-      "image": "/images/products/jamboe.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575757/jamboe_paeaex.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -86,7 +86,7 @@
       "id": "strawberry",
       "name": "Strawberry",
       "description": "Bright strawberry sip with chia seeds and nata de coco.",
-      "image": "/images/products/stroberi.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763578117/ChatGPT_Image_Nov_20_2025_01_48_25_AM_tgwjdg.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -98,7 +98,7 @@
       "id": "soursop",
       "name": "Soursop",
       "description": "Creamy tropical soursop with fun nata de coco bites.",
-      "image": "/images/products/sirsak.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575776/sirsak_nhv0dv.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -110,7 +110,7 @@
       "id": "avocado-coffee",
       "name": "Avocado Coffee",
       "description": "Avocado coffee dessert drink with creamy texture and sweet aroma.",
-      "image": "/images/products/alpukat.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575766/alpukat_xrngbn.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -124,7 +124,7 @@
       "id": "macaroni-schotel",
       "name": "Macaroni Schotel",
       "description": "Creamy & cheesy baked macaroni cups with a crispy outer layer.",
-      "image": "/images/products/sahroni.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575766/sahroni_scbpg6.png",
       "variants": [
         { "size": "2 pcs", "price": 40000 },
         { "size": "4 pcs", "price": 80000 },

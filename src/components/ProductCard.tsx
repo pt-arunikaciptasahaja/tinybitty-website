@@ -21,14 +21,14 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, className = '' }: ProductCardProps) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  const [quantity, setQuantity] = useState(1);
+  const [quantity, setQuantity] = useState(0);
   const [isAdding, setIsAdding] = useState(false);
-  const { addToCart } = useCart();
+  const { addToCart, updateQuantity, removeFromCart } = useCart();
   const { toast } = useToast();
 
   const selectedVariant = product.variants[selectedVariantIndex];
   const isMultiSize = product.variants.length > 1;
-
+  const hasItemInCart = quantity > 0;
 
   const handleAddToCart = () => {
     setIsAdding(true);
@@ -37,20 +37,51 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       productId: product.id,
       productName: product.name,
       variant: selectedVariant,
-      quantity,
+      quantity: 1,
       image: product.image,
-    });
-
-    toast({
-      title: 'Added to cart! 🎉',
-      description: `${quantity}x ${product.name} (${selectedVariant.size})`,
     });
 
     setQuantity(1);
 
+    toast({
+      title: 'Added to cart! 🎉',
+      description: `1x ${product.name} (${selectedVariant.size})`,
+    });
+
     setTimeout(() => {
       setIsAdding(false);
     }, 600);
+  };
+
+  const handleIncreaseQuantity = () => {
+    const newQuantity = quantity + 1;
+    setQuantity(newQuantity);
+    
+    updateQuantity(product.id, selectedVariant.size, newQuantity);
+
+    toast({
+      title: 'Updated! 🎉',
+      description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
+    });
+  };
+
+  const handleDecreaseQuantity = () => {
+    const newQuantity = Math.max(0, quantity - 1);
+    setQuantity(newQuantity);
+    
+    updateQuantity(product.id, selectedVariant.size, newQuantity);
+
+    if (newQuantity === 0) {
+      toast({
+        title: 'Removed from cart',
+        description: `${product.name} (${selectedVariant.size})`,
+      });
+    } else {
+      toast({
+        title: 'Updated! 🎉',
+        description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
+      });
+    }
   };
 
   const getSizeMeta = (size: string) => {
@@ -120,38 +151,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           style={{ backgroundImage: `url(${product.image})` }}
         />
         {product.isNew && (
-          <Badge className="absolute top-2 left-2 bg-[#ffa101] text-white text-[10px] px-2 py-0.5 shadow-md">
+          <Badge className="absolute top-2 left-2 bg-[#D8CFF7] text-white text-[10px] px-2 py-0.5 shadow-md">
             NEW
           </Badge>
         )}
 
-        {/* Qty below image */}
-        <div className="mt-2">
-          <label className="text-[11px] font-medium text-[#11110a]/80 mb-1 block text-center">
-            Qty
-          </label>
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              className="h-8 w-8 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
-            >
-              <Minus className="w-3 h-3" />
-            </Button>
-            <span className="text-base font-semibold w-8 text-center">
-              {quantity}
-            </span>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setQuantity(quantity + 1)}
-              className="h-8 w-8 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
-            >
-              <Plus className="w-3 h-3" />
-            </Button>
-          </div>
-        </div>
       </div>
 
       {/* RIGHT: title, price, desc, size, button */}
@@ -172,7 +176,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           </p>
 
           {/* Size section - dropdown for multi-size, plain text for single-size */}
-          <div className="mt-2">
+          <div className="w-full mt-2">
             <label className="text-[11px] font-semibold tracking-wide text-[#11110a]/85 mb-1.5 block">
               Size
             </label>
@@ -208,6 +212,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   sideOffset={6}
                   className="
                     z-50
+                    w-full
                     max-w-[280px]
                     rounded-2xl
                     border border-[#e5e7eb]
@@ -265,8 +270,8 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                 </SelectContent>
               </Select>
             ) : (
-              /* Plain text for single-size products (juice) */
-              <div className="flex items-center justify-center w-16 h-8 rounded-full bg-[#e0f2fe] text-[#1d4ed8] text-[11px] font-semibold">
+              /* Plain text for single-size products (juice) - now full width too */
+              <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#e0f2fe] text-[#1d4ed8] text-[11px] font-semibold">
                 {selectedVariant.size}
               </div>
             )}
@@ -274,24 +279,54 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
         </div>
 
-        {/* Bottom: Beli button aligned with qty bottom */}
-        <div className="flex items-center justify-end mt-2 flex-shrink-0">
-          <Button
-            onClick={handleAddToCart}
-            disabled={isAdding}
-            className="rounded-full px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
-          >
-            {isAdding ? (
-              <span className="flex items-center justify-center gap-1.5">
-                <Check className="w-4 h-4" />
-                Added!
+        {/* Bottom: Conditional UI - Beli button or Quantity controls */}
+        <div className="mt-2 flex-shrink-0">
+          {!hasItemInCart ? (
+            /* Show Beli button when not in cart */
+            <div className="w-full">
+              <Button
+                onClick={handleAddToCart}
+                disabled={isAdding}
+                className="w-full rounded-full px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+              >
+                {isAdding ? (
+                  <span className="flex items-center justify-center gap-1.5">
+                    <Check className="w-4 h-4" />
+                    Added!
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-1.5">
+                    Beli
+                  </span>
+                )}
+              </Button>
+            </div>
+          ) : (
+            /* Show quantity controls when in cart */
+            <div className="flex items-center justify-center gap-3">
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleDecreaseQuantity}
+                disabled={isAdding}
+                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+              >
+                <Minus className="w-4 h-4" />
+              </Button>
+              <span className="text-lg font-semibold w-8 text-center">
+                {quantity}
               </span>
-            ) : (
-              <span className="flex items-center justify-center gap-1.5">
-                Beli
-              </span>
-            )}
-          </Button>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={handleIncreaseQuantity}
+                disabled={isAdding}
+                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </Card>

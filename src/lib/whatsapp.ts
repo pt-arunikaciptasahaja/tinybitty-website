@@ -1,4 +1,5 @@
 import { CartItem, OrderFormData } from '@/types/product';
+import { kelurahanData } from '@/data/kelurahan-data';
 import wilayahData from '@/data/jabodetabek-addresses.json';
 
 export const buildWhatsAppMessage = (
@@ -7,268 +8,137 @@ export const buildWhatsAppMessage = (
   totalPrice: number,
   deliveryCost: number = 0
 ): string => {
-  const deliveryMethodMap = {
-    gosendInstant: 'GoSend Instant',
-    grab: 'Grab Express',
+  const deliveryMethodMap: Record<string, string> = {
+    gosend: 'GoSend Instant',
+    gosendsameday: 'GoSend Same Day',
+    grab: 'GrabExpress Instant',
     paxel: 'Paxel',
+    pickup: 'Ambil sendiri (pickup)',
   };
 
-  const paymentMethodMap = {
+  const paymentMethodMap: Record<string, string> = {
     transfer: 'Transfer Bank',
   };
 
-  let message = `***PESANAN BARU - Tiny Bitty***\n\n`;
+  const formatNumber = (value: number) =>
+    value.toLocaleString('id-ID'); // 365.000
 
-  message += `**Data Pelanggan**\n`;
-  message += `* Nama: ${orderData.name}\n`;
-  message += `* No. HP: ${orderData.phone}\n`;
-  
-  // Build structured address for WhatsApp message
+  // Helper function to convert text to camelCase
+  const toCamelCase = (text: string): string => {
+    if (!text) return '';
+    return text
+      .split(' ')
+      .map(word => {
+        // Handle words with dots, dashes, and numbers
+        if (word.includes('.') || word.includes('-') || /^\d/.test(word)) {
+          return word.toUpperCase();
+        }
+        // Regular words - capitalize first letter, lowercase the rest
+        return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
+      })
+      .join(' ');
+  };
+
+  // Bangun alamat dari kode wilayah dengan kecamatan dan kelurahan
   const buildAddressFromData = (data: OrderFormData): string => {
-    const parts = [];
-    
-    if (data.provinsi && wilayahData.provinsi[data.provinsi]) {
-      parts.push(wilayahData.provinsi[data.provinsi]);
-    }
-    
-    if (data.kota && wilayahData.kota[data.kota]) {
-      parts.push(wilayahData.kota[data.kota]);
-    }
-    
-    if (data.kecamatan && wilayahData.kecamatan[data.kecamatan]) {
-      parts.push(wilayahData.kecamatan[data.kecamatan]);
-    }
-    
-    if (data.kelurahan && wilayahData.kelurahan[data.kelurahan]) {
-      parts.push(wilayahData.kelurahan[data.kelurahan]);
-    }
-    
+    const parts: string[] = [];
+
+    // Add detailed address first with camelCase formatting
     if (data.detailedAddress) {
-      parts.push(data.detailedAddress);
+      parts.push(toCamelCase(data.detailedAddress));
     }
-    
+
+    // Add kelurahan explicitly if available - using kelurahan-data.js structure
+    if (data.kota && data.kecamatan && data.kelurahan && kelurahanData[data.kota]?.[data.kecamatan]) {
+      const kelurahanArray = kelurahanData[data.kota][data.kecamatan];
+      const kelurahanIndex = parseInt(data.kelurahan);
+      if (!isNaN(kelurahanIndex) && kelurahanArray[kelurahanIndex]) {
+        parts.push(`Kel. ${toCamelCase(kelurahanArray[kelurahanIndex])}`);
+      }
+    }
+
+    // Add kecamatan explicitly if available
+    if (data.kecamatan) {
+      parts.push(`Kec. ${toCamelCase(data.kecamatan)}`);
+    }
+
+    // Add kota/administrative area
+    if (data.kota) {
+      parts.push(toCamelCase(data.kota));
+    }
+
     return parts.join(', ');
   };
-  
-  message += `* Alamat: ${buildAddressFromData(orderData)}\n\n`;
 
-  message += `**Detail Pesanan**\n`;
-  cart.forEach((item, index) => {
-    message += `\n${index + 1}. **${item.productName}**\n`;
-    message += `   * ${item.variant.size} — ${item.quantity}x\n`;
-    message += `   * Subtotal: Rp ${(item.variant.price * item.quantity).toLocaleString('id-ID')}\n`;
+  const grandTotal = totalPrice + (deliveryCost || 0);
+  const deliveryLabel =
+    deliveryMethodMap[orderData.deliveryMethod] || orderData.deliveryMethod || '-';
+  const paymentLabel =
+    paymentMethodMap[orderData.paymentMethod] || orderData.paymentMethod || '-';
+
+  let message = '';
+
+  // Header – cute Tiny Bitty
+  message += `Hello, thank you for your order, @Tiny Bitty! 🧡\n\n`;
+
+  // Data pelanggan
+  message += `Nama : ${toCamelCase(orderData.name)}\n`;
+  message += `Telp : ${orderData.phone}\n`;
+  message += `Alamat :\n${buildAddressFromData(orderData)}\n\n`;
+
+  // Items
+  message += `Items + quantity:\n`;
+  cart.forEach((item) => {
+    const lineSubtotal = item.variant.price * item.quantity;
+    const sizeLabel = item.variant.size ? ` (${item.variant.size})` : '';
+    message += `${item.productName}${sizeLabel} ${formatNumber(
+      item.variant.price
+    )} x ${item.quantity} = ${formatNumber(lineSubtotal)}\n`;
   });
 
-  message += `\n**Rincian Pembayaran:**\n`;
-  message += `* Subtotal Produk: Rp ${totalPrice.toLocaleString('id-ID')}\n`;
-  message += `* Biaya Pengiriman: Rp ${deliveryCost.toLocaleString('id-ID')}\n`;
-  message += `* **Total Keseluruhan: Rp ${(totalPrice + deliveryCost).toLocaleString('id-ID')}**\n\n`;
+  message += `\n`;
 
-  message += `**Metode Pengiriman:** ${deliveryMethodMap[orderData.deliveryMethod]}\n`;
-  message += `**Metode Pembayaran:** ${paymentMethodMap[orderData.paymentMethod]}\n`;
-  
-  if (orderData.notes) {
-    message += `\n**Catatan Tambahan:**\n${orderData.notes}\n`;
+  // Rangkuman total ala invoice
+  message += `Total Produk : ${formatNumber(totalPrice)}\n`;
+
+  if (deliveryCost > 0) {
+    message += `Perkiraan Ongkir : ${formatNumber(deliveryCost)}\n`;
+    message += `\nPerhitungan Total :\n`;
+    message += `${formatNumber(totalPrice)} (produk) + ${formatNumber(deliveryCost)} (ongkir)\n`;
+    message += `= Grand Total ${formatNumber(grandTotal)}\n\n`;
+    message += `📝 *Note: Ongkir masih perkiraan ya, Kak! \n`;
+    message += `Ongkir final mengikuti aplikasi GoSend/GrabExpress \n`;
+    message += `(belum termasuk tol/parkir/tip)*\n`;
+  } else {
+    message += `\nTotal :\n`;
+    message += `${formatNumber(totalPrice)}\n`;
+    message += `= Grand Total ${formatNumber(totalPrice)}\n`;
   }
 
-  message += `\n**Catatan:** Ongkir yang muncul masih perkiraan ya, Kak! Nanti kami cek dan infokan ulang ongkir terbaik sebelum order diproses.\n`;
-  message += `\nTerima kasih sudah memesan di Tiny Bitty!`;
+  message += `\nKirim via : ${deliveryLabel}\n`;
+  message += `Metode pembayaran : ${paymentLabel}\n`;
+
+  // Catatan khusus dari user
+  if (orderData.notes) {
+    message += `\nCatatan tambahan:\n${orderData.notes}\n`;
+  }
+
+  // Info pembayaran (static Tiny Bitty)
+  message += `\nPlease transfer to:\n`;
+  message += `Luckyta Aryandini\n`;
+  message += `A/C BCA 1281458294\n\n`;
+
+  // Cute brand closing
+  message += `Kalau ada yang mau diubah, silakan balas chat ini ya.\n`;
+  message += `Terima kasih sudah memilih Tiny Bitty. Stay healthy! 🧁✨`;
 
   return message;
 };
 
-// Test WhatsApp URLs and functionality
-export const testWhatsAppUrls = (phoneNumber: string) => {
-  const testMessage = encodeURIComponent("Test message from Tiny Bitty");
-  
-  // Different URL formats to test
-  const urls = {
-    web: `https://wa.me/${phoneNumber}?text=${testMessage}`,
-    webDirect: `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${testMessage}`,
-    appBasic: `whatsapp://send?phone=${phoneNumber}`,
-    appWithText: `whatsapp://send?phone=${phoneNumber}&text=${testMessage}`
-  };
-  
-  console.log('Testing WhatsApp URLs:', urls);
-  
-  // Show testing dialog
-  const testChoice = prompt(
-    'WhatsApp Test Menu\n\n' +
-    '1 = WhatsApp Web (https://wa.me)\n' +
-    '2 = WhatsApp Web Direct\n' +
-    '3 = WhatsApp Desktop (basic)\n' +
-    '4 = WhatsApp Desktop (with text)\n\n' +
-    'Enter number (1-4):'
-  );
-  
-  switch (testChoice) {
-    case '1':
-      window.open(urls.web, '_blank');
-      break;
-    case '2':
-      window.open(urls.webDirect, '_blank');
-      break;
-    case '3':
-      window.open(urls.appBasic, '_blank');
-      break;
-    case '4':
-      window.open(urls.appWithText, '_blank');
-      break;
-    default:
-      console.log('No test selected');
-  }
-  
-  return urls;
-};
-
-// Main WhatsApp order function - opens in new tab for all platforms
-export const sendWhatsAppOrder = (message: string, phoneNumber: string) => {
-  const encodedMessage = encodeURIComponent(message);
-  
-  // Use wa.me URL which works for mobile, web, and desktop apps
-  const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
-  
-  console.log('Opening WhatsApp in new tab:', whatsappUrl);
-  
-  // Open in new tab - works for all platforms
-  const newWindow = window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
-  
-  if (!newWindow) {
-    // If popup was blocked, try alternative approach
-    console.warn('Popup blocked, trying alternative method');
-    // Create a temporary link and click it
-    const link = document.createElement('a');
-    link.href = whatsappUrl;
-    link.target = '_blank';
-    link.rel = 'noopener noreferrer';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-  }
-};
-
-// Alternative direct approach for immediate user clicks
-export const sendWhatsAppOrderDirect = (message: string, phoneNumber: string) => {
-  const encodedMessage = encodeURIComponent(message);
-  
-  // Try multiple URL formats for better compatibility
-  const urls = [
-    `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-    `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`,
-    `whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`
-  ];
-  
-  let opened = false;
-  
-  // Try each URL with a small delay
-  urls.forEach((url, index) => {
-    setTimeout(() => {
-      if (!opened) {
-        try {
-          console.log(`Trying URL ${index + 1}:`, url);
-          window.open(url, '_blank');
-          opened = true;
-        } catch (error) {
-          console.warn(`URL ${index + 1} failed:`, error);
-        }
-      }
-    }, index * 200);
-  });
-  
-  // If none worked after 1 second, use direct navigation
-  setTimeout(() => {
-    if (!opened) {
-      console.log('All popups failed, using direct navigation');
-      window.location.href = urls[0];
-    }
-  }, 1000);
-};
-
-// Helper function to check if user is on desktop
-export const isDesktop = () => {
-  return !/Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-};
-
-// Helper function to get WhatsApp URLs for manual use
-export const getWhatsAppUrls = (phoneNumber: string, message: string) => {
-  const encodedMessage = encodeURIComponent(message);
-  
-  return {
-    web: `https://wa.me/${phoneNumber}?text=${encodedMessage}`,
-    webDirect: `https://web.whatsapp.com/send?phone=${phoneNumber}&text=${encodedMessage}`,
-    desktop: `whatsapp://send?phone=${phoneNumber}&text=${encodedMessage}`,
-    desktopBasic: `whatsapp://send?phone=${phoneNumber}`
-  };
-};
-
-// Copy WhatsApp link to clipboard
-export const copyWhatsAppLink = async (phoneNumber: string, message: string) => {
+export const sendWhatsAppOrder = (message: string, phoneNumber: string): void => {
   const encodedMessage = encodeURIComponent(message);
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
   
-  try {
-    await navigator.clipboard.writeText(whatsappUrl);
-    return { success: true, url: whatsappUrl };
-  } catch (error) {
-    console.error('Failed to copy to clipboard:', error);
-    return { success: false, url: whatsappUrl };
-  }
-};
-
-// Show user-friendly WhatsApp options
-export const showWhatsAppOptions = (message: string, phoneNumber: string, onComplete: () => void) => {
-  const isDesktopUser = isDesktop();
-  
-  if (isDesktopUser) {
-    // Desktop user - provide multiple options
-    const choice = confirm(
-      '📱 **Pilihan Buka WhatsApp (Desktop):**\n\n' +
-      '1. **WhatsApp Web** (Buka di browser - paling stabil)\n' +
-      '2. **WhatsApp Desktop** (Aplikasi di komputer)\n' +
-      '3. **Salin Link** (Copy link untuk dibuka manual)\n\n' +
-      'Klik **OK** untuk WhatsApp Web (recommended)\n' +
-      'Klik **Cancel** untuk pilihan lain'
-    );
-    
-    if (choice) {
-      // Open WhatsApp Web
-      sendWhatsAppOrder(message, phoneNumber);
-      onComplete();
-    } else {
-      // Show alternative options
-      const altChoice = confirm(
-        'Pilih metode lain:\n\n' +
-        '**OK** = Coba WhatsApp Desktop\n' +
-        '**Cancel** = Salin link WhatsApp'
-      );
-      
-      if (altChoice) {
-        // Try desktop app
-        const desktopUrl = `whatsapp://send?phone=${phoneNumber}`;
-        try {
-          window.open(desktopUrl, '_blank');
-          onComplete();
-        } catch (error) {
-          console.warn('Desktop app failed:', error);
-          // Fallback to web
-          sendWhatsAppOrder(message, phoneNumber);
-          onComplete();
-        }
-      } else {
-        // Copy link to clipboard
-        copyWhatsAppLink(phoneNumber, message).then(result => {
-          if (result.success) {
-            alert('✅ Link WhatsApp berhasil disalin!\n\nSilakan paste link ini untuk membuka WhatsApp dengan pesan pesanan Anda.');
-          } else {
-            alert(`📋 Link WhatsApp:\n\n${result.url}\n\nSilakan copy link ini secara manual.`);
-          }
-          onComplete();
-        });
-      }
-    }
-  } else {
-    // Mobile/web user - direct approach
-    sendWhatsAppOrder(message, phoneNumber);
-    onComplete();
-  }
+  // Open WhatsApp in a new window/tab
+  window.open(whatsappUrl, '_blank');
 };

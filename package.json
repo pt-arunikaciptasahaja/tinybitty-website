@@ -52,6 +52,7 @@
     "framer-motion": "^11.18.0",
     "lottie-react": "^2.4.1",
     "lucide-react": "^0.394.0",
+    "node-fetch": "^3.3.2",
     "react": "^18.2.0",
     "react-day-picker": "^8.10.1",
     "react-dom": "^18.2.0",

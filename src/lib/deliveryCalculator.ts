@@ -185,11 +185,9 @@ export interface DeliveryCalculation {
   zone: DeliveryZone;
   method: string;
   estimatedTime: string;
-  confidence: 'high' | 'medium' | 'low' | 'invalid';
   breakdown: {
     baseRate: number;
     distanceMultiplier: number;
-    weightCharge: number;
     surcharges?: number;
   };
   isValidAddress: boolean;
@@ -304,11 +302,9 @@ export const calculateDeliveryCost = (
       zone: zone,
       method: deliveryMethod,
       estimatedTime: 'N/A',
-      confidence: 'invalid',
       breakdown: {
         baseRate: 0,
         distanceMultiplier: 1,
-        weightCharge: 0,
       },
       isValidAddress: false
     };
@@ -330,29 +326,8 @@ export const calculateDeliveryCost = (
       baseRate = baseRates.gosendInstant;
   }
   
-  // Weight calculation (realistic for cookies)
-  const totalWeight = cart.reduce((total, item) => {
-    const weightPerItem = item.productName.toLowerCase().includes('cookie') ? 
-      getCookieWeight(item.variant.size) : 
-      getProductWeight(item.variant.size);
-    return total + (weightPerItem * item.quantity);
-  }, 0);
-  
-  // Weight charge (updated 2024/2025 rates)
-  let weightCharge = 0;
-  if (totalWeight > 3) { // More than 3kg
-    weightCharge = (totalWeight - 3) * 15000; // Increased to Rp 15,000 per kg over 3kg
-  }
-  
-  // Time-based surge (peak hours)
-  const currentHour = new Date().getHours();
-  let timeSurcharge = 0;
-  if (currentHour >= 17 && currentHour <= 20) { // 5-8 PM peak
-    timeSurcharge = baseRate * 0.1; // 10% peak surcharge
-  }
-  
-  // Final calculation
-  const cost = Math.round(baseRate + weightCharge + timeSurcharge);
+  // Final calculation with 30% increase
+  const cost = Math.round(baseRate * 1.3);
   
   // Estimate delivery time based on delivery method (dynamic like price)
   const getEstimatedTime = (): string => {
@@ -371,21 +346,15 @@ export const calculateDeliveryCost = (
         return '1-3 jam';
     }
   };
-
-  // Calculate confidence level
-  const confidence = calculateConfidence(zone, address);
   
   return {
     cost,
     zone,
     method: deliveryMethod,
     estimatedTime: getEstimatedTime(),
-    confidence,
     breakdown: {
       baseRate,
       distanceMultiplier: 1, // Base rates already account for distance
-      weightCharge,
-      surcharges: timeSurcharge > 0 ? timeSurcharge : undefined
     },
     isValidAddress: true
   };
@@ -394,7 +363,7 @@ export const calculateDeliveryCost = (
 /**
  * Calculate confidence level of zone detection
  */
-const calculateConfidence = (zone: DeliveryZone, address: string): 'high' | 'medium' | 'low' => {
+const calculateConfidence = (zone: DeliveryZone, address: string): 'Tinggi' | 'Sedang' | 'Rendah' => {
   const addressLower = address.toLowerCase();
   let matchCount = 0;
   
@@ -403,14 +372,14 @@ const calculateConfidence = (zone: DeliveryZone, address: string): 'high' | 'med
     if (addressLower.includes(city.toLowerCase())) matchCount++;
   }
   
-  // Count district matches  
+  // Count district matches
   for (const district of zone.districts) {
     if (addressLower.includes(district.toLowerCase())) matchCount++;
   }
   
-  if (matchCount >= 3) return 'high';
-  if (matchCount >= 1) return 'medium';
-  return 'low';
+  if (matchCount >= 3) return 'Tinggi';
+  if (matchCount >= 1) return 'Sedang';
+  return 'Rendah';
 };
 
 /**
@@ -448,25 +417,16 @@ export const getDeliveryInfo = (address: string, deliveryMethod: string): {
   cost: string;
   zone: string;
   time: string;
-  confidence: string;
   breakdown: string;
   isValid: boolean;
 } => {
   const calculation = calculateDeliveryCost(address, deliveryMethod);
-  
-  const confidenceText = {
-    'high': 'Tinggi',
-    'medium': 'Sedang', 
-    'low': 'Rendah',
-    'invalid': 'Tidak Valid'
-  };
   
   if (!calculation.isValidAddress) {
     return {
       cost: 'Invalid Address',
       zone: 'Please enter a valid city/area',
       time: 'N/A',
-      confidence: 'Tidak Valid',
       breakdown: 'Address must contain recognizable city or area name',
       isValid: false
     };
@@ -476,10 +436,7 @@ export const getDeliveryInfo = (address: string, deliveryMethod: string): {
     cost: formatDeliveryCost(calculation.cost),
     zone: calculation.zone.name,
     time: calculation.estimatedTime,
-    confidence: confidenceText[calculation.confidence],
-    breakdown: `Base: ${formatDeliveryCost(calculation.breakdown.baseRate)}` + 
-               (calculation.breakdown.weightCharge > 0 ? ` + Weight: ${formatDeliveryCost(calculation.breakdown.weightCharge)}` : '') +
-               (calculation.breakdown.surcharges ? ` + Peak: ${formatDeliveryCost(calculation.breakdown.surcharges)}` : ''),
+    breakdown: `Base: ${formatDeliveryCost(calculation.breakdown.baseRate)}`,
     isValid: true
   };
 };

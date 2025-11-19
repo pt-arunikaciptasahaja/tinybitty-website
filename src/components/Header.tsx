@@ -35,7 +35,7 @@ export default function Header() {
           <div className="flex items-center justify-between">
             <Link to="/" className="flex items-center gap-3">
               <img
-                src="/logo-purple.png"
+                src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574652/logo-purple_dlshle.png"
                 alt="Tiny Bitty - Freshly Baked Happiness"
                 className="h-16 md:h-20 w-auto object-contain"
                 // style={{
@@ -82,7 +82,7 @@ export default function Header() {
                 <div className="relative p-2 rounded-full hover:bg-gray-100 transition-all duration-200 cursor-pointer">
                   <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 bg-[#f9c2cd] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                    <Badge className="absolute -top-1 -right-1 bg-[#C5B8FF] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -97,7 +97,7 @@ export default function Header() {
                 <div className="relative p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
                   <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 bg-[#f9c2cd] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                    <Badge className="absolute -top-1 -right-1 bg-[#C5B8FF] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
                       {getTotalItems()}
                     </Badge>
                   )}

@@ -149,19 +149,19 @@ export class DeliveryCalculator {
     } catch {
       // Ultimate fallback
       return {
-        cost: 50000, // Default 50k
+        cost: 65000, // Default 50k + 30%
         provider: this.getProviderFromMethod(method),
         zone: {
           name: 'Unknown',
           cities: [],
           districts: [],
-          baseRates: { gosendInstant: 50000, gosendSameDay: 35000, grab: 55000, paxel: 45000 },
+          baseRates: { gosendInstant: 65000, gosendSameDay: 45500, grab: 71500, paxel: 58500 },
           distance: 'medium'
         },
         isLive: false,
         estimated: true,
         breakdown: {
-          baseRate: 50000,
+          baseRate: 65000,
           distanceMultiplier: 1,
           weightCharge: 0,
           surcharges: 0

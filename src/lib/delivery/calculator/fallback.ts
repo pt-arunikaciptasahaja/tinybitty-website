@@ -51,7 +51,7 @@ export function fallbackCost(
     surcharges: timeSurcharge
   };
   
-  const cost = baseRate + weightCharge + timeSurcharge;
+  const cost = Math.round((baseRate + weightCharge + timeSurcharge) * 1.3);
   
   // Calculate confidence based on address matching
   const confidence = calculateFallbackConfidence(zone, address);
@@ -206,7 +206,7 @@ function emergencyFallback(
   const totalWeight = calculateWeight(cart);
   const weightCharge = totalWeight > 3 ? (totalWeight - 3) * 10000 : 0; // Lower rate for emergency
   
-  const cost = baseRate + weightCharge;
+  const cost = Math.round((baseRate + weightCharge) * 1.3);
   
   return {
     cost,
