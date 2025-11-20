@@ -111,15 +111,88 @@ export async function getDistanceKm(destination: string): Promise<number | null>
 // =============== DELIVERY FEE FORMULAS ======================
 
 export function getGoSendInstantFee(distanceKm: number): number {
-  return Math.max(14000, distanceKm * 4000);
+  // Tarif dasar: Rp 20.000 untuk 8 km pertama
+  if (distanceKm <= 8) {
+    return 20000;
+  }
+  
+  // Untuk jarak 0–20 km: Rp 2.500 / km (setelah 8 km pertama)
+  if (distanceKm <= 20) {
+    return 20000 + ((distanceKm - 8) * 2500);
+  }
+  
+  // Untuk jarak 20,01–40 km: Rp 3.000 / km
+  if (distanceKm <= 40) {
+    return 20000 + (12 * 2500) + ((distanceKm - 20) * 3000);
+  }
+  
+  return 0; // Tidak melayani jarak > 40 km
 }
 
 export function getGoSendSameDayFee(distanceKm: number): number {
-  return Math.max(10000, distanceKm * 3000);
+  // Jarak 0–3 km → ongkir Rp 12.000
+  if (distanceKm <= 3) {
+    return 12000;
+  }
+  
+  // Jarak 3,01–15 km → ongkir Rp 18.000
+  if (distanceKm <= 15) {
+    return 18000;
+  }
+  
+  // Jarak > 15 km → ongkir Rp 1.200 / km
+  if (distanceKm <= 40) {
+    return Math.round(distanceKm * 1200);
+  }
+  
+  return 0; // Tidak melayani jarak > 40 km
 }
 
 export function getGrabExpressInstantFee(distanceKm: number): number {
-  return Math.max(15000, distanceKm * 4200);
+  // Tarif minimum (base): Rp 20.000
+  if (distanceKm <= 0) {
+    return 20000;
+  }
+  
+  // 0 – 5 km → Rp 2.900 / km
+  if (distanceKm <= 5) {
+    return Math.max(20000, distanceKm * 2900);
+  }
+  
+  // 5 – 10 km → Rp 3.000 / km
+  if (distanceKm <= 10) {
+    return 5 * 2900 + ((distanceKm - 5) * 3000);
+  }
+  
+  // 10 – 30 km → Rp 3.200 / km (instant maksimal 30 km)
+  if (distanceKm <= 30) {
+    return 5 * 2900 + 5 * 3000 + ((distanceKm - 10) * 3200);
+  }
+  
+  return 0; // Tidak melayani jarak > 30 km untuk Instant
+}
+
+export function getGrabExpressSameDayFee(distanceKm: number): number {
+  // Ongkir sama (flat) berdasarkan jarak untuk SameDay
+  if (distanceKm <= 5) {
+    return 15000;
+  } else if (distanceKm <= 10) {
+    return 18000;
+  } else if (distanceKm <= 15) {
+    return 18000;
+  } else if (distanceKm <= 20) {
+    return 21000;
+  } else if (distanceKm <= 25) {
+    return 25000;
+  } else if (distanceKm <= 30) {
+    return 33000;
+  } else if (distanceKm <= 35) {
+    return 39000;
+  } else if (distanceKm <= 40) {
+    return 49000;
+  }
+  
+  return 0; // Tidak melayani jarak > 40 km untuk SameDay
 }
 
 // ========= MAIN PIPELINE: returns EXACT format required =========

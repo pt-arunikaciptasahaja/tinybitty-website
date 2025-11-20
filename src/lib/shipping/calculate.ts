@@ -3,7 +3,8 @@ import {
   getOriginAddress,
   getGoSendInstantFee,
   getGoSendSameDayFee,
-  getGrabExpressInstantFee
+  getGrabExpressInstantFee,
+  getGrabExpressSameDayFee
 } from './distance';
 import { ShippingRates, ShippingResult } from './types';
 
@@ -26,6 +27,10 @@ export async function calculateShipping(destination: string): Promise<ShippingRa
       grabexpress_instant: {
         available: false,
         reason: "Unable to calculate distance"
+      },
+      grabexpress_same_day: {
+        available: false,
+        reason: "Unable to calculate distance"
       }
     };
   }
@@ -46,10 +51,16 @@ export async function calculateShipping(destination: string): Promise<ShippingRa
     price: getGrabExpressInstantFee(distanceKm)
   };
 
+  const grabExpressSameDay = {
+    available: true as const,
+    price: getGrabExpressSameDayFee(distanceKm)
+  };
+
   return {
     distance_km: distanceKm,
     gosend_instant: gosendInstant,
     gosend_same_day: gosendSameDay,
     grabexpress_instant: grabExpressInstant,
+    grabexpress_same_day: grabExpressSameDay,
   };
 }

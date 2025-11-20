@@ -24,7 +24,7 @@ export const orderFormSchema = z.object({
   kelurahan: z.string().optional(),
   detailedAddress: z.string().min(5, 'Detail alamat (jalan, nomor rumah) minimal 5 karakter'),
 
-  deliveryMethod: z.enum(['gosend', 'grab', 'paxel', 'pickup', 'gosendsameday'], {
+  deliveryMethod: z.enum(['gosend', 'grab', 'paxel', 'pickup', 'gosendsameday', 'grabsameday'], {
     required_error: 'Pilih metode pengiriman',
   }),
 

@@ -46,21 +46,25 @@ export async function calculateShippingCost(
     
     switch (method) {
       case 'gosend':
-      case 'gosendInstant':
+      case 'gosendinstant':
         selectedRate = shippingRates.gosend_instant;
         estimatedTime = '1-3 jam';
         break;
       case 'grab':
         selectedRate = shippingRates.grabexpress_instant;
-        estimatedTime = '1-3 jam';
+        estimatedTime = '1-4 jam';
+        break;
+      case 'grabsameday':
+        selectedRate = shippingRates.grabexpress_same_day;
+        estimatedTime = '3-6 jam'; // Same Day takes longer but costs less
         break;
       case 'paxel':
         // Paxel doesn't have real-time calculation in the new engine
         // Use GoSend Same Day as fallback with distance-based pricing
         selectedRate = shippingRates.gosend_same_day;
-        estimatedTime = '1-3 jam';
+        estimatedTime = '2-6 jam';
         break;
-      case 'gosendSameDay':
+      case 'gosendsameday':
         selectedRate = shippingRates.gosend_same_day;
         estimatedTime = '3-6 jam'; // Same Day takes longer but costs less
         break;
@@ -143,7 +147,8 @@ export async function getQuickShippingEstimate(destination: string): Promise<{
     const availableOptions = [
       { name: 'GoSend Instant', rate: rates.gosend_instant },
       { name: 'GoSend Same Day', rate: rates.gosend_same_day },
-      { name: 'GrabExpress', rate: rates.grabexpress_instant }
+      { name: 'GrabExpress Instant', rate: rates.grabexpress_instant },
+      { name: 'GrabExpress SameDay', rate: rates.grabexpress_same_day }
     ].filter(option => option.rate.available);
     
     if (availableOptions.length === 0) {
@@ -188,20 +193,20 @@ export async function getQuickShippingEstimate(destination: string): Promise<{
 /**
  * Get cookie weight by size (realistic estimates)
  */
-function getCookieWeight(size: string): number {
-  if (size.toLowerCase().includes('small') || size === 'S') return 0.15; // 150g
-  if (size.toLowerCase().includes('medium') || size === 'M') return 0.25; // 250g
-  if (size.toLowerCase().includes('large') || size === 'L') return 0.35; // 350g
-  if (size.toLowerCase().includes('family') || size === 'F') return 0.5; // 500g
-  return 0.2; // Default 200g
-}
+// function getCookieWeight(size: string): number {
+//   if (size.toLowerCase().includes('small') || size === 'S') return 0.15; // 150g
+//   if (size.toLowerCase().includes('medium') || size === 'M') return 0.25; // 250g
+//   if (size.toLowerCase().includes('large') || size === 'L') return 0.35; // 350g
+//   if (size.toLowerCase().includes('family') || size === 'F') return 0.5; // 500g
+//   return 0.2; // Default 200g
+// }
 
 /**
  * Get product weight by size
  */
-function getProductWeight(size: string): number {
-  if (size.toLowerCase().includes('small') || size === 'S') return 0.2;
-  if (size.toLowerCase().includes('medium') || size === 'M') return 0.35;
-  if (size.toLowerCase().includes('large') || size === 'L') return 0.5;
-  return 0.25; // Default
-}
+// function getProductWeight(size: string): number {
+//   if (size.toLowerCase().includes('small') || size === 'S') return 0.2;
+//   if (size.toLowerCase().includes('medium') || size === 'M') return 0.35;
+//   if (size.toLowerCase().includes('large') || size === 'L') return 0.5;
+//   return 0.25; // Default
+// }

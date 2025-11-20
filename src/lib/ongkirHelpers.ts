@@ -28,12 +28,12 @@ const MAX_DISTANCE_WARNING =
 // -------------------------
 
 // GoSend – JABODETABEK (motor)
-const GOSEND_MIN_FARE_IDR = 13_000; // You can bump to 20_000 if you want to be conservative
+const GOSEND_MIN_FARE_IDR = 12_000; // You can bump to 20_000 if you want to be conservative
 const GOSEND_INSTANT_MAX_DISTANCE_KM = 40;
 const GOSEND_SAMEDAY_MAX_DISTANCE_KM = 40;
 
 // GrabExpress – JABODETABEK (bike)
-const GRAB_INSTANT_MIN_FARE_IDR = 20_000;
+const GRAB_INSTANT_MIN_FARE_IDR = 18_000;
 const GRAB_INSTANT_MAX_DISTANCE_KM = 40; // practical app limit often 30–40 km
 const GRAB_SAMEDAY_MAX_DISTANCE_KM = 40;
 

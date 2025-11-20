@@ -25,7 +25,7 @@ export default function Footer() {
               className="h-14 w-auto object-contain"
             />
             <div className="flex items-center gap-3">
-              <span className="text-lg text-[#11110a]/80 delius-regular">Homemade treats with love</span>
+              <span className="text-lg text-[#553d8f] delius-regular">Homemade treats with love</span>
               <Heart className="w-10 h-10 text-[#553d8f] fill-current" />
             </div>
           </div>
@@ -45,7 +45,7 @@ export default function Footer() {
               href="https://wa.me/6281112010160"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-[#553d8f] hover:text-[#a3e2f5]/80 transition-colors"
+              className="flex items-center gap-2 text-[#553d8f] hover:text-[#553d8f]/80 transition-colors"
             >
               <MessageCircle className="w-5 h-5" />
               <span className="text-sm font-medium">WhatsApp</span>
@@ -53,8 +53,8 @@ export default function Footer() {
           </div>
         </div>
 
-        <div className="mt-8 pt-6 border-t border-[#a3e2f5]/20 text-center">
-          <p className="text-xs text-[#11110a]/60">
+        <div className="mt-8 pt-6 border-t border-[#553d8f]/20 text-center">
+          <p className="text-xs text-[#553d8f]/60">
             All rights reserved 2025 • tinybitty
           </p>
         </div>

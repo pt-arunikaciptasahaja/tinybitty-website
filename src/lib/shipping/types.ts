@@ -15,6 +15,7 @@ export interface ShippingRates {
   gosend_instant: ShippingResult;
   gosend_same_day: ShippingResult;
   grabexpress_instant: ShippingResult;
+  grabexpress_same_day: ShippingResult;
 }
 
 export interface GeocodeResult {

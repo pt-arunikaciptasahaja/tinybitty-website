@@ -30,6 +30,8 @@ const getETA = (method: string): string => {
       return '3-6 jam';
     case 'grab':
       return '1-4 jam';
+    case 'grabsameday':
+      return '3-6 jam';
     case 'paxel':
       return '2-6 jam';
     default:
@@ -423,7 +425,7 @@ export default function OrderForm() {
                 time: 'N/A',
                 formattedCost: 'Error calculating delivery',
                 isValid: false,
-                validationError: 'Unable to calculate delivery cost. Please try again.'
+                validationError: 'Gagal menghitung ongkir. Ongkir akan dikonfirmasi via WhatsApp.'
               };
               setDeliveryInfo(info);
               calculationSuccess = false;
@@ -530,14 +532,7 @@ export default function OrderForm() {
     }
 
     const fullAddress = generateFullAddress();
-    if (deliveryInfo && !deliveryInfo.isValid) {
-      toast({
-        title: 'Invalid Address',
-        description: 'Please check your address and try again',
-        variant: 'destructive',
-      });
-      return;
-    }
+    // Allow orders even if delivery calculation fails - will be confirmed via WhatsApp
 
     if (!deliveryMethod) {
       toast({
@@ -1056,6 +1051,7 @@ export default function OrderForm() {
             <SelectItem value="gosend">GoSend Instant</SelectItem>
             <SelectItem value="gosendsameday">GoSend SameDay</SelectItem>
             <SelectItem value="grab">GrabExpress Instant</SelectItem>
+            <SelectItem value="grabsameday">GrabExpress SameDay</SelectItem>
             <SelectItem value="paxel">Paxel</SelectItem>
           </SelectContent>
         </Select>
@@ -1306,8 +1302,10 @@ export default function OrderForm() {
 </div>
 
 {/* Ringkasan Pesanan */}
-{cart.length > 0 && deliveryInfo?.isValid && (
-  <Card className="bg-[#F6F2FF] border-[#D8CFF7]/40">
+{cart.length > 0 && (
+  <Card className={`border-[#D8CFF7]/40 ${
+    deliveryInfo?.isValid ? 'bg-[#F6F2FF]' : 'bg-amber-50 border-amber-200'
+  }`}>
     <CardContent className="p-4">
       <div className="space-y-2">
         <div className="font-semibold text-[#5D4E8E] mb-3">Ringkasan Pesanan</div>
@@ -1319,18 +1317,36 @@ export default function OrderForm() {
           </span>
         </div>
 
-        <div className="flex justify-between text-sm">
-          <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-          <span className="font-medium text-[#5D4E8E]">
-            {deliveryInfo.formattedCost}
-          </span>
-        </div>
+        {deliveryInfo?.isValid ? (
+          <div className="flex justify-between text-sm">
+            <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+            <span className="font-medium text-[#5D4E8E]">
+              {deliveryInfo.formattedCost}
+            </span>
+          </div>
+        ) : (
+          <div className="bg-amber-100 border border-amber-300 rounded-lg p-3">
+            <div className="text-sm text-amber-800">
+              <div className="font-medium">⚠️ Ongkir Akan Dikonfirmasi</div>
+              <div className="text-xs mt-1">
+                Gagal menghitung ongkir. Kami akan konfirmasi ongkir melalui WhatsApp.
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="border-t border-[#D8CFF7]/40 pt-2">
           <div className="flex justify-between font-semibold">
-            <span className="text-[#5D4E8E]">Total Pembayaran</span>
+            <span className="text-[#5D4E8E]">
+              {deliveryInfo?.isValid ? 'Total Pembayaran' : 'Subtotal (Ongkir akan dikonfirmasi)'}
+            </span>
             <span className="text-[#BFAAE3]">
-              Rp {(getTotalPrice() + deliveryInfo.cost).toLocaleString('id-ID')}
+              Rp {getTotalPrice().toLocaleString('id-ID')}
+              {deliveryInfo?.isValid && deliveryInfo.cost > 0 && (
+                <span className="text-sm text-[#8978B4] font-normal block">
+                  + ongkir: {deliveryInfo.formattedCost}
+                </span>
+              )}
             </span>
           </div>
         </div>
@@ -1374,15 +1390,15 @@ export default function OrderForm() {
 
 <Button
   type="submit"
-  disabled={!isStep4Complete || !deliveryInfo?.isValid || cart.length === 0}
+  disabled={!isStep4Complete || cart.length === 0}
   className={`w-full transition-all duration-300 rounded-xl py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
-    isStep4Complete && deliveryInfo?.isValid && cart.length > 0
+    isStep4Complete && cart.length > 0
       ? 'bg-[#BFAAE3] hover:bg-[#9D85D0] text-white shadow-lg hover:shadow-xl text-md'
       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
   }`}
 >
   <MessageCircle className="w-5 h-5" />
-  {isStep4Complete && deliveryInfo?.isValid && cart.length > 0
+  {isStep4Complete && cart.length > 0
     ? 'Yuk checkout via WhatsApp 🚀'
     : `Lanjut ke Langkah ${nextStep}`}
 </Button>
@@ -1515,8 +1531,10 @@ export default function OrderForm() {
                   {deliveryMethod === 'gosend' && 'GoSend Instant'}
                   {deliveryMethod === 'gosendsameday' && 'GoSend Same Day'}
                   {deliveryMethod === 'grab' && 'GrabExpress Instant'}
+                  {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
                   {deliveryMethod === 'paxel' && 'Paxel'}
                   {deliveryMethod === 'pickup' && 'Ambil sendiri (pickup)'}
+                  {!deliveryMethod && 'Belum dipilih'}
                 </div>
               </div>
               <div>
@@ -1561,33 +1579,56 @@ export default function OrderForm() {
           </div>
 
           {/* Order Total */}
-          {deliveryInfo && deliveryInfo.isValid && (
-            <div className="bg-[#F6F2FF] rounded-2xl p-4">
-              <h3 className="font-semibold text-[#5D4E8E] mb-3">Ringkasan Pembayaran</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-[#8978B4]">Subtotal Produk</span>
-                  <span className="text-[#5D4E8E]">
-                    Rp {getTotalPrice().toLocaleString('id-ID')}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-                  <span className="text-[#5D4E8E]">
-                    Rp {deliveryInfo.cost.toLocaleString('id-ID')}
-                  </span>
-                </div>
-                <div className="border-t border-[#D8CFF7]/40 pt-2">
-                  <div className="flex justify-between font-bold text-lg">
-                    <span className="text-[#5D4E8E]">Total Pembayaran</span>
-                    <span className="text-[#BFAAE3]">
-                      Rp {(getTotalPrice() + deliveryInfo.cost).toLocaleString('id-ID')}
+          <div className={`rounded-2xl p-4 ${
+            deliveryInfo?.isValid ? 'bg-[#F6F2FF]' : 'bg-amber-50 border-2 border-amber-200'
+          }`}>
+            <h3 className="font-semibold text-[#5D4E8E] mb-3">Ringkasan Pembayaran</h3>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-[#8978B4]">Subtotal Produk</span>
+                <span className="text-[#5D4E8E]">
+                  Rp {getTotalPrice().toLocaleString('id-ID')}
+                </span>
+              </div>
+              {deliveryInfo?.isValid ? (
+                <>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+                    <span className="text-[#5D4E8E]">
+                      Rp {deliveryInfo.cost.toLocaleString('id-ID')}
                     </span>
                   </div>
-                </div>
-              </div>
+                  <div className="border-t border-[#D8CFF7]/40 pt-2">
+                    <div className="flex justify-between font-bold text-lg">
+                      <span className="text-[#5D4E8E]">Total Pembayaran</span>
+                      <span className="text-[#BFAAE3]">
+                        Rp {(getTotalPrice() + deliveryInfo.cost).toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="bg-amber-100 border border-amber-300 rounded-lg p-3 mt-2">
+                    <div className="text-sm text-amber-800">
+                      <div className="font-medium">⚠️ Ongkir Akan Dikonfirmasi</div>
+                      <div className="text-xs mt-1">
+                        Gagal menghitung ongkir. Kami akan konfirmasi biaya kirim melalui WhatsApp.
+                      </div>
+                    </div>
+                  </div>
+                  <div className="border-t border-amber-200 pt-2 mt-3">
+                    <div className="flex justify-between font-bold text-lg">
+                      <span className="text-[#5D4E8E]">Subtotal (Ongkir akan dikonfirmasi)</span>
+                      <span className="text-[#BFAAE3]">
+                        Rp {getTotalPrice().toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                  </div>
+                </>
+              )}
             </div>
-          )}
+          </div>
 
           {/* Action Buttons */}
           <div className="flex gap-3 pt-4">

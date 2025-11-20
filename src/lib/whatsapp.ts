@@ -12,6 +12,7 @@ export const buildWhatsAppMessage = (
     gosend: 'GoSend Instant',
     gosendsameday: 'GoSend Same Day',
     grab: 'GrabExpress Instant',
+    grabsameday: 'GrabExpress Same Day',
     paxel: 'Paxel',
     pickup: 'Ambil sendiri (pickup)',
   };
@@ -117,6 +118,12 @@ export const buildWhatsAppMessage = (
 
   message += `\nKirim via : ${deliveryLabel}\n`;
   message += `Metode pembayaran : ${paymentLabel}\n`;
+
+  // Note when delivery cost calculation fails
+  if (deliveryCost === 0 && orderData.deliveryMethod && orderData.deliveryMethod !== 'pickup') {
+    message += `\n⚠️ Note: Gagal menghitung ongkir secara otomatis.\n`;
+    message += `Biaya kirim akan dikonfirmasi melalui chat ini ya, Kak!\n`;
+  }
 
   // Catatan khusus dari user
   if (orderData.notes) {
