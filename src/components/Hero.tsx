@@ -1,5 +1,5 @@
 import { Button } from '@/components/ui/button';
-import { Grid3X3 } from 'lucide-react';
+import { Menu } from 'lucide-react';
 
 export default function Hero() {
 
@@ -37,10 +37,10 @@ export default function Hero() {
             <div className="flex justify-center">
               <Button
                 onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#553d8f] hover:bg-[#553d8f]/90 text-white px-8 flex items-center justify-center gap-2 rounded-full font-light text-base shadow-lg hover:shadow-xl transition-all duration-300 -mt-[128px] md:mt-12 md:px-12 md:py-8 md:text-3xl"
+                className="bg-[#553d8f] hover:bg-[#553d8f]/90 text-white px-6 flex items-center justify-center gap-2 rounded-full font-light text-sm shadow-lg hover:shadow-xl transition-all duration-300 -mt-[128px] md:mt-12 md:px-8 md:py-6 md:text-xl"
               >
-                <Grid3X3 className="w-5 h-5 md:w-10 md:h-10" />
-                Browse Menu
+                <Menu className="w-4 h-4 md:w-6 md:h-6" />
+                Lihat Menu
               </Button>
             </div>
           </div>

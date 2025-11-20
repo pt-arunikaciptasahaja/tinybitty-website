@@ -2,6 +2,7 @@ import Header from './Header';
 import Hero from './Hero';
 import RunningText from './RunningText';
 import ProductSection from './ProductSection';
+import HowToOrder from './HowToOrder';
 import OrderForm from './OrderForm';
 import Footer from './Footer';
 import productsData from '@/data/products.json';
@@ -37,6 +38,8 @@ export default function Home() {
           icon="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/mac-icon_kuyjid.png"
         />
       </main>
+
+      <HowToOrder />
 
       <OrderForm />
 

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Product } from '@/types/product';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -10,7 +10,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Plus, Minus, Check } from 'lucide-react';
+import { Plus, Minus, Check, Star } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/components/ui/use-toast';
 
@@ -21,14 +21,71 @@ interface ProductCardProps {
 
 export default function ProductCard({ product, className = '' }: ProductCardProps) {
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
-  const [quantity, setQuantity] = useState(0);
+  const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [isAdding, setIsAdding] = useState(false);
-  const { addToCart, updateQuantity, removeFromCart } = useCart();
+  const { addToCart, updateQuantity, removeFromCart, cart } = useCart();
   const { toast } = useToast();
 
   const selectedVariant = product.variants[selectedVariantIndex];
   const isMultiSize = product.variants.length > 1;
+  const quantity = quantities[selectedVariantIndex] || 0;
   const hasItemInCart = quantity > 0;
+
+  // Dynamic rating and sales based on product name
+  const getProductRating = (productName: string) => {
+    const name = productName.toLowerCase();
+    
+    // Best sellers get higher ratings
+    if (name.includes('choco almond')) return 4.9;
+    if (name.includes('soursop') || name.includes('sirsak')) return 4.8;
+    if (name.includes('macaroni')) return 4.8;
+    
+    // Other products have slightly lower ratings
+    return 4.5;
+  };
+
+  const getProductSales = (productName: string) => {
+    const name = productName.toLowerCase();
+    
+    // Best sellers have higher sales
+    if (name.includes('choco almond')) return '245+';
+    if (name.includes('soursop') || name.includes('sirsak')) return '189+';
+    if (name.includes('macaroni')) return '312+';
+    
+    // Other products have varied, distinct sales
+    if (name.includes('chocolate')) return '156+';
+    if (name.includes('vanilla')) return '134+';
+    if (name.includes('strawberry')) return '98+';
+    if (name.includes('cheese')) return '167+';
+    if (name.includes('orange')) return '112+';
+    if (name.includes('apple')) return '87+';
+    if (name.includes('mango')) return '143+';
+    
+    // Fallback for any other products
+    return '75+';
+  };
+
+  const productRating = getProductRating(product.name);
+  const productSales = getProductSales(product.name);
+
+  // Sync component quantity state with actual cart state
+  useEffect(() => {
+    const cartItem = cart.find(
+      item => item.productId === product.id && item.variant.size === selectedVariant.size
+    );
+    
+    if (cartItem) {
+      setQuantities(prev => ({
+        ...prev,
+        [selectedVariantIndex]: cartItem.quantity
+      }));
+    } else {
+      setQuantities(prev => ({
+        ...prev,
+        [selectedVariantIndex]: 0
+      }));
+    }
+  }, [cart, product.id, selectedVariant.size, selectedVariantIndex]);
 
   const handleAddToCart = () => {
     setIsAdding(true);
@@ -41,11 +98,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       image: product.image,
     });
 
-    setQuantity(1);
+    setQuantities(prev => ({
+      ...prev,
+      [selectedVariantIndex]: 1
+    }));
 
     toast({
-      title: 'Added to cart! 🎉',
-      description: `1x ${product.name} (${selectedVariant.size})`,
+      title: 'Yeay, berhasil! ✨',
+      description: `${product.name} (${selectedVariant.size}) siap dinikmati.`,
     });
 
     setTimeout(() => {
@@ -55,35 +115,41 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   const handleIncreaseQuantity = () => {
     const newQuantity = quantity + 1;
-    setQuantity(newQuantity);
+    setQuantities(prev => ({
+      ...prev,
+      [selectedVariantIndex]: newQuantity
+    }));
     
     updateQuantity(product.id, selectedVariant.size, newQuantity);
 
     toast({
-      title: 'Updated! 🎉',
-      description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
+      title: 'Jumlah diganti 😋',
+      description: `${newQuantity}x ${product.name} (${selectedVariant.size}) siap lanjut!`,
     });
   };
 
   const handleDecreaseQuantity = () => {
     const newQuantity = Math.max(0, quantity - 1);
-    setQuantity(newQuantity);
+    setQuantities(prev => ({
+      ...prev,
+      [selectedVariantIndex]: newQuantity
+    }));
     
     updateQuantity(product.id, selectedVariant.size, newQuantity);
-
+  
     if (newQuantity === 0) {
       toast({
-        title: 'Removed from cart',
+        title: 'Dihapus dari keranjang',
         description: `${product.name} (${selectedVariant.size})`,
       });
     } else {
       toast({
-        title: 'Updated! 🎉',
+        title: 'Jumlah diperbarui',
         description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
       });
     }
   };
-
+  
   const getSizeMeta = (size: string) => {
     const s = size.toLowerCase();
   
@@ -171,6 +237,16 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             Rp {selectedVariant.price.toLocaleString('id-ID')}
           </div>
 
+          {/* Star rating and sales info */}
+          <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center gap-1">
+              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+              <span className="text-sm font-medium text-[#11110a]">{productRating}</span>
+            </div>
+            <span className="text-sm text-[#11110a]/60">•</span>
+            <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
+          </div>
+
           <p className="text-sm md:text-[15px] text-[#11110a]/75 line-clamp-2 leading-tight">
             {product.description}
           </p>
@@ -208,12 +284,15 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                 <SelectContent
                   position="popper"
-                  side="top"
-                  sideOffset={6}
+                  sideOffset={8}
+                  align="start"
+                  collisionPadding={{ top: 60, bottom: 40 }}
                   className="
                     z-50
                     w-full
                     max-w-[280px]
+                    max-h-[200px]
+                    overflow-y-auto
                     rounded-2xl
                     border border-[#e5e7eb]
                     bg-white

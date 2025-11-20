@@ -1,17 +1,28 @@
 import Header from './Header';
 import Footer from './Footer';
 import { Toaster } from '@/components/ui/toaster';
+import { 
+  Home, 
+  Sprout, 
+  Dumbbell, 
+  Package, 
+  Store, 
+  Heart, 
+  Leaf, 
+  Gift 
+} from 'lucide-react';
 
 export default function OurStoryPage() {
   return (
     <div className="min-h-screen px-4 md:px-8 lg:px-12 xl:px-16" style={{ backgroundColor: '#f5f7f7' }}>
       <Header />
 
-      <main className="content-section">
+      <main className="content-section md:!pt-[10rem]" style={{ paddingTop: 'var(--mobile-header-height)' }}>
         {/* Hero Section */}
-        <div className="card-standard text-center mb-8 mt-16">
-          <span className="badge badge-primary mb-6">
-            🏠 Our Journey
+        <div className="card-standard text-center mb-8 mt-0">
+          <span className="badge badge-primary mb-6 inline-flex items-center gap-2">
+            <Home className="w-4 h-4" />
+            Our Journey
           </span>
           
           <h1 className="heading-xl mb-6">
@@ -39,7 +50,8 @@ export default function OurStoryPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    🌱 The Beginning
+                    <Sprout className="w-5 h-5 text-secondary" />
+                    The Beginning
                   </h3>
                   <p className="body-base">
                     Tiny Bitty began in 2019, starting from a small backyard oven and a simple dream:
@@ -59,7 +71,8 @@ export default function OurStoryPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    💪 Growing Through Challenges
+                    <Dumbbell className="w-5 h-5 text-primary" />
+                    Growing Through Challenges
                   </h3>
                   <p className="body-base">
                     Through the challenges of the pandemic, Tiny Bitty continued to grow — supported by
@@ -73,12 +86,13 @@ export default function OurStoryPage() {
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
                   <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary-foreground font-bold text-lg">📦</span>
+                    <Package className="w-6 h-6 text-primary-foreground" />
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    💝 Quality Over Quantity
+                    <Gift className="w-5 h-5 text-accent" />
+                    Quality Over Quantity
                   </h3>
                   <p className="body-base">
                     Along the way, Tiny Bitty learned something important: fragile, handcrafted cookies
@@ -98,7 +112,8 @@ export default function OurStoryPage() {
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    🏪 Growing Family
+                    <Store className="w-5 h-5 text-primary" />
+                    Growing Family
                   </h3>
                   <p className="body-base">
                     In 2024, Tiny Bitty introduced new members to its family — Tiny Juice and Macaroni Schotel,
@@ -113,7 +128,9 @@ export default function OurStoryPage() {
 
           {/* Quote Section */}
           <div className="card-standard text-center">
-            <div className="text-4xl mb-4">💖</div>
+            <div className="mb-4">
+              <Heart className="w-10 h-10 mx-auto text-accent" />
+            </div>
             <blockquote className="heading-md italic mb-6">
               "Because that's exactly what we're doing — creating homemade happiness, one cookie at a time."
             </blockquote>
@@ -124,7 +141,7 @@ export default function OurStoryPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="card-standard text-center">
               <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-foreground text-xl">🏠</span>
+                <Home className="w-6 h-6 text-primary-foreground" />
               </div>
               <h4 className="font-bold text-primary mb-2">Homemade</h4>
               <p className="body-sm">Every product made with love and care</p>
@@ -132,7 +149,7 @@ export default function OurStoryPage() {
             
             <div className="card-standard text-center">
               <div className="w-12 h-12 bg-accent-light rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary text-xl">🌿</span>
+                <Leaf className="w-6 h-6 text-primary" />
               </div>
               <h4 className="font-bold text-primary mb-2">Quality</h4>
               <p className="body-sm">Only the best ingredients make the cut</p>
@@ -140,7 +157,7 @@ export default function OurStoryPage() {
             
             <div className="card-standard text-center">
               <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <span className="text-primary-foreground text-xl">💝</span>
+                <Gift className="w-6 h-6 text-primary-foreground" />
               </div>
               <h4 className="font-bold text-primary mb-2">Care</h4>
               <p className="body-sm">Your satisfaction is our priority</p>

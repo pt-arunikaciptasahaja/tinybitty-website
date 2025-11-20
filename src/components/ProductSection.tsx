@@ -18,7 +18,7 @@ export default function ProductSection({
   const getBackgroundClass = (title: string) => {
     switch (title.toLowerCase()) {
       case 'cookies':
-        return 'bg-orange-50';
+        return 'bg-[#fff2cc]';
       case 'tiny juice':
         return 'bg-pink-50';
       case 'macaroni schotel':
@@ -28,24 +28,26 @@ export default function ProductSection({
     }
   };
 
+  // Map original titles to custom display titles
+  const getDisplayTitle = (title: string) => {
+    switch (title.toLowerCase()) {
+      case 'cookies':
+        return 'Sweet Bites';
+      case 'tiny juice':
+        return 'Fruity Splash';
+      case 'macaroni schotel':
+        return 'Hearty Bites';
+      default:
+        return title;
+    }
+  };
+
   return (
     <section className="mb-12 md:mb-16">
       <div className={`cookie-texture rounded-3xl md:rounded-[2rem] p-6 md:p-8 lg:p-10 ${getBackgroundClass(title)}`}>
         <div className="text-center mb-6">
-        <div className="mb-1">
-          <div
-            className={`mx-auto -mb-4 bg-contain bg-center bg-no-repeat ${
-              title === 'Cookies'
-                ? 'w-60 h-60 md:w-48 md:h-48'
-                : 'w-80 h-80 md:w-72 md:h-72'
-            }`}
-            style={{
-              backgroundImage: `url("${icon}")`,
-            }}
-          />
-        </div>
-          <h2 className={`text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 ${title === 'Tiny Juice' ? '-mt-[45px]' : '-mt-[85px]'} knewave-regular`}>
-            {title}
+          <h2 className="text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 modak-regular">
+            {getDisplayTitle(title)}
           </h2>
           {/* <p className="text-gray-600 text-base md:text-lg font-semibold max-w-2xl mx-auto patrick-hand-sc-regular">
             {description}

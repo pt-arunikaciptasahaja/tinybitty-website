@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Clock, Truck, CreditCard, Package, ChefHat, Phone } from 'lucide-react';
+import { ChevronDown, ChevronUp, Truck, CreditCard, Phone, HelpCircle, Cookie, Snowflake, MessageCircle } from 'lucide-react';
 
 export default function FAQ() {
   const [openItems, setOpenItems] = useState<number[]>([]);
@@ -14,8 +14,8 @@ export default function FAQ() {
 
   const faqCategories = [
     {
-      title: "🍪 About Our Products",
-      icon: <ChefHat className="w-5 h-5" />,
+      title: "About Our Products",
+      icon: <Cookie className="w-5 h-5" />,
       questions: [
         {
           question: "How fresh are your cookies and how long do they last?",
@@ -36,7 +36,7 @@ export default function FAQ() {
       ]
     },
     {
-      title: "🚚 Delivery & Pickup",
+      title: "Delivery & Pickup",
       icon: <Truck className="w-5 h-5" />,
       questions: [
         {
@@ -62,7 +62,7 @@ export default function FAQ() {
       ]
     },
     {
-      title: "💳 Ordering & Payment",
+      title: "Ordering & Payment",
       icon: <CreditCard className="w-5 h-5" />,
       questions: [
         {
@@ -88,8 +88,8 @@ export default function FAQ() {
       ]
     },
     {
-      title: "🧊 Storage & Handling",
-      icon: <Package className="w-5 h-5" />,
+      title: "Storage & Handling",
+      icon: <Snowflake className="w-5 h-5" />,
       questions: [
         {
           question: "How should I store my cookies?",
@@ -110,8 +110,8 @@ export default function FAQ() {
       ]
     },
     {
-      title: "📞 Contact & Support",
-      icon: <Phone className="w-5 h-5" />,
+      title: "Contact & Support",
+      icon: <MessageCircle className="w-5 h-5" />,
       questions: [
         {
           question: "How can I contact customer service?",
@@ -133,89 +133,214 @@ export default function FAQ() {
     }
   ];
 
-  return (
-    <section className="py-16 bg-gradient-to-br from-[#faf7f0] via-[#fefcf8] to-[#f7f3e8]">
-      <div className="container mx-auto px-4">
-        <div className="text-center mb-12">
-          <div className="mb-6">
-            <span className="inline-block px-6 py-3 bg-[#f9c2cd]/20 rounded-full text-sm font-medium text-[#553d8f] border border-[#f9c2cd]/30">
-              ❓ Frequently Asked Questions
-            </span>
-          </div>
-          <h2 className="text-3xl md:text-5xl bebas-neue-regular text-[#553d8f] mb-4">
-            Got Questions?
-          </h2>
-          <p className="text-lg text-[#11110a]/70 max-w-2xl mx-auto">
-            Find answers to the most common questions about our products, ordering, delivery, and more.
-          </p>
-        </div>
+  const faqCategoriesID = [
+    {
+      title: "Tentang Produk Kami",
+      icon: <Cookie className="w-5 h-5" />,
+      questions: [
+        {
+          question: "Seberapa fresh cookies kalian? Tahan berapa lama?",
+          answer: "Cookies kita dibuat fresh setiap hari! Tahan 3–5 hari di suhu ruangan, 2–3 minggu di kulkas, dan sampai 2 bulan kalau disimpan di freezer. Tapi paling enak dimakan di hari-hari awal ya!"
+        },
+        {
+          question: "Produk kalian pakai pengawet nggak?",
+          answer: "Nggak sama sekali! Semua produk 100% tanpa bahan pengawet. Cookies dibuat pakai Australian butter, brown sugar, dan bahan premium. Juice dibuat dari buah segar tanpa tambahan kimia. Macaroni schotel juga pakai keju dan bahan segar berkualitas."
+        },
+        {
+          question: "Bahan apa aja sih yang dipakai untuk cookies?",
+          answer: "Kita pakai bahan premium seperti Australian butter, brown sugar, tepung, chocolate chips, almond, oats, raisin, dan fresh cheese. Semua dipilih biar rasanya maksimal."
+        },
+        {
+          question: "Aman nggak buat yang punya alergi?",
+          answer: "Cookies kita mengandung tepung terigu, dairy (butter), dan kacang (almond). Juice umumnya dairy-free. Kalau punya alergi tertentu, chat kita dulu ya biar kita bantu rekomendasi pilihan aman."
+        }
+      ]
+    },
+    {
+      title: "Pengiriman & Pickup",
+      icon: <Truck className="w-5 h-5" />,
+      questions: [
+        {
+          question: "Kirimnya ke mana aja?",
+          answer: "Saat ini pengiriman tersedia untuk area Jabodetabek dan Bandung. Ini biar produk sampai dalam kondisi fresh & aman."
+        },
+        {
+          question: "Ongkirnya berapa?",
+          answer: "Tergantung jarak & metode kirim (GoSend, GrabExpress, Paxel). Ongkir akan muncul saat checkout sebelum kamu konfirmasi. Biasanya di kisaran 15–35 ribu."
+        },
+        {
+          question: "Estimasi waktu pengiriman berapa lama?",
+          answer: "Tergantung lokasi & metode: GoSend Instant (1–3 jam), GrabExpress (2–4 jam), Paxel (same day / next day). Estimasi detail akan kita info saat konfirmasi."
+        },
+        {
+          question: "Bisa ambil sendiri?",
+          answer: "Bisa! Kamu bisa pickup di dapur kami. Detail alamat & jam pickup akan dikirim saat order."
+        },
+        {
+          question: "Gimana kalau aku nggak di rumah waktu pesanan datang?",
+          answer: "Pastikan ada yang bisa terima pesanan ya. Cookies & juice sensitif panas, jadi lebih aman kalau kamu standby atau pilih pickup kalau waktunya fleksibel."
+        }
+      ]
+    },
+    {
+      title: "Pemesan & Pembayaran",
+      icon: <CreditCard className="w-5 h-5" />,
+      questions: [
+        {
+          question: "Cara ordernya gimana?",
+          answer: "Tinggal pilih menu, masukin keranjang, isi data pengiriman, dan klik 'Order via WhatsApp'. Nanti kita follow up lewat WA untuk konfirmasi & pembayaran."
+        },
+        {
+          question: "Metode pembayaran apa yang tersedia?",
+          answer: "Saat ini pembayaran via transfer bank. Setelah order lewat WA, kita kirim nomor rekening untuk proses pembayaran."
+        },
+        {
+          question: "Minimal order berapa?",
+          answer: "Minimal order Rp50.000 (di luar ongkir). Biar proses produksi & pengiriman tetap efisien."
+        },
+        {
+          question: "Bisa ubah atau cancel order?",
+          answer: "Bisa sebelum pesanan mulai dibuat (biasanya dalam 2 jam setelah order). Chat kita secepatnya ya kalau ada perubahan."
+        },
+        {
+          question: "Bisa request custom order?",
+          answer: "Bisa banget! Untuk acara atau bentuk custom, chat dulu minimal 2–3 hari sebelumnya ya."
+        }
+      ]
+    },
+    {
+      title: "Penyimpanan & Cara Penyajian",
+      icon: <Snowflake className="w-5 h-5" />,
+      questions: [
+        {
+          question: "Gimana cara simpan cookies?",
+          answer: "Simpan di wadah kedap udara. Kalau mau lebih lama, masukin kulkas. Untuk jangka panjang, bisa di-freezer sampai 2 bulan."
+        },
+        {
+          question: "Kalau minuman juice disimpan gimana?",
+          answer: "Selalu simpan di kulkas (2–4°C). Habis dibuka, habiskan dalam 24 jam. Paling nikmat diminum dingin!"
+        },
+        {
+          question: "Cara simpan macaroni schotel?",
+          answer: "Langsung masuk kulkas setelah diterima. Habis dalam 2–3 hari, atau bisa di-freeze sampai 1 bulan. Panaskan sebelum makan."
+        },
+        {
+          question: "Produknya sensitif panas nggak?",
+          answer: "Iya, terutama cookies dan schotel. Hindari taruh di mobil panas atau kena matahari lama-lama ya."
+        }
+      ]
+    },
+    {
+      title: "Kontak & Bantuan",
+      icon: <MessageCircle className="w-5 h-5" />,
+      questions: [
+        {
+          question: "Hubungi customer service ke mana?",
+          answer: "Bisa lewat WhatsApp ke +62 811-1201-0160. Kami online jam 09.00–21.00 setiap hari."
+        },
+        {
+          question: "Kalau ada masalah dengan pesanan?",
+          answer: "Langsung chat kita di WhatsApp ya. Kita bakal bantu sampai beres!"
+        },
+        {
+          question: "Bisa untuk event atau order banyak?",
+          answer: "Bisa banget, kita terima pesanan untuk event & corporate. Minimal chat H-7 ya. Ada harga khusus untuk jumlah besar."
+        },
+        {
+          question: "Bisa datang ke dapur?",
+          answer: "Bisa untuk pickup atau konsultasi custom order, tapi harus janjian dulu ya."
+        }
+      ]
+    }
+  ];
+  
 
-        <div className="max-w-4xl mx-auto space-y-8">
-          {faqCategories.map((category, categoryIndex) => (
-            <div key={categoryIndex} className="bg-white rounded-3xl shadow-lg border border-[#f9c2cd]/20 overflow-hidden">
-              <div className="bg-gradient-to-r from-[#f9c2cd]/10 to-[#edadc3]/10 px-6 py-4 border-b border-[#f9c2cd]/20">
-                <h3 className="text-xl font-bold text-[#553d8f] flex items-center gap-3">
-                  {category.icon}
-                  {category.title}
-                </h3>
-              </div>
-              
-              <div className="divide-y divide-[#f9c2cd]/10">
-                {category.questions.map((item, questionIndex) => {
-                  const globalIndex = categoryIndex * 100 + questionIndex;
-                  const isOpen = openItems.includes(globalIndex);
-                  
-                  return (
-                    <div key={questionIndex}>
-                      <button
-                        onClick={() => toggleItem(globalIndex)}
-                        className="w-full text-left px-6 py-4 hover:bg-[#f9c2cd]/5 transition-colors duration-200 flex items-center justify-between"
-                      >
-                        <span className="font-semibold text-[#11110a] pr-4">{item.question}</span>
-                        {isOpen ? (
-                          <ChevronUp className="w-5 h-5 text-[#553d8f] flex-shrink-0" />
-                        ) : (
-                          <ChevronDown className="w-5 h-5 text-[#553d8f] flex-shrink-0" />
-                        )}
-                      </button>
-                      
-                      <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                        isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                      }`}>
-                        <div className="px-6 pb-4">
-                          <p className="text-[#11110a]/80 leading-relaxed">{item.answer}</p>
-                        </div>
+  return (
+    <div className="card-standard">
+      {/* FAQ Categories */}
+      <div className="space-y-6">
+        {faqCategories.map((category, categoryIndex) => (
+          <div key={categoryIndex} className="card-elevated">
+            <div className="bg-gradient-to-r from-secondary/10 to-accent/10 px-6 py-4 border-b border-border">
+              <h3 className="text-xl font-bold text-primary flex items-center gap-3">
+                {category.icon}
+                {category.title}
+              </h3>
+            </div>
+            
+            <div className="divide-y divide-border">
+              {category.questions.map((item, questionIndex) => {
+                const globalIndex = categoryIndex * 100 + questionIndex;
+                const isOpen = openItems.includes(globalIndex);
+                
+                return (
+                  <div key={questionIndex}>
+                    <button
+                      onClick={() => toggleItem(globalIndex)}
+                      className="w-full text-left px-6 py-4 hover:bg-secondary/5 transition-colors duration-200 flex items-center justify-between"
+                    >
+                      <span className="font-semibold text-foreground pr-4">{item.question}</span>
+                      {isOpen ? (
+                        <ChevronUp className="w-5 h-5 text-primary flex-shrink-0" />
+                      ) : (
+                        <ChevronDown className="w-5 h-5 text-primary flex-shrink-0" />
+                      )}
+                    </button>
+                    
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                      isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                    }`}>
+                      <div className="px-6 pb-4">
+                        <p className="text-muted-foreground leading-relaxed">{item.answer}</p>
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  </div>
+                );
+              })}
             </div>
-          ))}
-        </div>
-
-        {/* Contact CTA */}
-        <div className="text-center mt-12">
-          <div className="bg-white rounded-3xl p-8 shadow-lg border border-[#a3e2f5]/30 max-w-2xl mx-auto">
-            <div className="mb-4">
-              <Phone className="w-12 h-12 text-[#553d8f] mx-auto mb-4" />
-            </div>
-            <h3 className="text-2xl font-bold text-[#553d8f] mb-4">Still Have Questions?</h3>
-            <p className="text-[#11110a]/70 mb-6">
-              Can't find the answer you're looking for? We're here to help!
-            </p>
-            <a
-              href="https://wa.me/6281112010160"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-[#f9c2cd] hover:bg-[#f9c2cd]/90 text-white px-6 py-3 rounded-full font-semibold transition-colors duration-200"
-            >
-              <Phone className="w-5 h-5" />
-              Chat with us on WhatsApp
-            </a>
           </div>
-        </div>
+        ))}
       </div>
-    </section>
+
+      {/* Contact CTA */}
+      <div className="card-elevated mt-6 md:mt-8 text-center">
+        <div className="mb-6">
+          <Phone className="w-16 h-16 text-[#553d8f] mx-auto mb-4" />
+        </div>
+        <h3 className="text-2xl font-bold text-primary mb-4">
+          Still Have <span className="text-[#553d8f]">Questions?</span>
+        </h3>
+        <p className="body-base mb-8 max-w-lg mx-auto">
+          Can't find the answer you're looking for? We're here to help!
+        </p>
+        <a
+          href="https://wa.me/6281112010160"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 bg-[#553d8f] hover:bg-[#553d8f]/90 text-primary-foreground px-4 py-2 text-sm md:px-6 md:py-3 md:text-base rounded-full font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
+        >
+          <Phone className="w-4 h-4 md:w-5 md:h-5" />
+          Chat with us on WhatsApp
+        </a>
+      </div>
+    </div>
   );
 }
+
+{/* <h3 className="text-2xl font-bold text-primary mb-4">
+  Masih Bingung <span className="text-[#553d8f]">? 😁</span>
+</h3>
+
+<p className="body-base mb-8 max-w-lg mx-auto">
+  Belum nemu jawaban yang kamu cari? Santai, tanya aja langsung!
+</p>
+
+<a
+  href="https://wa.me/6281112010160"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex items-center gap-2 bg-[#553d8f] hover:bg-[#553d8f]/90 text-primary-foreground px-6 py-3 rounded-full font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
+>
+  <Phone className="w-5 h-5" />
+  Chat via WhatsApp
+</a> */}

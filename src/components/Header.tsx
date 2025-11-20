@@ -48,31 +48,31 @@ export default function Header() {
             <nav className="hidden md:flex items-center gap-6">
               <button
                 onClick={() => handleNavigation('#products')}
-                className="text-sm font-medium text-[#11110a] nav-link-hover bg-transparent border-0 cursor-pointer"
+                className="text-sm font-medium text-[#553d8f] nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Products
               </button>
               <Link
                 to="/faq"
-                className="text-sm font-medium text-[#11110a] nav-link-hover"
+                className="text-sm font-medium text-[#553d8f] nav-link-hover"
               >
                 FAQ
               </Link>
               <Link
                 to="/ingredients"
-                className="text-sm font-medium text-[#11110a] nav-link-hover"
+                className="text-sm font-medium text-[#553d8f] nav-link-hover"
               >
                 Ingredients
               </Link>
               <Link
                 to="/our-story"
-                className="text-sm font-medium text-[#11110a] nav-link-hover"
+                className="text-sm font-medium text-[#553d8f] nav-link-hover"
               >
                 Our Story
               </Link>
               <button
                 onClick={() => handleNavigation('#order')}
-                className="text-sm font-medium text-[#11110a] nav-link-hover bg-transparent border-0 cursor-pointer"
+                className="text-sm font-medium text-[#553d8f] nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Order
               </button>
@@ -129,27 +129,27 @@ export default function Header() {
                     handleNavigation('#products');
                     toggleMenu();
                   }}
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
+                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Products
                 </button>
                 <Link
                   to="/faq"
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   FAQ
                 </Link>
                 <Link
                   to="/ingredients"
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   Ingredients
                 </Link>
                 <Link
                   to="/our-story"
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   Our Story
@@ -159,7 +159,7 @@ export default function Header() {
                     handleNavigation('#order');
                     toggleMenu();
                   }}
-                  className="text-sm font-medium text-[#11110a] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
+                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Order
                 </button>
