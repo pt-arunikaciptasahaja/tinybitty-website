@@ -9,7 +9,7 @@ export default function Hero() {
         mb-4 md:mb-8
 
         /* mobile: tighter spacing with 100px push to bottom */
-        mt-[130px]
+        mt-[145px]
 
         /* tablet & desktop: normal spacing */
         md:mt-40 lg:mt-48

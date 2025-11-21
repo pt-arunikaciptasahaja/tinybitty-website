@@ -1,11 +1,11 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingCart, FileText, Truck, Phone } from 'lucide-react';
+import { ShoppingBasket, FileText, Motorbike, Smartphone } from 'lucide-react';
 
 export default function HowToOrder() {
     const steps = [
         {
             id: 1,
-            icon: ShoppingCart,
+            icon: ShoppingBasket,
             title: "Pilih Menu",
             desc: "Tambahkan cookies, juice, atau pasta favoritmu ke keranjang.",
         },
@@ -17,13 +17,13 @@ export default function HowToOrder() {
         },
         {
             id: 3,
-            icon: Truck,
+            icon: Motorbike,
             title: "Cek Ongkir",
             desc: "Pilih kurir dan lihat estimasi ongkir otomatis.",
         },
         {
             id: 4,
-            icon: Phone,
+            icon: Smartphone,
             title: "Order via WhatsApp",
             desc: "Kami akan hubungi kamu untuk konfirmasi & pembayaran.",
         },

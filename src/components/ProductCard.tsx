@@ -164,7 +164,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       let badgeClass = '';
       
       if (s.includes('mini')) {
-        code = 'Mini';
+        code = 'Mn';
         badgeClass = 'bg-[#ffe4f0] text-[#b83263]';
       } else if (s.startsWith('s') || s.includes('small')) {
         code = 'S';
@@ -192,7 +192,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       return {
         code: num,                // badge: 2 / 4 / 9
         label: 'pcs',             // label: "pcs"
-        badgeClass: 'bg-[#e0f2fe] text-[#1d4ed8]',
+        badgeClass: 'bg-[#F6F2FF] text-[#553d8f]',
       };
     }
   
@@ -208,7 +208,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex items-stretch gap-3 md:gap-4 border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ${className}`}
+      className={`flex items-stretch gap-3 md:gap-4 border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden -mx-[7px] md:mx-0 w-[calc(100%+14px)] md:w-full ${className}`}
     >
       {/* LEFT: image + qty at bottom */}
       <div className="relative flex flex-col justify-between items-center flex-shrink-0">
@@ -326,10 +326,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                             <div
                               className={`
                                 flex items-center justify-center
-                                w-7 h-7
+                                w-7 h-7 md:w-7 md:h-7
                                 rounded-full
-                                text-[11px] font-semibold
+                                text-[9px] md:text-[11px] font-semibold
                                 ${meta.badgeClass}
+                                min-w-[24px]
                               `}
                             >
                               {meta.code}
@@ -350,7 +351,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
               </Select>
             ) : (
               /* Plain text for single-size products (juice) - now full width too */
-              <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#e0f2fe] text-[#1d4ed8] text-[11px] font-semibold">
+              <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#F6F2FF] text-[#553d8f] text-[10px] md:text-[11px] font-semibold">
                 {selectedVariant.size}
               </div>
             )}
@@ -388,7 +389,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                 size="icon"
                 onClick={handleDecreaseQuantity}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-11 w-11 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Minus className="w-4 h-4" />
               </Button>
@@ -400,7 +401,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                 size="icon"
                 onClick={handleIncreaseQuantity}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-11 w-11 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Plus className="w-4 h-4" />
               </Button>

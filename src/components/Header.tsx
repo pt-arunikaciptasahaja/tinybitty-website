@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ShoppingCart, Menu, X } from 'lucide-react';
 import CartSheet from './CartSheet';
 import { Badge } from '@/components/ui/badge';
@@ -9,8 +9,27 @@ export default function Header() {
   const { getTotalItems } = useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const navigate = useNavigate();
+  const headerRef = useRef<HTMLElement>(null);
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (headerRef.current && !headerRef.current.contains(event.target as Node)) {
+        setIsMenuOpen(false);
+      }
+    };
+
+    // Only add listener when menu is open
+    if (isMenuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isMenuOpen]);
 
   const handleNavigation = (hash: string) => {
     // Navigate to homepage
@@ -29,7 +48,7 @@ export default function Header() {
   };
 
   return (
-    <header className="fixed top-4 left-0 right-0 z-50">
+    <header ref={headerRef} className="fixed top-4 left-0 right-0 z-50">
       <div className="mx-4 md:mx-8 lg:mx-12 xl:mx-16">
         <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-4 py-3">
           <div className="flex items-center justify-between">

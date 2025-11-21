@@ -64,3 +64,5 @@ export default function ProductSection({
     </section>
   );
 }
+
+//<div className="container mx-auto px-4 max-w-[896px]">

@@ -16,9 +16,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useToast } from '@/components/ui/use-toast';
 import Lottie from 'lottie-react';
-import deliveryAnimation from '@/data/delivery-man-bike.json';
-import { kelurahanData } from '@/data/kelurahan-data';
-import { MessageCircle, CheckCircle2, Truck, MapPin, Timer, AlertCircle, ShoppingBag } from 'lucide-react';
+import remixAnimation from '@/data/Remix of assssa.json';
+import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText } from 'lucide-react';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
 
@@ -80,18 +79,284 @@ export default function OrderForm() {
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
   const [isCalculatingDelivery, setIsCalculatingDelivery] = useState(false);
   
-  const [availableKota, setAvailableKota] = useState<Record<string, string>>({});
-  const [availableKecamatan, setAvailableKecamatan] = useState<Record<string, string>>({});
-  const [availableKelurahan, setAvailableKelurahan] = useState<Record<string, string>>({});
+  // Address search state for Gojek-style input
+  const [addressSearch, setAddressSearch] = useState('');
+  const [searchSuggestions, setSearchSuggestions] = useState<Array<{
+    display_name: string;
+    lat: string;
+    lon: string;
+    address?: any;
+  }>>([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
   
   const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
-  const [lastKota, setLastKota] = useState('');
-  const [lastKecamatan, setLastKecamatan] = useState('');
   const [hasCompletedDeliveryCalculation, setHasCompletedDeliveryCalculation] = useState(false);
   const [hasCalculatedDelivery, setHasCalculatedDelivery] = useState(false);
+  const [isDistanceTooFar, setIsDistanceTooFar] = useState(false);
+  const [deliveryDistance, setDeliveryDistance] = useState<number | null>(null);
   
   // Debounced address calculation to prevent API calls on every keystroke
   const calculationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const addressSearchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Gojek-style address search using OpenStreetMap Nominatim API
+  const searchAddress = useCallback(async (query: string) => {
+    if (query.length < 3) {
+      setSearchSuggestions([]);
+      return;
+    }
+
+    setIsSearchingAddress(true);
+    
+    try {
+      // Using OpenStreetMap Nominatim API (free, no key required)
+      const response = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=3&addressdetails=1&countrycodes=id&accept-language=id`,
+        {
+          headers: {
+            'User-Agent': 'TinyBitty-Cookie/1.0'
+          }
+        }
+      );
+      
+      if (!response.ok) throw new Error('Search failed');
+      
+      const data = await response.json();
+      setSearchSuggestions(data);
+    } catch (error) {
+      console.error('Address search error:', error);
+      setSearchSuggestions([]);
+    } finally {
+      setIsSearchingAddress(false);
+    }
+  }, []);
+
+  // Debounced address search
+  const debouncedAddressSearch = useCallback(() => {
+    if (addressSearchTimeoutRef.current) {
+      clearTimeout(addressSearchTimeoutRef.current);
+    }
+    
+    addressSearchTimeoutRef.current = setTimeout(() => {
+      searchAddress(addressSearch);
+    }, 500); // 500ms debounce
+  }, [addressSearch, searchAddress]);
+
+  // Handle selecting an address from suggestions
+  const handleAddressSelect = useCallback((suggestion: any) => {
+    // Auto-fill the address fields based on the selected suggestion
+    const address = suggestion.address;
+    const fullAddress = suggestion.display_name;
+    
+    // Update the search field
+    setAddressSearch(fullAddress);
+    setShowSuggestions(false);
+    
+    // Try to extract administrative hierarchy if available
+    if (address) {
+      const province = address.state || address.province || '';
+      const regency = address.city || address.regency || address.town || '';
+      const district = address.county || address.suburb || address.neighbourhood || '';
+      
+      // console.log('📍 [ADDRESS SELECTOR] Extracted administrative data:', { province, regency, district });
+      
+      // Update form fields
+      if (province) form.setValue('provinsi', province);
+      if (regency) form.setValue('kota', regency);
+      if (district) form.setValue('kecamatan', district);
+    }
+    
+    // Store coordinates for future use
+    form.setValue('address', fullAddress);
+    
+    // Reset delivery calculation since address changed
+    setHasCompletedDeliveryCalculation(false);
+    setDeliveryInfo(null);
+    setIsDistanceTooFar(false);
+    setDeliveryDistance(null);
+    setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+    form.setValue('deliveryMethod', undefined);
+    form.setValue('paymentMethod', undefined);
+  }, []);
+
+  // Handle delivery method change - this is when we trigger ongkir calculation
+  const handleDeliveryMethodChange = useCallback((method: string) => {
+    form.setValue('deliveryMethod', method as any);
+    
+    // Log shipping calculator trigger
+    // console.log('🚚 [SHIPPING CALCULATOR] Delivery method selected:', method);
+    
+    // If user selects Paxel, clear the distance too far state
+    if (method === 'paxel') {
+      setIsDistanceTooFar(false);
+      setDeliveryDistance(null);
+      setDeliveryInfo(null); // Clear any existing delivery info
+      setHasCompletedDeliveryCalculation(false);
+    }
+    
+    // Force form validation to reset to avoid timing issues
+    form.trigger('paymentMethod');
+    
+    // Trigger delivery calculation only when delivery method is selected (not for Paxel)
+    const address = form.getValues('address') || addressSearch;
+    const detailedAddress = form.getValues('detailedAddress');
+    
+    if (address && method && method !== 'paxel') {
+      // console.log('🚚 [SHIPPING CALCULATOR] Starting calculation for:', { address, method, detailedAddress });
+      calculateDeliveryForAddress(address, method, detailedAddress);
+    }
+  }, []);
+
+  // Separate function for delivery calculation (only triggered on delivery method selection)
+  const calculateDeliveryForAddress = useCallback(async (address: string, method: string, detailedAddress?: string) => {
+    // console.log('🚚 [SHIPPING CALCULATOR] Cart total:', getTotalPrice());
+    
+    setIsCalculatingDelivery(true);
+    let calculationSuccess = false;
+    
+    try {
+      // console.log('🚚 [SHIPPING CALCULATOR] Attempting primary calculation...');
+      // Use the existing ongkir calculation logic
+      const calculation = await calculateShippingCost(address, method, cart);
+      
+      if (!calculation.isValidAddress) {
+        console.log('[SHIPPING CALCULATOR] Primary calculation failed: Invalid address');
+        const info = {
+          cost: 0,
+          zone: '',
+          time: '',
+          formattedCost: 'Address not found',
+          isValid: false,
+          validationError: 'Please check your address and try again'
+        };
+        setDeliveryInfo(info);
+        calculationSuccess = false;
+        return;
+      }
+      
+      console.log('[SHIPPING CALCULATOR] Primary calculation successful:', calculation);
+      
+      // Extract distance from zone name
+      const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+      const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+      setDeliveryDistance(distance);
+      
+      // Check if any GoSend/Grab method is selected and distance > 40km
+      const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
+      
+      // Check if delivery is not available due to distance > 40km
+      if (isGoSendGrabMethod && distance > 40) {
+        // Remove calculator display and show Paxel alternative
+        setDeliveryInfo(null);
+        setHasCompletedDeliveryCalculation(false);
+        setIsDistanceTooFar(true);
+        console.log('[SHIPPING CALCULATOR] GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { method, distance });
+        
+        // Show toast notification about Paxel alternative
+        toast({
+          title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
+          description: `Jarak pengiriman ${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+          variant: 'default',
+        });
+        calculationSuccess = false;
+      } else {
+        const formattedCost = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(calculation.cost);
+        
+        const estimatedTime = getETA(method);
+        
+        const info = {
+          cost: calculation.cost,
+          zone: calculation.zone.name,
+          time: estimatedTime,
+          formattedCost: formattedCost,
+          isValid: true
+        };
+        setDeliveryInfo(info);
+        
+        // Only clear distance too far state if it's not a GoSend/Grab method for far distance
+        if (!isGoSendGrabMethod || distance <= 40) {
+          setIsDistanceTooFar(false);
+        }
+        
+        calculationSuccess = true;
+        setHasCompletedDeliveryCalculation(true);
+        console.log('[SHIPPING CALCULATOR] Delivery info set:', info);
+      }
+    } catch (error) {
+      console.log('[SHIPPING CALCULATOR] Primary calculation error:', error);
+      try {
+        console.log('[SHIPPING CALCULATOR] Attempting fallback calculation...');
+        const fallbackCalculation = calculateDeliveryCost(address, method, cart, getTotalPrice());
+        
+        // Check for distance limit exceeded (for all GoSend/Grab methods) in fallback too
+        const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
+        const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+        const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+        setDeliveryDistance(distance);
+        
+        // Check if GoSend/Grab delivery is not available due to distance > 40km
+        if (isGoSendGrabMethod && distance > 40) {
+          // Remove calculator display and show Paxel alternative
+          setDeliveryInfo(null);
+          setHasCompletedDeliveryCalculation(false);
+          setIsDistanceTooFar(true);
+          console.log('[SHIPPING CALCULATOR] Fallback: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { method, distance });
+          
+          // Show toast notification about Paxel alternative
+          toast({
+            title: 'Maaf layanan ini tidak tersedia untuk gojek/grab',
+            description: `Jarak pengiriman ${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+            variant: 'default',
+          });
+          calculationSuccess = false;
+        } else {
+          const info = {
+            cost: fallbackCalculation.cost,
+            zone: fallbackCalculation.zone.name,
+            time: fallbackCalculation.estimatedTime,
+            formattedCost: formatDeliveryCost(fallbackCalculation.cost),
+            isValid: true
+          };
+          setDeliveryInfo(info);
+          
+          // Only clear distance too far state if it's not a GoSend/Grab method for far distance
+          if (!isGoSendGrabMethod || distance <= 40) {
+            setIsDistanceTooFar(false);
+          }
+          
+          calculationSuccess = true;
+          setHasCompletedDeliveryCalculation(true);
+          console.log('[SHIPPING CALCULATOR] Fallback calculation successful:', info);
+        }
+      } catch (fallbackError) {
+        console.log('[SHIPPING CALCULATOR] Fallback calculation failed:', fallbackError);
+        const info = {
+          cost: 0,
+          zone: 'Error',
+          time: 'N/A',
+          formattedCost: 'Error calculating delivery',
+          isValid: false,
+          validationError: 'Gagal menghitung ongkir. Ongkir akan dikonfirmasi via WhatsApp.'
+        };
+        setDeliveryInfo(info);
+        calculationSuccess = false;
+        setHasCompletedDeliveryCalculation(false);
+      }
+    } finally {
+      setIsCalculatingDelivery(false);
+      if (calculationSuccess) {
+        setHasCompletedDeliveryCalculation(true);
+      }
+      setHasCalculatedDelivery(calculationSuccess);
+      console.log('[SHIPPING CALCULATOR] Calculation completed. Success:', calculationSuccess);
+    }
+  }, []);
 
   const form = useForm<OrderFormData>({
     resolver: zodResolver(orderFormSchema),
@@ -113,177 +378,36 @@ export default function OrderForm() {
   });
 
   // Watch for changes in address and delivery method to calculate delivery cost
-  // Province is fixed to DKI Jakarta, so no need to watch it
-  const selectedKota = form.watch('kota');
-  const selectedKecamatan = form.watch('kecamatan');
-  const selectedKelurahan = form.watch('kelurahan');
   const detailedAddress = form.watch('detailedAddress');
   const deliveryMethod = form.watch('deliveryMethod');
   const paymentMethod = form.watch('paymentMethod');
 
-  // Reset delivery-related fields when address fields change
-  const resetDeliveryFields = useCallback(() => {
-    setIsCalculatingDelivery(false);
-    form.setValue('deliveryMethod', undefined);
-    setDeliveryInfo(null);
-    setClearedFields(prev => {
-      const updated = new Set(prev);
-      updated.add('deliveryMethod');
-      updated.add('paymentMethod');
-      return updated;
-    });
-    
-    // Clear payment method as well since it's related to delivery
-    form.setValue('paymentMethod', undefined);
-    setClearedFields(prev => {
-      const updated = new Set(prev);
-      updated.add('paymentMethod');
-      return updated;
-    });
-    
-    // Show cleared field notifications
-    setTimeout(() => {
-      setClearedFields(prev => {
-        const updated = new Set(prev);
-        updated.delete('deliveryMethod');
-        updated.delete('paymentMethod');
-        return updated;
-      });
-    }, 3000);
-  }, []);
-
-  const updateDropdownOptions = () => {
-    const filteredKota = Object.keys(kelurahanData);
-    setAvailableKota(filteredKota.reduce((acc, kota) => {
-      acc[kota] = kota;
-      return acc;
-    }, {} as Record<string, string>));
-    
-    if (selectedKota !== lastKota) {
-      const newlyCleared = new Set(clearedFields);
-      let hasNewClears = false;
-      
-      // Reset delivery calculation tracking when address changes
-      setHasCompletedDeliveryCalculation(false);
-      
-      if (selectedKecamatan) {
-        form.setValue('kecamatan', '');
-        newlyCleared.add('kecamatan');
-        hasNewClears = true;
-      }
-      
-      if (selectedKelurahan) {
-        form.setValue('kelurahan', '');
-        newlyCleared.add('kelurahan');
-        hasNewClears = true;
-      }
-      
-      if (detailedAddress) {
-        form.setValue('detailedAddress', '');
-        newlyCleared.add('detailedAddress');
-        hasNewClears = true;
-      }
-      
-      // Only clear delivery fields if address was complete and delivery method was actually selected
-      if ((deliveryMethod || paymentMethod) && hasCompletedDeliveryCalculation) {
-        form.setValue('deliveryMethod', undefined);
-        form.setValue('paymentMethod', undefined);
-        newlyCleared.add('deliveryMethod');
-        newlyCleared.add('paymentMethod');
-        hasNewClears = true;
-        
-        setDeliveryInfo(null);
-        setIsCalculatingDelivery(false);
-      }
-      
-      setDeliveryInfo(null);
-      
-      if (hasNewClears) {
-        setClearedFields(newlyCleared);
-        setTimeout(() => {
-          setClearedFields(prev => {
-            const updated = new Set(prev);
-            updated.delete('kecamatan');
-            updated.delete('kelurahan');
-            updated.delete('detailedAddress');
-            updated.delete('deliveryMethod');
-            updated.delete('paymentMethod');
-            return updated;
-          });
-        }, 3000);
-      }
-      
-      setLastKota(selectedKota);
-    }
-    
-    if (selectedKota && !filteredKota.includes(selectedKota)) {
-      form.setValue('kota', '');
-      return;
-    }
-
-    if (selectedKota) {
-      const filteredKecamatan = Object.keys(kelurahanData[selectedKota] || {});
-      setAvailableKecamatan(filteredKecamatan.reduce((acc, kecamatan) => {
-        acc[kecamatan] = kecamatan;
-        return acc;
-      }, {} as Record<string, string>));
-      
-      if (selectedKecamatan !== lastKecamatan && selectedKecamatan) {
-        const newlyCleared = new Set(clearedFields);
-        
-        if (selectedKelurahan) {
-          form.setValue('kelurahan', '');
-          newlyCleared.add('kelurahan');
-          setTimeout(() => {
-            setClearedFields(prev => {
-              const updated = new Set(prev);
-              updated.delete('kelurahan');
-              return updated;
-            });
-          }, 3000);
-        }
-        
-        setClearedFields(newlyCleared);
-        setLastKecamatan(selectedKecamatan);
-      }
-      
-      if (selectedKecamatan && !filteredKecamatan.includes(selectedKecamatan)) {
-        form.setValue('kecamatan', '');
-        return;
-      }
-    } else {
-      setAvailableKecamatan({});
-      form.setValue('kecamatan', '');
-    }
-
-    if (selectedKecamatan && selectedKota) {
-      const filteredKelurahan = kelurahanData[selectedKota]?.[selectedKecamatan] || [];
-      setAvailableKelurahan(filteredKelurahan.reduce((acc, kelurahan, index) => {
-        acc[index.toString()] = kelurahan;
-        return acc;
-      }, {} as Record<string, string>));
-      
-      if (selectedKelurahan && !filteredKelurahan.includes(selectedKelurahan)) {
-        form.setValue('kelurahan', '');
-      }
-    } else {
-      setAvailableKelurahan({});
-      form.setValue('kelurahan', '');
-    }
-  };
-
+  // Trigger address search when user types
   useEffect(() => {
-    updateDropdownOptions();
-  }, [selectedKota, selectedKecamatan]);
+    if (addressSearch.length >= 3) {
+      debouncedAddressSearch();
+    } else {
+      setSearchSuggestions([]);
+      setShowSuggestions(false);
+    }
+  }, [addressSearch, debouncedAddressSearch]);
 
   // Generate full address for display purposes (includes detailed address)
   const generateFullAddress = useCallback(() => {
+    const addressField = form.watch('address');
+    const detailedAddressField = form.watch('detailedAddress');
+    
+    // Build address from search-based system
     const parts = [];
     
-    // Add detailed address first (street address, house number, etc.)
-    if (detailedAddress && detailedAddress.trim()) {
-      // Normalize common address abbreviations for better geocoding
-      const normalizedAddress = detailedAddress
+    // Add main address from search
+    if (addressField && addressField.trim()) {
+      parts.push(toCamelCase(addressField.trim()));
+    }
+    
+    // Add detailed address (street address, house number, etc.)
+    if (detailedAddressField && detailedAddressField.trim()) {
+      const normalizedAddress = detailedAddressField
         .trim()
         .replace(/\bjl\.?\b/gi, 'Jalan')
         .replace(/\bstreet\b/gi, 'Jalan')
@@ -294,62 +418,19 @@ export default function OrderForm() {
       parts.push(toCamelCase(normalizedAddress));
     }
     
-    // Then add administrative hierarchy with camelCase formatting
-    if (selectedKelurahan) {
-      const kelurahanName = kelurahanData[selectedKota]?.[selectedKecamatan]?.[parseInt(selectedKelurahan)];
-      if (kelurahanName) {
-        parts.push(toCamelCase(kelurahanName));
-      }
-    }
-    
-    if (selectedKecamatan && kelurahanData[selectedKota]?.[selectedKecamatan]) {
-      parts.push(toCamelCase(selectedKecamatan));
-    }
-    
-    if (selectedKota) {
-      const kotaName = selectedKota
-        .replace(/Kota Administrasi /g, '')
-        .replace(/Kabupaten /g, '');
-      parts.push(toCamelCase(kotaName));
-    }
-    
-    // Always add Jakarta, Indonesia for better geocoding
-    parts.push('Jakarta, Indonesia');
-    
     return parts.join(', ');
-  }, [detailedAddress, selectedKota, selectedKecamatan, selectedKelurahan]);
-
-  // Generate simplified address for API calls (kelurahan level only - no detailed address)
-  const generateKelurahanOnlyAddress = useCallback(() => {
-    const parts = [];
-    
-    // Only add administrative hierarchy - NO detailed address for API calls
-    if (selectedKelurahan) {
-      const kelurahanName = kelurahanData[selectedKota]?.[selectedKecamatan]?.[parseInt(selectedKelurahan)];
-      if (kelurahanName) {
-        parts.push(toCamelCase(kelurahanName));
-      }
-    }
-    
-    if (selectedKecamatan && kelurahanData[selectedKota]?.[selectedKecamatan]) {
-      parts.push(toCamelCase(selectedKecamatan));
-    }
-    
-    if (selectedKota) {
-      const kotaName = selectedKota
-        .replace(/Kota Administrasi /g, '')
-        .replace(/Kabupaten /g, '');
-      parts.push(toCamelCase(kotaName));
-    }
-    
-    // Always add Jakarta, Indonesia for better geocoding
-    parts.push('Jakarta, Indonesia');
-    
-    return parts.join(', ');
-  }, [selectedKota, selectedKecamatan, selectedKelurahan]);
+  }, [form]);
 
   // Debounced function for delivery calculation
   const debouncedDeliveryCalculation = useCallback(() => {
+    // console.log('🔵 [DEBOUNCE] debouncedDeliveryCalculation called');
+    
+    // Skip calculation if already completed - this prevents the overwrite issue
+    if (hasCompletedDeliveryCalculation) {
+      // console.log('🟢 [DEBOUNCE] Skipping calculation - already completed');
+      return;
+    }
+    
     // Clear existing timeout
     if (calculationTimeoutRef.current) {
       clearTimeout(calculationTimeoutRef.current);
@@ -357,14 +438,35 @@ export default function OrderForm() {
 
     // Set new timeout for 2 seconds to debounce API calls
     calculationTimeoutRef.current = setTimeout(() => {
-      // Use kelurahan-only address for API calls to avoid geocoding errors
-      const fullAddress = generateKelurahanOnlyAddress();
-      const isDetailedAddressComplete = detailedAddress && detailedAddress.trim().length >= 8;
-      const isAddressComplete = selectedKota && selectedKecamatan && isDetailedAddressComplete;
+      // console.log('🔵 [DEBOUNCE 1] Timeout fired - checking current state');
+      
+      // Check again inside timeout - calculation might have completed while waiting
+      if (hasCompletedDeliveryCalculation || deliveryInfo?.isValid) {
+        // console.log('🟢 [DEBOUNCE] Skipping timeout logic - calculation already completed');
+        return;
+      }
+      
+      // console.log('🔵 [DEBOUNCE 2] Timeout fired - starting calculation logic');
+      // Use the new address system check (same as step completion logic)
+      const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
+        (detailedAddress && detailedAddress.trim().length >= 8);
+      
+      // Generate address for API calls - use the search-based address
+      const fullAddress = form.watch('address') || '';
+      
+      // console.log('🔵 [DEBOUNCE 3] Calculation conditions:', {
+      //   isAddressComplete,
+      //   deliveryMethod,
+      //   hasCompletedDeliveryCalculation,
+      //   addressLength: fullAddress.length,
+      //   detailedAddressLength: detailedAddress?.trim().length
+      // });
       
       // Only calculate delivery if address is complete, delivery method is selected,
       // and we haven't already calculated delivery for this specific combination
-      if (isAddressComplete && deliveryMethod && !hasCompletedDeliveryCalculation) {
+      // Skip calculation for Paxel as it uses external calculator
+      if (isAddressComplete && deliveryMethod && deliveryMethod !== 'paxel' && !hasCompletedDeliveryCalculation) {
+        console.log('🟢 [DEBOUNCE] Starting new delivery calculation');
         const calculateNewDelivery = async () => {
           setIsCalculatingDelivery(true);
           let calculationSuccess = false;
@@ -386,38 +488,81 @@ export default function OrderForm() {
               return;
             }
             
-            const formattedCost = new Intl.NumberFormat('id-ID', {
-              style: 'currency',
-              currency: 'IDR',
-              minimumFractionDigits: 0,
-              maximumFractionDigits: 0
-            }).format(calculation.cost);
+            // Extract distance from calculation result
+            const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+            const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+            setDeliveryDistance(distance);
             
-            const estimatedTime = getETA(deliveryMethod);
-            
-            const info = {
-              cost: calculation.cost,
-              zone: calculation.zone.name,
-              time: estimatedTime,
-              formattedCost: formattedCost,
-              isValid: true
-            };
-            setDeliveryInfo(info);
-            calculationSuccess = true;
-            setHasCompletedDeliveryCalculation(true);
+            // Check if GoSend/Grab delivery is not available due to distance > 40km
+            const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
+            if (isGoSendGrabMethod && distance > 40) {
+              setDeliveryInfo(null);
+              setHasCompletedDeliveryCalculation(false);
+              setIsDistanceTooFar(true);
+              console.log('🟠 [CALC] Debounced: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { deliveryMethod, distance });
+              calculationSuccess = false;
+            } else {
+              const formattedCost = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+              }).format(calculation.cost);
+              
+              const estimatedTime = getETA(deliveryMethod);
+              
+              const info = {
+                cost: calculation.cost,
+                zone: calculation.zone.name,
+                time: estimatedTime,
+                formattedCost: formattedCost,
+                isValid: true
+              };
+              console.log('🟢 [CALC] Setting deliveryInfo with successful calculation:', info);
+              setDeliveryInfo(info);
+              
+              // Only clear distance too far state if it's not a GoSend/Grab method for far distance
+              if (!isGoSendGrabMethod || distance <= 40) {
+                setIsDistanceTooFar(false);
+              }
+              
+              calculationSuccess = true;
+              setHasCompletedDeliveryCalculation(true);
+            }
           } catch (error) {
             try {
               const fallbackCalculation = calculateDeliveryCost(fullAddress, deliveryMethod, cart, getTotalPrice());
-              const info = {
-                cost: fallbackCalculation.cost,
-                zone: fallbackCalculation.zone.name,
-                time: fallbackCalculation.estimatedTime,
-                formattedCost: formatDeliveryCost(fallbackCalculation.cost),
-                isValid: true
-              };
-              setDeliveryInfo(info);
-              calculationSuccess = true;
-              setHasCompletedDeliveryCalculation(true);
+              
+              // Check distance in fallback calculation too
+              const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+              const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+              setDeliveryDistance(distance);
+              
+              const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
+              if (isGoSendGrabMethod && distance > 40) {
+                setDeliveryInfo(null);
+                setHasCompletedDeliveryCalculation(false);
+                setIsDistanceTooFar(true);
+                console.log('🟠 [CALC] Fallback: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { deliveryMethod, distance });
+                calculationSuccess = false;
+              } else {
+                const info = {
+                  cost: fallbackCalculation.cost,
+                  zone: fallbackCalculation.zone.name,
+                  time: fallbackCalculation.estimatedTime,
+                  formattedCost: formatDeliveryCost(fallbackCalculation.cost),
+                  isValid: true
+                };
+                setDeliveryInfo(info);
+                
+                // Only clear distance too far state if it's not a GoSend/Grab method for far distance
+                if (!isGoSendGrabMethod || distance <= 40) {
+                  setIsDistanceTooFar(false);
+                }
+                
+                calculationSuccess = true;
+                setHasCompletedDeliveryCalculation(true);
+              }
             } catch (fallbackError) {
               const info = {
                 cost: 0,
@@ -443,6 +588,7 @@ export default function OrderForm() {
 
         calculateNewDelivery();
       } else if (isAddressComplete && !deliveryMethod) {
+        // console.log('🟡 [DEBOUNCE] Setting deliveryInfo - address complete but no delivery method');
         const info = {
           cost: 0,
           zone: '',
@@ -454,6 +600,7 @@ export default function OrderForm() {
         setDeliveryInfo(info);
       } else if (!isAddressComplete && deliveryMethod) {
         // Keep the calculator visible when delivery method is selected but address is incomplete
+        // console.log('🟡 [DEBOUNCE] Setting deliveryInfo - delivery method selected but address incomplete');
         const info = {
           cost: 0,
           zone: '',
@@ -465,20 +612,29 @@ export default function OrderForm() {
         setDeliveryInfo(info);
       } else if (!isAddressComplete && !deliveryMethod) {
         // Clear calculator only when both address and delivery method are incomplete
+        // console.log('🔴 [DEBOUNCE] Clearing deliveryInfo - no address and no delivery method');
         setDeliveryInfo(null);
       }
     }, 2000); // 2 second debounce
-  }, [generateKelurahanOnlyAddress, detailedAddress, selectedKota, selectedKecamatan, deliveryMethod, hasCompletedDeliveryCalculation, cart, getTotalPrice]);
+  }, [detailedAddress, deliveryMethod, hasCompletedDeliveryCalculation, cart, getTotalPrice, form, deliveryInfo?.isValid]);
 
   useEffect(() => {
-    // Only trigger calculation if all fields are complete
-    const isDetailedAddressComplete = detailedAddress && detailedAddress.trim().length >= 8;
-    const isAddressComplete = selectedKota && selectedKecamatan && isDetailedAddressComplete;
+    // Only trigger calculation if all fields are complete (using new address system)
+    const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
+      (detailedAddress && detailedAddress.trim().length >= 8);
+    
+    // console.log('🔵 [USEEFFECT] Delivery calculation useEffect triggered', {
+    //   isAddressComplete,
+    //   deliveryMethod,
+    //   hasCompletedDeliveryCalculation
+    // });
     
     if (isAddressComplete || deliveryMethod) {
+      // console.log('🔵 [USEEFFECT] Calling debouncedDeliveryCalculation');
       debouncedDeliveryCalculation();
     } else {
       // Clear any pending calculations if address is incomplete
+      // console.log('🔴 [USEEFFECT] Clearing deliveryInfo - address incomplete and no delivery method');
       if (calculationTimeoutRef.current) {
         clearTimeout(calculationTimeoutRef.current);
         calculationTimeoutRef.current = null;
@@ -486,13 +642,6 @@ export default function OrderForm() {
       setDeliveryInfo(null);
     }
   }, [debouncedDeliveryCalculation]);
-
-  // Reset delivery fields when address fields change after successful calculation
-  useEffect(() => {
-    if (hasCalculatedDelivery && hasCompletedDeliveryCalculation) {
-      resetDeliveryFields();
-    }
-  }, [selectedKota, selectedKecamatan, selectedKelurahan, resetDeliveryFields]);
 
   const handleWhatsAppRedirect = () => {
     if (!orderData) return;
@@ -574,8 +723,8 @@ export default function OrderForm() {
   const isStep1Complete = form.watch('name') && form.watch('phone') &&
     form.watch('name').trim() !== '' && form.watch('phone').trim() !== '';
   
-  const isAddressComplete = selectedKota && selectedKecamatan &&
-    detailedAddress && detailedAddress.trim().length >= 8;
+  const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
+    (detailedAddress && detailedAddress.trim().length >= 8);
   
   const isStep2Complete = isAddressComplete;
   const isStep3Complete = deliveryMethod && deliveryMethod.trim() !== '';
@@ -663,7 +812,7 @@ export default function OrderForm() {
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='mb-6'>
                     <FormLabel className="text-[#5D4E8E] font-semibold">Nama Lengkap</FormLabel>
                     <FormControl>
                       <Input
@@ -737,201 +886,121 @@ export default function OrderForm() {
                 >
                   2
                 </div>
-                <h3 className="font-semibold text-[#5D4E8E]">📍 Alamat Lengkap</h3>
+                <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
+                  {/* <MapPin className="w-4 h-4" /> */}
+                  Alamat Lengkap
+                </h3>
                 {isStep2Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
               </div>
 
+              {/* Gojek-style Address Search */}
               <FormField
                 control={form.control}
-                name="provinsi"
+                name="address"
                 render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#5D4E8E]">Provinsi</FormLabel>
-                    <Select value="DKI  Jakarta" disabled={true}>
-                      <FormControl>
-                        <SelectTrigger className="rounded-xl border-[#D8CFF7]/40 bg-gray-100 cursor-not-allowed">
-                          <SelectValue>DKI Jakarta</SelectValue>
-                        </SelectTrigger>
-                      </FormControl>
-                    </Select>
-                  </FormItem>
-                )}
-              />
-
-              {/* Kota Dropdown */}
-              <FormField
-                control={form.control}
-                name="kota"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#5D4E8E]">Kota</FormLabel>
-                    <Select
-                      value={field.value || ''}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                      }}
-                      defaultValue={field.value}
-                      disabled={!isStep1Complete}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className={`rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white ${
-                            !isStep1Complete ? 'bg-gray-100 cursor-not-allowed' : ''
-                          } ${
-                            clearedFields.has('kota') ? 'border-amber-300 bg-amber-50' : ''
-                          }`}
-                        >
-                          <SelectValue
-                            placeholder={
-                              !isStep1Complete
-                                ? 'Lengkapi data kontak dulu'
-                                : 'Pilih Kota'
-                            }
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(availableKota).map(([code, name]) => (
-                          <SelectItem key={code} value={code}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    {clearedFields.has('kota') && (
-                      <p className="text-xs text-amber-600 bg-amber-50 px-3 py-2 rounded-lg">
-                        💡 Field ini dikosongkan otomatis karena perubahan field sebelumnya
-                      </p>
-                    )}
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Kecamatan Dropdown */}
-              <FormField
-                control={form.control}
-                name="kecamatan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#5D4E8E]">Kecamatan</FormLabel>
-                    <Select
-                      value={field.value || ''}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setLastKecamatan(value);
-                        setClearedFields((prev) => {
-                          const updated = new Set(prev);
-                          updated.delete('kecamatan');
-                          return updated;
-                        });
-                      }}
-                      disabled={!selectedKota || !isStep1Complete}
-                    >
-                      <FormControl>
-                        <SelectTrigger
-                          className={`rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white ${
-                            !selectedKota || !isStep1Complete
-                              ? 'bg-gray-100 cursor-not-allowed'
-                              : ''
-                          } ${
-                            clearedFields.has('kecamatan')
-                              ? 'border-amber-300 bg-amber-50'
-                              : ''
-                          }`}
-                        >
-                          <SelectValue
-                            placeholder={
-                              !isStep1Complete
-                                ? 'Lengkapi data kontak dulu'
-                                : !selectedKota
-                                ? 'Pilih Kota terlebih dahulu'
-                                : 'Pilih Kecamatan'
-                            }
-                          />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {Object.entries(availableKecamatan).map(([code, name]) => (
-                          <SelectItem key={code} value={code}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Kelurahan Dropdown */}
-              <FormField
-                control={form.control}
-                name="kelurahan"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="flex items-center gap-2 text-[#5D4E8E]">
-                      Kelurahan
-                      {clearedFields.has('kelurahan') && (
-                        <span className="ml-2 text-xs text-amber-600 bg-amber-100 px-2 py-1 rounded-full">
-                          ✨ Dikosongkan - Pilih ulang
-                        </span>
-                      )}
+                  <FormItem className="mb-6">
+                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+                      <MapPin className="w-4 h-4" />
+                      Alamat Pengantaran
                     </FormLabel>
-                    <Select
-                      value={field.value || ''}
-                      onValueChange={(value) => {
-                        field.onChange(value);
-                        setClearedFields((prev) => {
-                          const updated = new Set(prev);
-                          updated.delete('kelurahan');
-                          return updated;
-                        });
-                      }}
-                      disabled={
-                        !selectedKecamatan ||
-                        Object.keys(availableKelurahan).length === 0 ||
-                        !isStep1Complete
-                      }
-                    >
+                    <div className="relative">
                       <FormControl>
-                        <SelectTrigger
-                          className={`rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white ${
-                            !selectedKecamatan || !isStep1Complete ? 'bg-gray-100' : ''
-                          } ${
-                            clearedFields.has('kelurahan')
-                              ? 'border-amber-300 bg-amber-50'
-                              : ''
-                          }`}
-                        >
-                          <SelectValue
-                            placeholder={
-                              !isStep1Complete
-                                ? 'Lengkapi data kontak dulu'
-                                : !selectedKecamatan
-                                ? 'Pilih kecamatan terlebih dahulu'
-                                : Object.keys(availableKelurahan).length > 0
-                                ? 'Pilih kelurahan'
-                                : 'Data kelurahan tidak tersedia'
-                            }
+                        <div className="relative">
+                          {/* <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /> */}
+                          <Input
+                            placeholder="Contoh: Pesona Khayangan"
+                            {...field}
+                            value={addressSearch || field.value}
+                            onChange={(e) => {
+                              const value = e.target.value;
+                              setAddressSearch(value);
+                              field.onChange(value);
+                              setShowSuggestions(value.length >= 5);
+                              setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+                              form.setValue('deliveryMethod', undefined);
+                              form.setValue('paymentMethod', undefined);
+                              setHasCompletedDeliveryCalculation(false);
+                              setDeliveryInfo(null);
+                              setIsDistanceTooFar(false);
+                              setDeliveryDistance(null);
+                            }}
+                            className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
+                            disabled={!isStep1Complete}
                           />
-                        </SelectTrigger>
+                          {isSearchingAddress && (
+                            <div className="absolute right-3 top-3">
+                              <div className="w-4 h-4 border-2 border-[#BFAAE3]/30 border-t-[#BFAAE3] rounded-full animate-spin"></div>
+                            </div>
+                          )}
+                        </div>
                       </FormControl>
-                      <SelectContent>
-                        {Object.entries(availableKelurahan).map(([code, name]) => (
-                          <SelectItem key={code} value={code}>
-                            {name}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                      
+                      {/* Address Suggestions Dropdown */}
+                      {showSuggestions && searchSuggestions.length > 0 && (
+                        <div className="absolute z-50 w-full mt-1 bg-white border border-[#D8CFF7] rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                          {searchSuggestions.map((suggestion, index) => (
+                            <div
+                              key={index}
+                              className="p-3 hover:bg-[#F6F2FF] cursor-pointer border-b border-[#D8CFF7]/20 last:border-b-0"
+                              onClick={() => handleAddressSelect(suggestion)}
+                            >
+                              <div className="font-medium text-[#5D4E8E] text-sm flex items-center gap-2">
+                                <MapPin className="w-3 h-3" />
+                                {suggestion.display_name.split(',')[0]}
+                              </div>
+                              <div className="text-xs text-[#8978B4] mt-1">
+                                {suggestion.display_name}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              {/* Detail Alamat (Mandatory) */}
+              <FormField
+                control={form.control}
+                name="detailedAddress"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+                      <MapPinHouse className="w-4 h-4" />
+                      Detail Alamat (Wajib)
+                      <span className="text-red-500">*</span>
+                    </FormLabel>
+                    <FormControl>
+                      <Textarea
+                        placeholder="Contoh: Blok ABC No. 123"
+                        {...field}
+                        disabled={!isStep1Complete}
+                        className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white min-h-[80px] placeholder:text-gray-400"
+                        onChange={(e) => {
+                          field.onChange(e);
+                          setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+                          form.setValue('deliveryMethod', undefined);
+                          form.setValue('paymentMethod', undefined);
+                          setHasCompletedDeliveryCalculation(false);
+                          setDeliveryInfo(null);
+                          setIsDistanceTooFar(false);
+                          setDeliveryDistance(null);
+                        }}
+                      />
+                    </FormControl>
+                    <p className="text-xs text-[#8978B4] flex items-center gap-1">
+                      <Lightbulb className="w-3 h-3" />
+                      Detail alamat diperlukan untuk akurasi pengiriman (nomor rumah, RT/RW, lantai, dll)
+                    </p>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
               {/* Detailed Address Input */}
-              <FormField
+              {/* <FormField
                 control={form.control}
                 name="detailedAddress"
                 render={({ field }) => (
@@ -971,7 +1040,7 @@ export default function OrderForm() {
                     <FormMessage />
                   </FormItem>
                 )}
-              />
+              /> */}
             </div>
 
 {/* Step 3: Cek Ongkir / Kurir */}
@@ -1000,8 +1069,9 @@ export default function OrderForm() {
     >
       3
     </div>
-    <h3 className="font-semibold text-[#5D4E8E]">
-      Cek Ongkir Dulu Yuk! 🚚
+    <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
+      {/* <Motorbike className="w-4 h-4" /> */}
+      Cek Ongkir Dulu Yuk!
     </h3>
     {isStep3Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
   </div>
@@ -1011,6 +1081,7 @@ export default function OrderForm() {
     name="deliveryMethod"
     render={({ field }) => (
       <FormItem>
+        
         <FormLabel className="text-[#5D4E8E] font-semibold">
           Pilih Kurir / Metode Pengiriman
         </FormLabel>
@@ -1018,8 +1089,8 @@ export default function OrderForm() {
           value={field.value || ''}
           onValueChange={(value) => {
             field.onChange(value);
-            // Reset flag kalkulasi ongkir ketika ganti metode
-            setHasCompletedDeliveryCalculation(false);
+            // Trigger ongkir calculation when delivery method is selected
+            handleDeliveryMethodChange(value);
             setClearedFields((prev) => {
               const updated = new Set(prev);
               updated.delete('deliveryMethod');
@@ -1059,10 +1130,21 @@ export default function OrderForm() {
       </FormItem>
     )}
   />
+
+  {/* WhatsApp Confirmation Notice */}
+  {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mt-3">
+    <div className="flex items-center gap-2 text-blue-700">
+      <MessageCircle className="w-4 h-4" />
+      <span className="text-sm font-medium">💬 ONGKIR AKAN DIKONFIRMASI VIA WHATSAPP</span>
+    </div>
+    <p className="text-xs text-blue-600 mt-1 ml-6">
+      Biaya pengiriman akan dikonfirmasi melalui WhatsApp setelah order diterima.
+    </p>
+  </div> */}
 </div>
 
-{/* Ongkir Display */}
-{(deliveryInfo || isCalculatingDelivery) && (
+{/* Ongkir Display - Hide when distance is too far for GoSend/Grab OR when Paxel is selected */}
+{(deliveryInfo || isCalculatingDelivery || deliveryMethod) && !isDistanceTooFar && deliveryMethod !== 'paxel' && (
   <Card
     className={`border-2 shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
       deliveryInfo?.isValid
@@ -1074,9 +1156,9 @@ export default function OrderForm() {
       <div className="space-y-4">
         <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
           <div className="p-2 bg-[#BFAAE3] rounded-lg">
-            <Truck className="w-5 h-5 text-white" />
+            <Motorbike className="w-5 h-5 text-white" />
           </div>
-          <span className="flex-1 text-lg">Kalkulator Ongkir</span>
+          <span className="flex-1 text-sm">Kalkulator Ongkir</span>
           {isCalculatingDelivery && (
             <div className="hidden md:flex items-center gap-2 text-sm text-[#8978B4] bg-[#BFAAE3]/10 px-3 py-1 rounded-full">
               <div className="w-4 h-4 border-2 border-[#BFAAE3]/30 border-t-[#BFAAE3] rounded-full animate-spin"></div>
@@ -1109,7 +1191,7 @@ export default function OrderForm() {
                   </div>
                   <div>
                     <div className="font-bold text-[#5D4E8E] text-sm">
-                      Perkiraan Jarak
+                      Estimasi Jarak
                     </div>
                     <div className="text-[#8978B4] font-medium">
                       {deliveryInfo.zone}
@@ -1137,7 +1219,7 @@ export default function OrderForm() {
               <div className="bg-gradient-to-br from-[#BFAAE3] to-[#9D85D0] rounded-xl p-4 border border-[#BFAAE3] hover:shadow-lg transition-all duration-200">
                 <div className="flex items-center gap-3">
                   <div className="p-2 bg-white/20 rounded-lg">
-                    <Truck className="w-5 h-5 text-white" />
+                    <Motorbike className="w-5 h-5 text-white" />
                   </div>
                   <div>
                     <div className="font-bold text-white text-sm">
@@ -1199,6 +1281,60 @@ export default function OrderForm() {
   </Card>
 )}
 
+{/* Paxel Display - Show when Paxel is selected */}
+{deliveryMethod === 'paxel' && (
+  <Card className="border-2 shadow-lg bg-gradient-to-br from-[#F6F2FF] to-[#F0E8FF] border-[#BFAAE3] shadow-[#BFAAE3]/20">
+    <CardContent className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
+          <div className="p-2 bg-[#BFAAE3] rounded-lg">
+            <ExternalLink className="w-5 h-5 text-white" />
+          </div>
+          <span className="flex-1 text-sm">Cek Ongkir via Paxel</span>
+        </div>
+
+        <div className="text-center">
+          <p className="text-[#8978B4] mb-4">Klik tombol di bawah untuk cek ongkir pengiriman Paxel</p>
+          <Button
+            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
+            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Cek Ongkir Paxel
+          </Button>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)}
+
+{/* Paxel Alternative - Show when distance > 40km */}
+{isDistanceTooFar && deliveryDistance && deliveryDistance > 40 && (
+  <Card className="border-2 shadow-lg bg-gradient-to-br from-[#F6F2FF] to-[#F0E8FF] border-[#BFAAE3] shadow-[#BFAAE3]/20">
+    <CardContent className="p-6">
+      <div className="space-y-4">
+        <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
+          <div className="p-2 bg-[#BFAAE3] rounded-lg">
+            <AlertCircle className="w-5 h-5 text-white" />
+          </div>
+          <span className="flex-1 text-sm">Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress</span>
+        </div>
+
+        <div className="text-center">
+          {/* <p className="text-[#8978B4] mb-4">Untuk jarak {deliveryDistance.toFixed(1)} km, sebaiknya gunakan Paxel</p> */}
+          <Button
+            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
+            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
+          >
+            <ExternalLink className="w-4 h-4" />
+            Cek Ongkir Paxel
+          </Button>
+        </div>
+      </div>
+    </CardContent>
+  </Card>
+)}
+
 {/* Step 4: Metode Pembayaran */}
 <div
   className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
@@ -1227,7 +1363,10 @@ export default function OrderForm() {
     >
       4
     </div>
-    <h3 className="font-semibold text-[#5D4E8E]">💳 Metode Pembayaran</h3>
+    <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
+      {/* <CreditCard className="w-4 h-4" /> */}
+      Metode Pembayaran
+    </h3>
     {isStep4Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
   </div>
 
@@ -1290,7 +1429,7 @@ export default function OrderForm() {
         </FormLabel>
         <FormControl>
           <Textarea
-            placeholder="Contoh: Tolong kirim sore hari, atau tanpa es, dll."
+            placeholder="Ada instruksi khusus? Tulis di sini"
             {...field}
             className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
           />
@@ -1324,32 +1463,14 @@ export default function OrderForm() {
               {deliveryInfo.formattedCost}
             </span>
           </div>
-        ) : (
-          <div className="bg-amber-100 border border-amber-300 rounded-lg p-3">
-            <div className="text-sm text-amber-800">
-              <div className="font-medium">⚠️ Ongkir Akan Dikonfirmasi</div>
-              <div className="text-xs mt-1">
-                Gagal menghitung ongkir. Kami akan konfirmasi ongkir melalui WhatsApp.
-              </div>
-            </div>
+        ) : deliveryMethod === 'paxel' ? (
+          <div className="flex justify-between text-sm">
+            {/* <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+            <span className="font-medium text-[#5D4E8E]">
+              Tidak tersedia
+            </span> */}
           </div>
-        )}
-
-        <div className="border-t border-[#D8CFF7]/40 pt-2">
-          <div className="flex justify-between font-semibold">
-            <span className="text-[#5D4E8E]">
-              {deliveryInfo?.isValid ? 'Total Pembayaran' : 'Subtotal (Ongkir akan dikonfirmasi)'}
-            </span>
-            <span className="text-[#BFAAE3]">
-              Rp {getTotalPrice().toLocaleString('id-ID')}
-              {deliveryInfo?.isValid && deliveryInfo.cost > 0 && (
-                <span className="text-sm text-[#8978B4] font-normal block">
-                  + ongkir: {deliveryInfo.formattedCost}
-                </span>
-              )}
-            </span>
-          </div>
-        </div>
+        ) : ""}
       </div>
     </CardContent>
   </Card>
@@ -1363,11 +1484,27 @@ export default function OrderForm() {
       <span>Ada data yang perlu dilengkapi dulu:</span>
     </div>
     <div className="space-y-2 text-sm text-red-600">
+      {(() => {
+        console.log('🔴 [VALIDATION ERROR] Validation errors detected:', {
+          errors,
+          errorKeys: Object.keys(errors),
+          isAddressComplete,
+          deliveryMethod,
+          paymentMethod,
+          formValues: {
+            name: form.watch('name'),
+            phone: form.watch('phone'),
+            address: form.watch('address'),
+            detailedAddress: form.watch('detailedAddress'),
+            deliveryMethod: form.watch('deliveryMethod'),
+            paymentMethod: form.watch('paymentMethod')
+          }
+        });
+        return null;
+      })()}
       {errors.name && <div>• Nama lengkap</div>}
       {errors.phone && <div>• Nomor WhatsApp</div>}
-      {!selectedKota && <div>• Kota/Kabupaten</div>}
-      {!selectedKecamatan && <div>• Kecamatan</div>}
-      {!detailedAddress?.trim() && <div>• Detail alamat</div>}
+      {!isAddressComplete && <div>• Alamat lengkap (search + detail)</div>}
       {!deliveryMethod && <div>• Cek ongkir & pilih kurir</div>}
       {!paymentMethod && <div>• Metode pembayaran</div>}
     </div>
@@ -1391,7 +1528,7 @@ export default function OrderForm() {
 <Button
   type="submit"
   disabled={!isStep4Complete || cart.length === 0}
-  className={`w-full transition-all duration-300 rounded-xl py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
+  className={`w-full transition-all duration-300 rounded-full py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
     isStep4Complete && cart.length > 0
       ? 'bg-[#BFAAE3] hover:bg-[#9D85D0] text-white shadow-lg hover:shadow-xl text-md'
       : 'bg-gray-300 text-gray-500 cursor-not-allowed'
@@ -1415,12 +1552,12 @@ export default function OrderForm() {
     <div className="bg-[#F6F2FF] border-b-2 border-[#D8CFF7]/40 px-6 py-6 text-center">
       <div className="flex justify-center mb-3">
         <div className="w-12 h-12 bg-[#BFAAE3] rounded-full flex items-center justify-center shadow-lg">
-          <CheckCircle2 className="w-8 h-8 text-white" />
+          <PackageCheck className="w-8 h-8 text-white" />
         </div>
       </div>
 
       <DialogTitle className="text-xl font-bold text-[#5D4E8E] mb-2">
-        Terima kasih, {toCamelCase(customerName)}
+        Terima kasih, {toCamelCase(customerName)}!
       </DialogTitle>
 
       <DialogDescription className="text-[#8978B4] text-sm">
@@ -1438,7 +1575,7 @@ export default function OrderForm() {
         {/* Manual WhatsApp Button */}
         <div className="bg-[#F6F2FF] rounded-2xl p-4 mb-4">
           <div className="flex items-center justify-center gap-2 mb-2">
-            <MessageCircle className="w-5 h-5 text-[#5D4E8E]" />
+            {/* <MessagesSquare className="w-5 h-5 text-[#5D4E8E]" /> */}
             <p className="text-[#5D4E8E] font-semibold text-base">
               Lanjut konfirmasi via WhatsApp
             </p>
@@ -1448,7 +1585,7 @@ export default function OrderForm() {
             onClick={handleWhatsAppRedirect}
             className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2"
           >
-            <MessageCircle className="w-5 h-5" />
+            <MessagesSquare className="w-5 h-5" />
             Buka WhatsApp
           </Button>
 
@@ -1463,11 +1600,11 @@ export default function OrderForm() {
       </div>
 
       <div className="flex justify-center">
-        <div className="w-44 h-44 bg-[#F6F2FF] rounded-3xl flex items-center justify-center border-2 border-[#D8CFF7]/40">
+        <div className="w-[340px] h-[200px] bg-[#F6F2FF] rounded-3xl flex items-center max-auto">
           <Lottie
-            animationData={deliveryAnimation}
+            animationData={remixAnimation}
             loop={true}
-            className="w-36 h-36"
+            // className="w-[340px] h-[200px]"
           />
         </div>
       </div>
@@ -1494,7 +1631,7 @@ export default function OrderForm() {
     <div className="bg-[#F6F2FF] border-b-2 border-[#D8CFF7]/40 px-6 py-6 flex-shrink-0">
       <DialogHeader>
         <DialogTitle className="text-2xl font-bold text-[#5D4E8E] flex items-center gap-2">
-          <CheckCircle2 className="w-8 h-8 text-[#BFAAE3]" />
+          <ClipboardCheck className="w-8 h-8 text-[#BFAAE3]" />
           Cek Ulang Pesanan Kamu
         </DialogTitle>
         <DialogDescription className="text-[#8978B4]">
@@ -1509,7 +1646,7 @@ export default function OrderForm() {
           {/* Customer Details */}
           <div className="bg-[#F6F2FF] rounded-2xl p-4">
             <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
-              <MessageCircle className="w-5 h-5 text-[#BFAAE3]" />
+              <UserCheck className="w-5 h-5 text-[#BFAAE3]" />
               Data Pemesan
             </h3>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
@@ -1533,7 +1670,6 @@ export default function OrderForm() {
                   {deliveryMethod === 'grab' && 'GrabExpress Instant'}
                   {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
                   {deliveryMethod === 'paxel' && 'Paxel'}
-                  {deliveryMethod === 'pickup' && 'Ambil sendiri (pickup)'}
                   {!deliveryMethod && 'Belum dipilih'}
                 </div>
               </div>
@@ -1547,7 +1683,8 @@ export default function OrderForm() {
           {/* Order Items */}
           <div className="bg-white rounded-2xl border-2 border-[#D8CFF7]/40 p-4">
             <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
-              🛒 Produk Dipesan ({cart.length} item)
+              <ShoppingBag className="w-5 h-5 text-[#BFAAE3]" />
+              Produk Dipesan ({cart.length} item)
             </h3>
             <div className="space-y-3">
               {cart.map((item) => (
@@ -1582,7 +1719,9 @@ export default function OrderForm() {
           <div className={`rounded-2xl p-4 ${
             deliveryInfo?.isValid ? 'bg-[#F6F2FF]' : 'bg-amber-50 border-2 border-amber-200'
           }`}>
-            <h3 className="font-semibold text-[#5D4E8E] mb-3">Ringkasan Pembayaran</h3>
+            <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
+            <ReceiptText className="w-5 h-5 text-[#BFAAE3]" />
+              Ringkasan Pembayaran</h3>
             <div className="space-y-2">
               <div className="flex justify-between text-sm">
                 <span className="text-[#8978B4]">Subtotal Produk</span>
@@ -1607,26 +1746,16 @@ export default function OrderForm() {
                     </div>
                   </div>
                 </>
-              ) : (
+              ) : deliveryMethod === 'paxel' ? (
                 <>
-                  <div className="bg-amber-100 border border-amber-300 rounded-lg p-3 mt-2">
-                    <div className="text-sm text-amber-800">
-                      <div className="font-medium">⚠️ Ongkir Akan Dikonfirmasi</div>
-                      <div className="text-xs mt-1">
-                        Gagal menghitung ongkir. Kami akan konfirmasi biaya kirim melalui WhatsApp.
-                      </div>
-                    </div>
-                  </div>
-                  <div className="border-t border-amber-200 pt-2 mt-3">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span className="text-[#5D4E8E]">Subtotal (Ongkir akan dikonfirmasi)</span>
-                      <span className="text-[#BFAAE3]">
-                        Rp {getTotalPrice().toLocaleString('id-ID')}
-                      </span>
-                    </div>
+                  <div className="flex justify-between text-sm">
+                    <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+                    <span className="text-[#5D4E8E]">
+                      Konfirmasi via WhatsApp
+                    </span>
                   </div>
                 </>
-              )}
+              ) : ""}
             </div>
           </div>
 
@@ -1643,14 +1772,17 @@ export default function OrderForm() {
               onClick={handleConfirmOrder}
               className="flex-1 bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
             >
-              <MessageCircle className="w-5 h-5" />
+              <CircleCheckBig className="w-5 h-5" />
               Konfirmasi
             </Button>
           </div>
 
           {orderData.notes && (
             <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4">
-              <h4 className="font-medium text-[#5D4E8E] mb-2">📝 Catatan Tambahan</h4>
+              <h4 className="font-medium text-[#5D4E8E] mb-2 flex items-center gap-2">
+                <FileText className="w-4 h-4" />
+                Catatan Tambahan
+              </h4>
               <p className="text-sm text-[#8978B4]">{orderData.notes}</p>
             </div>
           )}

@@ -1,6 +1,4 @@
 import { CartItem, OrderFormData } from '@/types/product';
-import { kelurahanData } from '@/data/kelurahan-data';
-import wilayahData from '@/data/jabodetabek-addresses.json';
 
 export const buildWhatsAppMessage = (
   orderData: OrderFormData,
@@ -40,32 +38,26 @@ export const buildWhatsAppMessage = (
       .join(' ');
   };
 
-  // Bangun alamat dari kode wilayah dengan kecamatan dan kelurahan
+  // Build address using the new search-based system (avoiding duplicates)
   const buildAddressFromData = (data: OrderFormData): string => {
     const parts: string[] = [];
 
-    // Add detailed address first with camelCase formatting
+    // Add detailed address first (street address, house number, etc.)
     if (data.detailedAddress) {
-      parts.push(toCamelCase(data.detailedAddress));
+      const normalizedAddress = data.detailedAddress
+        .trim()
+        .replace(/\bjl\.?\b/gi, 'Jalan')
+        .replace(/\bstreet\b/gi, 'Jalan')
+        .replace(/\brt\.?\s*(\d+)/gi, 'RT $1')
+        .replace(/\brw\.?\s*(\d+)/gi, 'RW $1')
+        .replace(/\bno\.?\s*(\d+)/gi, 'No $1')
+        .trim();
+      parts.push(toCamelCase(normalizedAddress));
     }
 
-    // Add kelurahan explicitly if available - using kelurahan-data.js structure
-    if (data.kota && data.kecamatan && data.kelurahan && kelurahanData[data.kota]?.[data.kecamatan]) {
-      const kelurahanArray = kelurahanData[data.kota][data.kecamatan];
-      const kelurahanIndex = parseInt(data.kelurahan);
-      if (!isNaN(kelurahanIndex) && kelurahanArray[kelurahanIndex]) {
-        parts.push(`Kel. ${toCamelCase(kelurahanArray[kelurahanIndex])}`);
-      }
-    }
-
-    // Add kecamatan explicitly if available
-    if (data.kecamatan) {
-      parts.push(`Kec. ${toCamelCase(data.kecamatan)}`);
-    }
-
-    // Add kota/administrative area
-    if (data.kota) {
-      parts.push(toCamelCase(data.kota));
+    // Add main address from search-based system (this already includes city/province)
+    if (data.address) {
+      parts.push(toCamelCase(data.address.trim()));
     }
 
     return parts.join(', ');

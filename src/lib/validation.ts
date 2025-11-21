@@ -15,12 +15,12 @@ export const orderFormSchema = z.object({
     ),
 
   // Legacy single address field for backward compatibility
-  address: z.string().optional(),
+  address: z.string().min(8, 'Alamat minimal 8 karakter'),
   
-  // New structured address fields
-  provinsi: z.string().min(1, 'Provinsi wajib dipilih'),
-  kota: z.string().min(1, 'Kota/Kabupaten wajib dipilih'),
-  kecamatan: z.string().min(1, 'Kecamatan wajib dipilih'),
+  // New structured address fields (optional since address search is used)
+  provinsi: z.string().optional(),
+  kota: z.string().optional(),
+  kecamatan: z.string().optional(),
   kelurahan: z.string().optional(),
   detailedAddress: z.string().min(5, 'Detail alamat (jalan, nomor rumah) minimal 5 karakter'),
 
