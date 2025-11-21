@@ -4,7 +4,9 @@ export const buildWhatsAppMessage = (
   orderData: OrderFormData,
   cart: CartItem[],
   totalPrice: number,
-  deliveryCost: number = 0
+  deliveryCost: number = 0,
+  isDistanceTooFar: boolean = false,
+  deliveryDistance: number | null = null
 ): string => {
   const deliveryMethodMap: Record<string, string> = {
     gosend: 'GoSend Instant',
@@ -64,8 +66,11 @@ export const buildWhatsAppMessage = (
   };
 
   const grandTotal = totalPrice + (deliveryCost || 0);
-  const deliveryLabel =
-    deliveryMethodMap[orderData.deliveryMethod] || orderData.deliveryMethod || '-';
+  
+  // Force Paxel display when distance > 40km for GoSend/Grab methods
+  const deliveryLabel = (isDistanceTooFar && deliveryDistance && deliveryDistance > 40) 
+    ? 'Paxel' 
+    : (deliveryMethodMap[orderData.deliveryMethod] || orderData.deliveryMethod || '-');
   const paymentLabel =
     paymentMethodMap[orderData.paymentMethod] || orderData.paymentMethod || '-';
 

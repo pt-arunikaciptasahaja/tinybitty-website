@@ -646,7 +646,7 @@ export default function OrderForm() {
   const handleWhatsAppRedirect = () => {
     if (!orderData) return;
     
-    const message = buildWhatsAppMessage(orderData, cart, orderTotal, deliveryInfo?.cost || 0);
+    const message = buildWhatsAppMessage(orderData, cart, orderTotal, deliveryInfo?.cost || 0, isDistanceTooFar, deliveryDistance);
     
     sendWhatsAppOrder(message, WHATSAPP_NUMBER);
     
@@ -1665,12 +1665,17 @@ export default function OrderForm() {
               <div>
                 <span className="text-[#8978B4]">Kurir / Ongkir:</span>
                 <div className="font-medium text-[#5D4E8E]">
-                  {deliveryMethod === 'gosend' && 'GoSend Instant'}
-                  {deliveryMethod === 'gosendsameday' && 'GoSend Same Day'}
-                  {deliveryMethod === 'grab' && 'GrabExpress Instant'}
-                  {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
-                  {deliveryMethod === 'paxel' && 'Paxel'}
-                  {!deliveryMethod && 'Belum dipilih'}
+                  {/* Force Paxel display when distance > 40km and GoSend/Grab unavailable */}
+                  {isDistanceTooFar && deliveryDistance && deliveryDistance > 40 ? 'Paxel' : (
+                    <>
+                      {deliveryMethod === 'gosend' && 'GoSend Instant'}
+                      {deliveryMethod === 'gosendsameday' && 'GoSend Same Day'}
+                      {deliveryMethod === 'grab' && 'GrabExpress Instant'}
+                      {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
+                      {deliveryMethod === 'paxel' && 'Paxel'}
+                      {!deliveryMethod && 'Belum dipilih'}
+                    </>
+                  )}
                 </div>
               </div>
               <div>
