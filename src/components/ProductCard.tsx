@@ -480,7 +480,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
       {/* Image Modal */}
       <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-        <DialogContent className="max-w-xl w-full max-h-[90vh] md:max-h-[85vh] rounded-2xl p-0 sm:p-6 overflow-hidden [&>button]:hidden sm:[&>button]:block">
+        <DialogContent className="max-w-lg w-full aspect-square rounded-2xl p-0 sm:p-6 overflow-hidden [&>button]:hidden sm:[&>button]:block">
           {/* Mobile Header with bigger close button */}
           <div className="flex items-center justify-between p-4 sm:p-0 sm:hidden border-b">
             <DialogTitle className="text-lg font-bold text-[#11110a] pr-8">
@@ -505,15 +505,17 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           </DialogHeader>
           
           {/* Scrollable Content Area */}
-          <div className="flex-1 h-full overflow-y-auto">
-            <div className="p-4 sm:px-0 sm:pr-2 sm:-mr-2">
-              <div className="space-y-3 md:space-y-4">
-                {/* Product Image - Responsive sizing */}
-                <div className="w-full h-36 sm:h-48 md:h-64 rounded-2xl overflow-hidden">
-                  <div
-                    className="w-full h-full bg-cover bg-center bg-no-repeat"
-                    style={{ backgroundImage: `url(${product.image})` }}
-                  />
+          <div className="flex-1 h-full overflow-y-auto overflow-x-hidden">
+            <div className="p-4 w-full box-border">
+              <div className="space-y-1 md:space-y-3 w-full max-w-full">
+                {/* Product Image - Responsive and Visible */}
+                <div className="flex justify-center mb-4">
+                  <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border border-gray-200">
+                    <div
+                      className="w-full h-full bg-cover bg-center bg-no-repeat"
+                      style={{ backgroundImage: `url(${product.image})` }}
+                    />
+                  </div>
                 </div>
                 
                 {/* Product Details */}
@@ -542,16 +544,16 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   </div>
                   
                   {/* Size Info */}
-                  <div className="space-y-2">
+                  <div className="space-y-2 w-full">
                     <h3 className="text-sm font-semibold text-[#11110a]">Pilihan Size</h3>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 w-full max-w-full">
                       {product.variants.map((variant, index) => {
                         const meta = getSizeMeta(variant.size);
                         return (
                           <Badge 
                             key={index} 
                             variant={index === selectedVariantIndex ? "default" : "secondary"}
-                            className={`text-xs py-1 px-3 ${
+                            className={`text-xs py-1 px-3 shrink-0 ${
                               index === selectedVariantIndex 
                                 ? 'bg-[#553d8f] text-white hover:bg-[#553d8f]' 
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
@@ -566,14 +568,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                   {/* Ingredients */}
                   {product.ingredients && product.ingredients.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 w-full">
                       <h3 className="text-sm font-semibold text-[#11110a]">Bahan-bahan</h3>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 w-full max-w-full">
                         {product.ingredients.map((ingredient, index) => (
                           <Badge 
                             key={index} 
                             variant="secondary"
-                            className="text-xs py-1 px-2 bg-[#f0f9ff] text-[#0c4a6e] hover:bg-[#f0f9ff]"
+                            className="text-xs py-1 px-2 shrink-0 bg-[#f0f9ff] text-[#0c4a6e] hover:bg-[#f0f9ff]"
                           >
                             {ingredient}
                           </Badge>
@@ -584,14 +586,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                   {/* Toppings */}
                   {product.toppings && product.toppings.length > 0 && (
-                    <div className="space-y-2">
+                    <div className="space-y-2 w-full">
                       <h3 className="text-sm font-semibold text-[#11110a]">Topping</h3>
-                      <div className="flex flex-wrap gap-1.5">
+                      <div className="flex flex-wrap gap-1.5 w-full max-w-full">
                         {product.toppings.map((topping, index) => (
                           <Badge 
                             key={index} 
                             variant="secondary"
-                            className="text-xs py-1 px-2 bg-[#fef3c7] text-[#92400e] hover:bg-[#fef3c7]"
+                            className="text-xs py-1 px-2 shrink-0 bg-[#fef3c7] text-[#92400e] hover:bg-[#fef3c7]"
                           >
                             {topping}
                           </Badge>
