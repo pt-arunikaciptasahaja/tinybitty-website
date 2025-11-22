@@ -1,5 +1,12 @@
 import ProductCard from './ProductCard';
 import { Product } from '@/types/product';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselPrevious,
+  CarouselNext,
+} from '@/components/ui/carousel';
 
 interface ProductSectionProps {
   title: string;
@@ -20,7 +27,7 @@ export default function ProductSection({
       case 'cookies':
         return 'bg-[#fff2cc]';
       case 'tiny juice':
-        return 'bg-pink-50';
+        return 'bg-purple-50';
       case 'macaroni schotel':
         return 'bg-blue-50';
       default:
@@ -54,15 +61,29 @@ export default function ProductSection({
           </p> */}
         </div>
 
-        {/* Compact grid layout for desktop */}
-        <div className="grid grid-cols-1 gap-4 md:gap-5 lg:gap-4 lg:grid-cols-2 xl:grid-cols-3">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {/* Carousel layout with 4 cards per slide */}
+        <Carousel
+          opts={{
+            align: "start",
+            slidesToScroll: 1,
+          }}
+          className="w-full overflow-visible"
+        >
+          <CarouselContent className="-ml-4 md:-ml-2">
+            {products.map((product, index) => (
+              <CarouselItem key={product.id} className="pl-4 md:pl-2 basis-[80%] sm:basis-1/2 lg:basis-1/4">
+                <ProductCard product={product} />
+              </CarouselItem>
+            ))}
+          </CarouselContent>
+          
+          {/* Built-in carousel navigation */}
+          <div className="hidden md:block">
+            <CarouselPrevious className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm border border-[#a3e2f5]/30 hover:bg-white shadow-sm" />
+            <CarouselNext className="h-8 w-8 rounded-full bg-white/80 backdrop-blur-sm border border-[#a3e2f5]/30 hover:bg-white shadow-sm" />
+          </div>
+        </Carousel>
       </div>
     </section>
   );
 }
-
-//<div className="container mx-auto px-4 max-w-[896px]">

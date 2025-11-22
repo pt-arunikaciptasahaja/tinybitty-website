@@ -4,6 +4,12 @@ import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -23,6 +29,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
   const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [isAdding, setIsAdding] = useState(false);
+  const [showImageModal, setShowImageModal] = useState(false);
   const { addToCart, updateQuantity, removeFromCart, cart } = useCart();
   const { toast } = useToast();
 
@@ -199,7 +206,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     // fallback for other sizes (like juice "250ml")
     return {
       code: size,                 // show full size for single-size products
-      label: size,
+      label: '',                  // empty label to avoid duplication
       badgeClass: 'bg-gray-100 text-gray-700',
     };
   };
@@ -208,188 +215,133 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex items-stretch gap-3 md:gap-4 border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden -mx-[7px] md:mx-0 w-[calc(100%+14px)] md:w-full ${className}`}
+      className={`flex flex-col h-[480px] md:h-[520px] border border-[#e5e7eb] rounded-2xl bg-white shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group w-full md:w-80 lg:w-80 ${className}`}
     >
-      {/* LEFT: image + qty at bottom */}
-      <div className="relative flex flex-col justify-between items-center flex-shrink-0">
+      {/* Image Section */}
+      <div 
+        className="relative w-full aspect-square md:aspect-square overflow-hidden rounded-t-2xl cursor-pointer"
+        onClick={() => setShowImageModal(true)}
+      >
         <div
-          className="w-28 h-28 md:w-32 md:h-32 rounded-2xl bg-cover bg-center bg-no-repeat"
+          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
           style={{ backgroundImage: `url(${product.image})` }}
         />
         {product.isNew && (
-          <Badge className="absolute top-2 left-2 bg-[#D8CFF7] border-[#553d8f]/30 text-white text-[10px] px-2 py-0.5 shadow-md">
+          <Badge className="absolute top-3 left-3 bg-[#C5B8FF] border-[#553d8f]/10 text-white text-xs px-2 py-1 font-semibold shadow-md">
             NEW
           </Badge>
         )}
-
+        
+        {/* Click to view overlay */}
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
+              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+              </svg>
+            </div>
+          </div>
+        </div>
       </div>
 
-      {/* RIGHT: title, price, desc, size, button */}
-      <div className="flex flex-col flex-1 justify-between min-w-0">
-        {/* Top text & controls */}
-        <div className="space-y-1.5 mb-2 flex-1 overflow-hidden">
-          <h3 className="text-base md:text-lg font-bold text-[#11110a] truncate">
-            {product.name}
-          </h3>
+      {/* Content Section */}
+      <div className="flex flex-col flex-1 p-4 space-y-3">
+        {/* Title */}
+        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 leading-tight">
+          {product.name}
+        </h3>
 
-          {/* Price directly under title */}
-          <div className="text-base md:text-lg font-semibold text-[#11110a]">
-            Rp {selectedVariant.price.toLocaleString('id-ID')}
+        {/* Rating and Sales */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-semibold text-gray-900">{productRating}</span>
           </div>
-
-          {/* Star rating and sales info */}
-          <div className="flex items-center gap-2 mt-1">
-            <div className="flex items-center gap-1">
-              <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-              <span className="text-sm font-medium text-[#11110a]">{productRating}</span>
-            </div>
-            <span className="text-sm text-[#11110a]/60">•</span>
-            <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
-          </div>
-
-          <p className="text-sm md:text-[15px] text-[#11110a]/75 line-clamp-2 leading-tight">
-            {product.description}
-          </p>
-
-          {/* Size section - dropdown for multi-size, plain text for single-size */}
-          <div className="w-full mt-2">
-            <label className="text-[11px] font-semibold tracking-wide text-[#11110a]/85 mb-1.5 block">
-              Size
-            </label>
-
-            {isMultiSize ? (
-              /* Dropdown for multi-size products (cookies, macaroni) */
-              <Select
-                value={selectedVariantIndex.toString()}
-                onValueChange={(value) => setSelectedVariantIndex(parseInt(value))}
-              >
-                <SelectTrigger
-                  className="
-                    w-full h-10
-                    rounded-full
-                    border border-[#e5e7eb]
-                    bg-[#f9fafb]
-                    px-3
-                    text-xs
-                    flex items-center justify-between gap-2
-                    shadow-none
-                    ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0
-                    data-[state=open]:bg-white
-                    data-[state=open]:border-[#a3e2f5]
-                    transition-colors
-                  "
-                >
-                  <SelectValue placeholder="Pilih ukuran" />
-                </SelectTrigger>
-
-                <SelectContent
-                  position="popper"
-                  sideOffset={8}
-                  align="start"
-                  collisionPadding={{ top: 60, bottom: 40 }}
-                  className="
-                    z-50
-                    w-full
-                    max-w-[280px]
-                    max-h-[200px]
-                    overflow-y-auto
-                    rounded-2xl
-                    border border-[#e5e7eb]
-                    bg-white
-                    shadow-lg
-                    p-1.5
-                  "
-                >
-
-                  {product.variants.map((variant, index) => {
-                      const meta = getSizeMeta(variant.size);
-
-                      return (
-                        <SelectItem
-                          key={index}
-                          value={index.toString()}
-                          className="
-                            text-xs
-                            py-1.5 px-2
-                            rounded-full
-                            data-[state=checked]:bg-[#e0f2fe]
-                            data-[state=checked]:text-[#0f172a]
-                            data-[highlighted]:bg-[#f3f4f6]
-                            data-[highlighted]:text-[#111827]
-                            cursor-pointer
-                            focus:bg-[#f3f4f6]
-                            focus:text-[#111827]
-                          "
-                        >
-                          <div className="flex items-center gap-2.5">
-                            {/* Size icon pill */}
-                            <div
-                              className={`
-                                flex items-center justify-center
-                                w-7 h-7 md:w-7 md:h-7
-                                rounded-full
-                                text-[9px] md:text-[11px] font-semibold
-                                ${meta.badgeClass}
-                                min-w-[24px]
-                              `}
-                            >
-                              {meta.code}
-                            </div>
-
-                            {/* Texts - for cookies show only grams, for macaroni show only number */}
-                            <div className="flex flex-col leading-tight">
-                              <span className="text-[13px] font-semibold text-[#11110a]">
-                                {meta.label}
-                              </span>
-                            </div>
-                          </div>
-                        </SelectItem>
-                      );
-                    })}
-
-                </SelectContent>
-              </Select>
-            ) : (
-              /* Plain text for single-size products (juice) - now full width too */
-              <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#F6F2FF] text-[#553d8f] text-[10px] md:text-[11px] font-semibold">
-                {selectedVariant.size}
-              </div>
-            )}
-          </div>
-
+          <span className="text-sm text-gray-500">•</span>
+          <span className="text-sm text-gray-500">terjual {productSales}</span>
         </div>
 
-        {/* Bottom: Conditional UI - Beli button or Quantity controls */}
-        <div className="mt-2 flex-shrink-0">
+        {/* Price */}
+        <div className="text-2xl font-bold text-gray-900">
+          Rp {selectedVariant.price.toLocaleString('id-ID')}
+        </div>
+
+
+
+        {/* Size Selection */}
+        {isMultiSize && (
+          <div className="space-y-2">
+            <label className="text-sm font-semibold text-gray-700">Size:</label>
+            <Select
+              value={selectedVariantIndex.toString()}
+              onValueChange={(value) => setSelectedVariantIndex(parseInt(value))}
+            >
+              <SelectTrigger className="w-full h-10 border border-gray-300 rounded-xl bg-white">
+                <SelectValue placeholder="Pilih ukuran" />
+              </SelectTrigger>
+              <SelectContent className="rounded-lg border border-gray-200">
+                {product.variants.map((variant, index) => {
+                  const meta = getSizeMeta(variant.size);
+                  return (
+                    <SelectItem key={index} value={index.toString()}>
+                      <div className="flex items-center gap-2">
+                        <div
+                          className={`
+                            w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center
+                            ${meta.badgeClass}
+                          `}
+                        >
+                          {meta.code}
+                        </div>
+                        <span className="text-sm">{meta.label}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+          </div>
+        )}
+
+        {/* Single size display */}
+        {!isMultiSize && (
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-semibold text-gray-700">Size:</span>
+            <Badge className="text-xs bg-[#C5B8FF]">
+              {selectedVariant.size}
+            </Badge>
+          </div>
+        )}
+
+        {/* Add to Cart / Quantity Controls */}
+        <div className="mt-auto pt-2">
           {!hasItemInCart ? (
-            /* Show Beli button when not in cart */
-            <div className="w-full">
-              <Button
-                onClick={handleAddToCart}
-                disabled={isAdding}
-                className="w-full rounded-full px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
-              >
-                {isAdding ? (
-                  <span className="flex items-center justify-center gap-1.5">
-                    <Check className="w-4 h-4" />
-                    Added!
-                  </span>
-                ) : (
-                  <span className="flex items-center justify-center gap-1.5">
-                    Beli
-                  </span>
-                )}
-              </Button>
-            </div>
+            <Button
+              onClick={handleAddToCart}
+              disabled={isAdding}
+              className="w-full h-12 bg-[#553d8f] hover:bg-[#553d8f]/90 text-white font-semibold rounded-2xl transition-colors"
+            >
+              {isAdding ? (
+                <span className="flex items-center gap-2">
+                  <Check className="w-4 h-4" />
+                  Added to Cart
+                </span>
+              ) : (
+                <span className="flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  keranjang
+                </span>
+              )}
+            </Button>
           ) : (
-            /* Show quantity controls when in cart */
             <div className="flex items-center justify-center gap-3">
               <Button
                 variant="outline"
                 size="icon"
                 onClick={handleDecreaseQuantity}
                 disabled={isAdding}
-                className="h-11 w-11 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-10 w-10 rounded-lg border border-gray-300 hover:bg-gray-50"
               >
                 <Minus className="w-4 h-4" />
               </Button>
@@ -401,7 +353,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                 size="icon"
                 onClick={handleIncreaseQuantity}
                 disabled={isAdding}
-                className="h-11 w-11 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-10 w-10 rounded-lg border border-gray-300 hover:bg-gray-50"
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -409,6 +361,76 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           )}
         </div>
       </div>
+
+      {/* Image Modal */}
+      <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
+        <DialogContent className="max-w-xl w-full max-h-[85vh]">
+          <DialogHeader>
+            <DialogTitle className="text-lg font-bold text-gray-900 mb-3">
+              {product.name}
+            </DialogTitle>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            {/* Full Size Image */}
+            <div className="w-full h-64 md:h-80 rounded-2xl overflow-hidden">
+              <div
+                className="w-full h-full bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: `url(${product.image})` }}
+              />
+            </div>
+            
+            {/* Product Details */}
+            <div className="space-y-3">
+              {/* Rating and Sales */}
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1">
+                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                  <span className="text-sm font-semibold text-gray-900">{productRating}</span>
+                </div>
+                <span className="text-gray-500">•</span>
+                <span className="text-sm text-gray-500">terjual {productSales}</span>
+              </div>
+              
+              {/* Price */}
+              <div className="text-2xl font-bold text-gray-900">
+                Rp {selectedVariant.price.toLocaleString('id-ID')}
+              </div>
+              
+              {/* Description */}
+              <div className="space-y-2">
+                <h3 className="text-base font-semibold text-gray-900">Deskripsi Produk</h3>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {product.description}
+                </p>
+              </div>
+              
+              {/* Size Info */}
+              <div className="space-y-2">
+                <h3 className="text-base font-semibold text-gray-900">Pilihan Size</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.variants.map((variant, index) => {
+                    const meta = getSizeMeta(variant.size);
+                    return (
+                      <Badge 
+                        key={index} 
+                        variant={index === selectedVariantIndex ? "default" : "secondary"}
+                        className={`text-xs py-1 px-2 ${
+                          index !== selectedVariantIndex 
+                            ? 'bg-purple-200 text-purple-800 hover:bg-purple-200' 
+                            : ''
+                        }`}
+                      >
+                        {meta.label ? `${meta.code} - ${meta.label}` : meta.code}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
