@@ -480,117 +480,136 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
       {/* Image Modal */}
       <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-        <DialogContent className="max-w-xl w-full max-h-[85vh] rounded-2xl overflow-hidden">
-          <DialogHeader className="flex-shrink-0">
+        <DialogContent className="max-w-xl w-full max-h-[90vh] md:max-h-[85vh] rounded-2xl p-0 sm:p-6 overflow-hidden [&>button]:hidden sm:[&>button]:block">
+          {/* Mobile Header with bigger close button */}
+          <div className="flex items-center justify-between p-4 sm:p-0 sm:hidden border-b">
+            <DialogTitle className="text-lg font-bold text-[#11110a] pr-8">
+              {product.name}
+            </DialogTitle>
+            <button
+              onClick={() => setShowImageModal(false)}
+              className="w-11 h-11 flex items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 transition-colors shrink-0"
+              aria-label="Close dialog"
+            >
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                <path d="M18 6L6 18M6 6l12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
+          </div>
+          
+          {/* Desktop Header */}
+          <DialogHeader className="hidden sm:flex flex-shrink-0 px-0">
             <DialogTitle className="text-lg font-bold text-[#11110a]">
               {product.name}
             </DialogTitle>
           </DialogHeader>
           
           {/* Scrollable Content Area */}
-          <div className="flex-1 overflow-y-auto pr-2 -mr-2">
-            <div className="space-y-4">
-              {/* Full Size Image - Made Smaller */}
-              <div className="w-full h-48 md:h-64 rounded-2xl overflow-hidden">
-                <div
-                  className="w-full h-full bg-cover bg-center bg-no-repeat"
-                  style={{ backgroundImage: `url(${product.image})` }}
-                />
-              </div>
-              
-              {/* Product Details */}
-              <div className="space-y-4 pb-4">
-                {/* Rating and Sales */}
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-1">
-                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                    <span className="text-sm font-semibold text-[#11110a]">{productRating}</span>
-                  </div>
-                  <span className="text-sm text-[#11110a]/60">•</span>
-                  <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
+          <div className="flex-1 h-full overflow-y-auto">
+            <div className="p-4 sm:px-0 sm:pr-2 sm:-mr-2">
+              <div className="space-y-3 md:space-y-4">
+                {/* Product Image - Responsive sizing */}
+                <div className="w-full h-36 sm:h-48 md:h-64 rounded-2xl overflow-hidden">
+                  <div
+                    className="w-full h-full bg-cover bg-center bg-no-repeat"
+                    style={{ backgroundImage: `url(${product.image})` }}
+                  />
                 </div>
                 
-                {/* Price */}
-                <div className="text-lg font-bold text-[#11110a]">
-                  Rp {selectedVariant.price.toLocaleString('id-ID')}
-                </div>
-                
-                {/* Description */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-[#11110a]">Deskripsi Produk</h3>
-                  <p className="text-sm text-[#11110a]/75 leading-relaxed">
-                    {product.description}
-                  </p>
-                </div>
-                
-                {/* Size Info */}
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold text-[#11110a]">Pilihan Size</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {product.variants.map((variant, index) => {
-                      const meta = getSizeMeta(variant.size);
-                      return (
-                        <Badge 
-                          key={index} 
-                          variant={index === selectedVariantIndex ? "default" : "secondary"}
-                          className={`text-xs py-1 px-3 ${
-                            index === selectedVariantIndex 
-                              ? 'bg-[#553d8f] text-white hover:bg-[#553d8f]' 
-                              : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
-                          }`}
-                        >
-                          {meta.label && meta.label !== meta.code ? `${meta.code} - ${meta.label}` : meta.code}
-                        </Badge>
-                      );
-                    })}
+                {/* Product Details */}
+                <div className="space-y-3 md:space-y-4 pb-4">
+                  {/* Rating and Sales */}
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-1">
+                      <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                      <span className="text-sm font-semibold text-[#11110a]">{productRating}</span>
+                    </div>
+                    <span className="text-sm text-[#11110a]/60">•</span>
+                    <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
                   </div>
-                </div>
-
-                {/* Ingredients */}
-                {product.ingredients && product.ingredients.length > 0 && (
+                  
+                  {/* Price */}
+                  <div className="text-lg font-bold text-[#11110a]">
+                    Rp {selectedVariant.price.toLocaleString('id-ID')}
+                  </div>
+                  
+                  {/* Description */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-[#11110a]">Bahan-bahan</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.ingredients.map((ingredient, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary"
-                          className="text-xs py-1 px-2 bg-[#f0f9ff] text-[#0c4a6e] hover:bg-[#f0f9ff]"
-                        >
-                          {ingredient}
-                        </Badge>
-                      ))}
+                    <h3 className="text-sm font-semibold text-[#11110a]">Deskripsi Produk</h3>
+                    <p className="text-sm text-[#11110a]/75 leading-relaxed">
+                      {product.description}
+                    </p>
+                  </div>
+                  
+                  {/* Size Info */}
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-[#11110a]">Pilihan Size</h3>
+                    <div className="flex flex-wrap gap-2">
+                      {product.variants.map((variant, index) => {
+                        const meta = getSizeMeta(variant.size);
+                        return (
+                          <Badge 
+                            key={index} 
+                            variant={index === selectedVariantIndex ? "default" : "secondary"}
+                            className={`text-xs py-1 px-3 ${
+                              index === selectedVariantIndex 
+                                ? 'bg-[#553d8f] text-white hover:bg-[#553d8f]' 
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
+                            }`}
+                          >
+                            {meta.label && meta.label !== meta.code ? `${meta.code} - ${meta.label}` : meta.code}
+                          </Badge>
+                        );
+                      })}
                     </div>
                   </div>
-                )}
 
-                {/* Toppings */}
-                {product.toppings && product.toppings.length > 0 && (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-[#11110a]">Topping</h3>
-                    <div className="flex flex-wrap gap-1.5">
-                      {product.toppings.map((topping, index) => (
-                        <Badge 
-                          key={index} 
-                          variant="secondary"
-                          className="text-xs py-1 px-2 bg-[#fef3c7] text-[#92400e] hover:bg-[#fef3c7]"
-                        >
-                          {topping}
-                        </Badge>
-                      ))}
+                  {/* Ingredients */}
+                  {product.ingredients && product.ingredients.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-[#11110a]">Bahan-bahan</h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {product.ingredients.map((ingredient, index) => (
+                          <Badge 
+                            key={index} 
+                            variant="secondary"
+                            className="text-xs py-1 px-2 bg-[#f0f9ff] text-[#0c4a6e] hover:bg-[#f0f9ff]"
+                          >
+                            {ingredient}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Cup Information */}
-                {product.cupSize && (
-                  <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-[#11110a]">Cup Size</h3>
-                    <div className="text-sm text-[#11110a]/75 leading-relaxed">
-                      {product.cupSize}
+                  {/* Toppings */}
+                  {product.toppings && product.toppings.length > 0 && (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-[#11110a]">Topping</h3>
+                      <div className="flex flex-wrap gap-1.5">
+                        {product.toppings.map((topping, index) => (
+                          <Badge 
+                            key={index} 
+                            variant="secondary"
+                            className="text-xs py-1 px-2 bg-[#fef3c7] text-[#92400e] hover:bg-[#fef3c7]"
+                          >
+                            {topping}
+                          </Badge>
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
+
+                  {/* Cup Information */}
+                  {product.cupSize && (
+                    <div className="space-y-2">
+                      <h3 className="text-sm font-semibold text-[#11110a]">Cup Size</h3>
+                      <div className="text-sm text-[#11110a]/75 leading-relaxed">
+                        {product.cupSize}
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
