@@ -215,7 +215,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ${className}`}
+      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-2 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ${className}`}
       onClick={(e) => {
         // Prevent all clicks from bubbling up to carousel or other components
         e.stopPropagation();
@@ -226,7 +226,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       }}
     >
       {/* TOP: image section */}
-      <div className="relative mb-3 md:mb-4 group">
+      <div className="relative mb-2 md:mb-4 group">
         <div
           className="w-full aspect-square rounded-2xl bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${product.image})` }}
@@ -239,10 +239,10 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       </div>
 
       {/* BOTTOM: content section */}
-      <div className="flex flex-col flex-1 space-y-2 md:space-y-3">
+      <div className="flex flex-col flex-1 space-y-1 md:space-y-3">
         {/* Title with View Item button */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-base md:text-lg font-bold text-[#11110a] truncate leading-tight flex-1">
+          <h3 className="text-sm md:text-base font-bold text-[#11110a] truncate leading-tight flex-1">
             {product.name}
           </h3>
           <Button
@@ -252,14 +252,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
               setShowImageModal(true);
               e.stopPropagation();
             }}
-            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-2 py-1 h-auto text-xs font-medium shrink-0"
+            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-1 py-0.5 h-auto text-[10px] font-medium shrink-0"
           >
             Detail produk
           </Button>
         </div>
 
         {/* Price */}
-        <div className="text-base md:text-lg font-semibold text-[#11110a]">
+        <div className="text-sm md:text-base font-semibold text-[#11110a]">
           Rp {selectedVariant.price.toLocaleString('id-ID')}
         </div>
 
@@ -267,10 +267,10 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-medium text-[#11110a]">{productRating}</span>
+            <span className="text-xs font-medium text-[#11110a]">{productRating}</span>
           </div>
-          <span className="text-sm text-[#11110a]/60">•</span>
-          <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
+          <span className="text-xs text-[#11110a]/60">•</span>
+          <span className="text-xs text-[#11110a]/60">terjual {productSales}</span>
         </div>
 
         {/* Size section - dropdown for multi-size, plain text for single-size */}
@@ -295,11 +295,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             >
               <SelectTrigger
                 className="
-                  w-full h-10
+                  w-full h-8 md:h-10
                   rounded-full
                   border border-[#e5e7eb]
                   bg-[#f9fafb]
-                  px-3
+                  px-2 md:px-3
                   text-xs
                   flex items-center justify-between gap-2
                   shadow-none
@@ -382,7 +382,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                           <div
                             className={`
                               flex items-center justify-center
-                              w-7 h-7
+                              w-6 h-6 md:w-7 md:h-7
                               rounded-full
                               text-[11px] font-semibold
                               ${meta.badgeClass}
@@ -393,7 +393,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                           {/* Texts - for cookies show only grams, for macaroni show only number */}
                           <div className="flex flex-col leading-tight">
-                            <span className="text-[13px] font-semibold text-[#11110a]">
+                            <span className="text-[11px] font-semibold text-[#11110a]">
                               {meta.label}
                             </span>
                           </div>
@@ -406,7 +406,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             </Select>
           ) : (
             /* Plain text for single-size products (juice) */
-            <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[11px] font-semibold">
+            <div className="flex items-center justify-center w-full h-7 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[10px] font-semibold">
               {selectedVariant.size}
             </div>
           )}
@@ -429,7 +429,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="w-full rounded-full px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+                className="w-full rounded-full px-4 md:px-8 py-1.5 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
               >
                 {isAdding ? (
                   <span className="flex items-center justify-center gap-1.5">
@@ -438,7 +438,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   </span>
                 ) : (
                   <span className="flex items-center justify-center gap-1.5">
-                    Beli
+                    + Keranjang
                   </span>
                 )}
               </Button>
@@ -454,11 +454,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Minus className="w-4 h-4" />
               </Button>
-              <span className="text-lg font-semibold w-8 text-center">
+              <span className="text-base font-semibold w-6 text-center">
                 {quantity}
               </span>
               <Button
@@ -469,7 +469,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Plus className="w-4 h-4" />
               </Button>
