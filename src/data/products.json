@@ -3,7 +3,7 @@
     {
       "id": "choco-almond-crunch",
       "name": "Choco Almond",
-      "description": "Crunchy, nutty, chocolate-forward.",
+      "description": "Rich, buttery cookies loaded with premium Australian almonds and melty chocolate chips, finished with a delightful corn flake crunch in every bite.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575760/almondd_v75yxv.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
@@ -11,13 +11,13 @@
         { "size": "Small 100gr", "price": 65000 },
         { "size": "Mini 30gr", "price": 20000 }
       ],
-      "ingredients": ["Flour", "Australian Butter", "Brown Sugar", "Chocolate chips", "Almond"],
+      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Chocolate chips", "Almond", "Corn flakes"],
       "isNew": false
     },
     {
       "id": "heavenly-bites",
       "name": "Heavenly Bites",
-      "description": "Sweet cookies with Oreo crumb magic.",
+      "description": "Indulgent cookies packed with crunchy chocolate chips, creamy dark cookie crumbles, and choco cereal bits for the ultimate chocolate lover's experience.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575761/heaven_y9sj24.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
@@ -25,13 +25,13 @@
         { "size": "Small 100gr", "price": 65000 },
         { "size": "Mini 30gr", "price": 20000 }
       ],
-      "ingredients": ["Flour", "Australian Butter", "Brown Sugar", "Oreo crumbs", "Chocolate chips"],
+      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Dark crumbs", "Chocolate chips", "Choco cereal"],
       "isNew": false
     },
     {
       "id": "oatmeal-raisin",
       "name": "Oatmeal Raisin",
-      "description": "Chewy, warm spices, classic favorite.",
+      "description": "Hearty, chewy cookies made with wholesome oats, sweet golden raisins, and a cozy blend of warm cinnamon for that perfect comfort food feeling.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575769/oatmeal_spzisq.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
@@ -39,13 +39,13 @@
         { "size": "Small 100gr", "price": 65000 },
         { "size": "Mini 30gr", "price": 20000 }
       ],
-      "ingredients": ["Oats", "Raisin", "Australian Butter", "Brown Sugar", "Eggs"],
+      "ingredients": ["Flour", "Eggs", "Australian Butter", "Oats", "Raisin",  "Brown Sugar", "Cinnamon powder"],
       "isNew": false
     },
     {
-      "id": "choco-cheese-almond",
+      "id": "cheese-almond",
       "name": "Cheese Almond",
-      "description": "Sweet-salty mix with crunchy almonds.",
+      "description": "A delicious harmony of sharp, aged cheddar cheese and buttery roasted almonds in every bite - the perfect sweet and savory treat.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575763/cheesy_soullc.png",
       "variants": [
         { "size": "Large 400gr", "price": 220000 },
@@ -53,7 +53,7 @@
         { "size": "Small 100gr", "price": 65000 },
         { "size": "Mini 30gr", "price": 20000 }
       ],
-      "ingredients": ["Chocolate chips", "Australian Butter", "Brown Sugar", "Cheese", "Almond"],
+      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Cheddar Cheese", "Almond"],
       "isNew": true
     }
   ],
@@ -61,79 +61,79 @@
     {
       "id": "mango",
       "name": "Mango",
-      "description": "Rich mango juice with fun bites of chia seeds and nata de coco.",
+      "description": "Luscious, tropical mango goodness bursting with natural sweetness, enhanced with satisfying chewy textures from chia seeds and bouncy nata de coco.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785933/WhatsApp_Image_2025-11-22_at_11.11.10_iwmttv.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Mango juice", "Sugar", "Water"],
+      "ingredients": ["Mango", "Sugar", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": false
     },
     {
       "id": "guava",
       "name": "Guava",
-      "description": "Fresh guava tang with chewy nata de coco and chia seeds.",
+      "description": "Vibrant and tangy guava refreshment with a satisfying burst of chewy nata de coco and nutrient-rich chia seeds in every sip.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785942/WhatsApp_Image_2025-11-22_at_11.20.30_yzhrkw.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Guava juice", "Sugar", "Water"],
+      "ingredients": ["Guava", "Sugar", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": false
     },
     {
       "id": "strawberry",
       "name": "Strawberry",
-      "description": "Bright strawberry sip with chia seeds and nata de coco.",
+      "description": "Bright, refreshing strawberry burst with a playful mix of chewy nata de coco and omega-3 rich chia seeds for the perfect guilt-free indulgence.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/strawberry-delight_y3xczp.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Strawberry juice", "Sugar", "Water"],
+      "ingredients": ["Strawberry", "Sugar", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": false
     },
     {
       "id": "strawberry tropicana",
       "name": "Strawberry Tropicana",
-      "description": "Bright strawberry sip with chia seeds and nata de coco and tropicana slim sweetener.",
+      "description": "Sweet strawberry perfection with zero guilt - naturally sweetened with Tropicana Slim and loaded with satisfying chewy textures for a truly delightful experience.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786126/WhatsApp_Image_2025-11-22_at_11.35.00_wkjibs.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Strawberry juice", "Sugar", "Water"],
+      "ingredients": ["Strawberry", "Tropicana sweetener", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": true
     },
     {
       "id": "soursop",
       "name": "Soursop",
-      "description": "Creamy tropical soursop with fun nata de coco bites.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763792358/yupp-generated-image-560702_1_byflc6.png",
+      "description": "Silky smooth tropical escape with the exotic sweetness of soursop, complemented by bouncy nata de coco for a refreshing and satisfying drink.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763806406/yupp-generated-image-210752_1_fhp7lk.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Soursop juice", "Sugar", "Water"],
+      "ingredients": ["Soursop", "Sugar", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": false
     },
     {
       "id": "soursop tropicana",
       "name": "Soursop Tropicana",
-      "description": "Creamy tropical soursop with fun nata de coco bites and tropicana slim sweetener.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/soursop-delight_dr1bcw.jpg",
+      "description": "Exotic tropical indulgence without the sugar rush - creamy soursop naturally sweetened with Tropicana Slim, dotted with delightful nata de coco pearls.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763806454/yupp-generated-image-757808_1_fqxcuh.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
-      "ingredients": ["Soursop juice", "Sugar", "Water"],
+      "ingredients": ["Soursop", "Tropicana sweetener", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": true
     },
     {
       "id": "avocado-coffee",
       "name": "Avocado Coffee",
-      "description": "Avocado coffee dessert drink with creamy texture and sweet aroma.",
+      "description": "Indulgent coffee meets creamy avocado richness - a perfectly balanced drink with aromatic coffee, smooth avocado, and just the right amount of sweetness.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786332/WhatsApp_Image_2025-11-22_at_11.37.48_bj68up.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
@@ -147,15 +147,15 @@
     {
       "id": "macaroni-schotel",
       "name": "Macaroni Schotel",
-      "description": "Creamy & cheesy baked macaroni cups with a crispy outer layer.",
+      "description": "Decadent baked macaroni cups loaded with creamy white and sharp red cheddar, tender smoked beef, juicy chicken, and perfectly seasoned pasta in every bite.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575766/sahroni_scbpg6.png",
       "variants": [
         { "size": "2 pcs", "price": 40000 },
         { "size": "4 pcs", "price": 80000 },
         { "size": "9 pcs", "price": 180000 }
       ],
-      "ingredients": ["Cheddar Cheese", "Red Cheddar Cheese", "Smoked beef", "Chicken breast"],
-      "size": "Cup Ø 8cm • tall 3.5cm",
+      "ingredients": ["White Cheddar Cheese", "Red Cheddar Cheese", "Eggs", "Milk", "Smoked beef", "Chicken breast", "Pasta", "Oregano", "Spices"],
+      "cupSize": "Cup Ø 8cm • tall 3.5cm",
       "isNew": false
     }
   ]

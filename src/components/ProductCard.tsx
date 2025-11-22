@@ -112,7 +112,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
     toast({
       title: 'Yeay, berhasil! ✨',
-      description: `${product.name} (${selectedVariant.size}) siap dinikmati.`,
+      description: `${product.name} (${selectedVariant.size}) siap menikmati.`,
     });
 
     setTimeout(() => {
@@ -171,7 +171,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       let badgeClass = '';
       
       if (s.includes('mini')) {
-        code = 'Mn';
+        code = 'Mini';
         badgeClass = 'bg-[#ffe4f0] text-[#b83263]';
       } else if (s.startsWith('s') || s.includes('small')) {
         code = 'S';
@@ -199,14 +199,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       return {
         code: num,                // badge: 2 / 4 / 9
         label: 'pcs',             // label: "pcs"
-        badgeClass: 'bg-[#F6F2FF] text-[#553d8f]',
+        badgeClass: 'bg-[#e0f2fe] text-[#1d4ed8]',
       };
     }
   
     // fallback for other sizes (like juice "250ml")
     return {
       code: size,                 // show full size for single-size products
-      label: '',                  // empty label to avoid duplication
+      label: size,
       badgeClass: 'bg-gray-100 text-gray-700',
     };
   };
@@ -215,133 +215,246 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex flex-col h-[480px] md:h-[520px] border border-[#e5e7eb] rounded-2xl bg-white shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden group w-full md:w-80 lg:w-80 ${className}`}
+      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ${className}`}
+      onClick={(e) => {
+        // Prevent all clicks from bubbling up to carousel or other components
+        e.stopPropagation();
+      }}
+      onMouseDown={(e) => {
+        // Prevent mouse events that might trigger unwanted interactions
+        e.stopPropagation();
+      }}
     >
-      {/* Image Section */}
-      <div 
-        className="relative w-full aspect-square md:aspect-square overflow-hidden rounded-t-2xl cursor-pointer"
-        onClick={() => setShowImageModal(true)}
-      >
+      {/* TOP: image section */}
+      <div className="relative mb-3 md:mb-4 group">
         <div
-          className="w-full h-full bg-cover bg-center bg-no-repeat transition-transform duration-300 group-hover:scale-105"
+          className="w-full aspect-square rounded-2xl bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${product.image})` }}
         />
         {product.isNew && (
-          <Badge className="absolute top-3 left-3 bg-[#C5B8FF] border-[#553d8f]/10 text-white text-xs px-2 py-1 font-semibold shadow-md">
+          <Badge className="absolute top-2 right-2 bg-[#D8CFF7] text-white text-[10px] px-2 py-0.5 shadow-md">
             NEW
           </Badge>
         )}
-        
-        {/* Click to view overlay */}
-        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300 flex items-center justify-center">
-          <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-            <div className="bg-white/90 backdrop-blur-sm rounded-full p-2">
-              <svg className="w-6 h-6 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-              </svg>
-            </div>
-          </div>
-        </div>
       </div>
 
-      {/* Content Section */}
-      <div className="flex flex-col flex-1 p-4 space-y-3">
-        {/* Title */}
-        <h3 className="text-lg font-bold text-gray-900 line-clamp-2 leading-tight">
-          {product.name}
-        </h3>
-
-        {/* Rating and Sales */}
-        <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
-            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-            <span className="text-sm font-semibold text-gray-900">{productRating}</span>
-          </div>
-          <span className="text-sm text-gray-500">•</span>
-          <span className="text-sm text-gray-500">terjual {productSales}</span>
+      {/* BOTTOM: content section */}
+      <div className="flex flex-col flex-1 space-y-2 md:space-y-3">
+        {/* Title with View Item button */}
+        <div className="flex items-center justify-between gap-2">
+          <h3 className="text-base md:text-lg font-bold text-[#11110a] truncate leading-tight flex-1">
+            {product.name}
+          </h3>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={(e) => {
+              setShowImageModal(true);
+              e.stopPropagation();
+            }}
+            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-2 py-1 h-auto text-xs font-medium shrink-0"
+          >
+            Detail produk
+          </Button>
         </div>
 
         {/* Price */}
-        <div className="text-2xl font-bold text-gray-900">
+        <div className="text-base md:text-lg font-semibold text-[#11110a]">
           Rp {selectedVariant.price.toLocaleString('id-ID')}
         </div>
 
+        {/* Star rating and sales info */}
+        <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1">
+            <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+            <span className="text-sm font-medium text-[#11110a]">{productRating}</span>
+          </div>
+          <span className="text-sm text-[#11110a]/60">•</span>
+          <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
+        </div>
 
+        {/* Size section - dropdown for multi-size, plain text for single-size */}
+        <div 
+          className="w-full"
+          onClick={(e) => {
+            // Prevent any click events from bubbling up from this entire section
+            e.stopPropagation();
+          }}
+        >
+          {/* <label className="text-[11px] font-semibold tracking-wide text-[#11110a]/85 mb-1.5 block">
+            Size
+          </label> */}
 
-        {/* Size Selection */}
-        {isMultiSize && (
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700">Size:</label>
+          {isMultiSize ? (
+            /* Dropdown for multi-size products (cookies, macaroni) */
             <Select
               value={selectedVariantIndex.toString()}
-              onValueChange={(value) => setSelectedVariantIndex(parseInt(value))}
+              onValueChange={(value) => {
+                setSelectedVariantIndex(parseInt(value));
+              }}
             >
-              <SelectTrigger className="w-full h-10 border border-gray-300 rounded-xl bg-white">
+              <SelectTrigger
+                className="
+                  w-full h-10
+                  rounded-full
+                  border border-[#e5e7eb]
+                  bg-[#f9fafb]
+                  px-3
+                  text-xs
+                  flex items-center justify-between gap-2
+                  shadow-none
+                  ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0
+                  data-[state=open]:bg-white
+                  data-[state=open]:border-[#a3e2f5]
+                  transition-colors
+                "
+              >
                 <SelectValue placeholder="Pilih ukuran" />
               </SelectTrigger>
-              <SelectContent className="rounded-lg border border-gray-200">
+
+              <SelectContent
+                position="popper"
+                sideOffset={8}
+                align="start"
+                collisionPadding={{ top: 60, bottom: 40 }}
+                side="bottom"
+                className="
+                  z-[9999]
+                  w-full
+                  max-w-[280px]
+                  max-h-[200px]
+                  overflow-y-auto
+                  rounded-2xl
+                  border border-[#e5e7eb]
+                  bg-white
+                  shadow-lg
+                  p-1.5
+                  pointer-events-auto
+                "
+                onClick={(e) => {
+                  // Prevent all clicks within the dropdown content from bubbling
+                  e.stopPropagation();
+                }}
+                onMouseDown={(e) => {
+                  // Prevent mouse events from passing through to content underneath
+                  e.preventDefault();
+                  e.stopPropagation();
+                }}
+                onMouseEnter={() => {
+                  // Ensure dropdown captures all pointer events
+                  // This prevents mouse events from leaking to underlying content
+                }}
+              >
+
                 {product.variants.map((variant, index) => {
-                  const meta = getSizeMeta(variant.size);
-                  return (
-                    <SelectItem key={index} value={index.toString()}>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`
-                            w-6 h-6 rounded-full text-xs font-semibold flex items-center justify-center
-                            ${meta.badgeClass}
-                          `}
-                        >
-                          {meta.code}
+                    const meta = getSizeMeta(variant.size);
+
+                    return (
+                      <SelectItem
+                        key={index}
+                        value={index.toString()}
+                        className="
+                          text-xs
+                          py-1.5 px-2
+                          rounded-full
+                          data-[state=checked]:bg-[#e0f2fe]
+                          data-[state=checked]:text-[#0f172a]
+                          data-[highlighted]:bg-[#f3f4f6]
+                          data-[highlighted]:text-[#111827]
+                          cursor-pointer
+                          focus:bg-[#f3f4f6]
+                          focus:text-[#111827]
+                          pointer-events-auto
+                        "
+                        onClick={(e) => {
+                          // Ensure clicks don't pass through to underlying content
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                        onMouseDown={(e) => {
+                          // Prevent mouse events from passing through
+                          e.stopPropagation();
+                          e.preventDefault();
+                        }}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          {/* Size icon pill */}
+                          <div
+                            className={`
+                              flex items-center justify-center
+                              w-7 h-7
+                              rounded-full
+                              text-[11px] font-semibold
+                              ${meta.badgeClass}
+                            `}
+                          >
+                            {meta.code}
+                          </div>
+
+                          {/* Texts - for cookies show only grams, for macaroni show only number */}
+                          <div className="flex flex-col leading-tight">
+                            <span className="text-[13px] font-semibold text-[#11110a]">
+                              {meta.label}
+                            </span>
+                          </div>
                         </div>
-                        <span className="text-sm">{meta.label}</span>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
+                      </SelectItem>
+                    );
+                  })}
+
               </SelectContent>
             </Select>
-          </div>
-        )}
-
-        {/* Single size display */}
-        {!isMultiSize && (
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-semibold text-gray-700">Size:</span>
-            <Badge className="text-xs bg-[#C5B8FF]">
-              {selectedVariant.size}
-            </Badge>
-          </div>
-        )}
-
-        {/* Add to Cart / Quantity Controls */}
-        <div className="mt-auto pt-2">
-          {!hasItemInCart ? (
-            <Button
-              onClick={handleAddToCart}
-              disabled={isAdding}
-              className="w-full h-12 bg-[#553d8f] hover:bg-[#553d8f]/90 text-white font-semibold rounded-2xl transition-colors"
-            >
-              {isAdding ? (
-                <span className="flex items-center gap-2">
-                  <Check className="w-4 h-4" />
-                  Added to Cart
-                </span>
-              ) : (
-                <span className="flex items-center gap-2">
-                  <Plus className="w-4 h-4" />
-                  keranjang
-                </span>
-              )}
-            </Button>
           ) : (
+            /* Plain text for single-size products (juice) */
+            <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[11px] font-semibold">
+              {selectedVariant.size}
+            </div>
+          )}
+        </div>
+
+        {/* Bottom: Conditional UI - Beli button or Quantity controls */}
+        <div 
+          className="mt-auto pt-2"
+          onClick={(e) => {
+            // Prevent button clicks from bubbling to other elements
+            e.stopPropagation();
+          }}
+        >
+          {!hasItemInCart ? (
+            /* Show Beli button when not in cart */
+            <div className="w-full">
+              <Button
+                onClick={(e) => {
+                  handleAddToCart();
+                  e.stopPropagation();
+                }}
+                disabled={isAdding}
+                className="w-full rounded-full px-6 md:px-8 py-2 md:py-2.5 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+              >
+                {isAdding ? (
+                  <span className="flex items-center justify-center gap-1.5">
+                    <Check className="w-4 h-4" />
+                    Added!
+                  </span>
+                ) : (
+                  <span className="flex items-center justify-center gap-1.5">
+                    Beli
+                  </span>
+                )}
+              </Button>
+            </div>
+          ) : (
+            /* Show quantity controls when in cart */
             <div className="flex items-center justify-center gap-3">
               <Button
                 variant="outline"
                 size="icon"
-                onClick={handleDecreaseQuantity}
+                onClick={(e) => {
+                  handleDecreaseQuantity();
+                  e.stopPropagation();
+                }}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-lg border border-gray-300 hover:bg-gray-50"
+                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Minus className="w-4 h-4" />
               </Button>
@@ -351,9 +464,12 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
               <Button
                 variant="outline"
                 size="icon"
-                onClick={handleIncreaseQuantity}
+                onClick={(e) => {
+                  handleIncreaseQuantity();
+                  e.stopPropagation();
+                }}
                 disabled={isAdding}
-                className="h-10 w-10 rounded-lg border border-gray-300 hover:bg-gray-50"
+                className="h-10 w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
                 <Plus className="w-4 h-4" />
               </Button>
@@ -364,68 +480,117 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
       {/* Image Modal */}
       <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-        <DialogContent className="max-w-xl w-full max-h-[85vh]">
-          <DialogHeader>
-            <DialogTitle className="text-lg font-bold text-gray-900 mb-3">
+        <DialogContent className="max-w-xl w-full max-h-[85vh] rounded-2xl overflow-hidden">
+          <DialogHeader className="flex-shrink-0">
+            <DialogTitle className="text-lg font-bold text-[#11110a]">
               {product.name}
             </DialogTitle>
           </DialogHeader>
           
-          <div className="space-y-4">
-            {/* Full Size Image */}
-            <div className="w-full h-64 md:h-80 rounded-2xl overflow-hidden">
-              <div
-                className="w-full h-full bg-cover bg-center bg-no-repeat"
-                style={{ backgroundImage: `url(${product.image})` }}
-              />
-            </div>
-            
-            {/* Product Details */}
-            <div className="space-y-3">
-              {/* Rating and Sales */}
-              <div className="flex items-center gap-3">
-                <div className="flex items-center gap-1">
-                  <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                  <span className="text-sm font-semibold text-gray-900">{productRating}</span>
+          {/* Scrollable Content Area */}
+          <div className="flex-1 overflow-y-auto pr-2 -mr-2">
+            <div className="space-y-4">
+              {/* Full Size Image - Made Smaller */}
+              <div className="w-full h-48 md:h-64 rounded-2xl overflow-hidden">
+                <div
+                  className="w-full h-full bg-cover bg-center bg-no-repeat"
+                  style={{ backgroundImage: `url(${product.image})` }}
+                />
+              </div>
+              
+              {/* Product Details */}
+              <div className="space-y-4 pb-4">
+                {/* Rating and Sales */}
+                <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
+                    <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    <span className="text-sm font-semibold text-[#11110a]">{productRating}</span>
+                  </div>
+                  <span className="text-sm text-[#11110a]/60">•</span>
+                  <span className="text-sm text-[#11110a]/60">terjual {productSales}</span>
                 </div>
-                <span className="text-gray-500">•</span>
-                <span className="text-sm text-gray-500">terjual {productSales}</span>
-              </div>
-              
-              {/* Price */}
-              <div className="text-2xl font-bold text-gray-900">
-                Rp {selectedVariant.price.toLocaleString('id-ID')}
-              </div>
-              
-              {/* Description */}
-              <div className="space-y-2">
-                <h3 className="text-base font-semibold text-gray-900">Deskripsi Produk</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">
-                  {product.description}
-                </p>
-              </div>
-              
-              {/* Size Info */}
-              <div className="space-y-2">
-                <h3 className="text-base font-semibold text-gray-900">Pilihan Size</h3>
-                <div className="flex flex-wrap gap-2">
-                  {product.variants.map((variant, index) => {
-                    const meta = getSizeMeta(variant.size);
-                    return (
-                      <Badge 
-                        key={index} 
-                        variant={index === selectedVariantIndex ? "default" : "secondary"}
-                        className={`text-xs py-1 px-2 ${
-                          index !== selectedVariantIndex 
-                            ? 'bg-purple-200 text-purple-800 hover:bg-purple-200' 
-                            : ''
-                        }`}
-                      >
-                        {meta.label ? `${meta.code} - ${meta.label}` : meta.code}
-                      </Badge>
-                    );
-                  })}
+                
+                {/* Price */}
+                <div className="text-lg font-bold text-[#11110a]">
+                  Rp {selectedVariant.price.toLocaleString('id-ID')}
                 </div>
+                
+                {/* Description */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-[#11110a]">Deskripsi Produk</h3>
+                  <p className="text-sm text-[#11110a]/75 leading-relaxed">
+                    {product.description}
+                  </p>
+                </div>
+                
+                {/* Size Info */}
+                <div className="space-y-2">
+                  <h3 className="text-sm font-semibold text-[#11110a]">Pilihan Size</h3>
+                  <div className="flex flex-wrap gap-2">
+                    {product.variants.map((variant, index) => {
+                      const meta = getSizeMeta(variant.size);
+                      return (
+                        <Badge 
+                          key={index} 
+                          variant={index === selectedVariantIndex ? "default" : "secondary"}
+                          className={`text-xs py-1 px-3 ${
+                            index === selectedVariantIndex 
+                              ? 'bg-[#553d8f] text-white hover:bg-[#553d8f]' 
+                              : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
+                          }`}
+                        >
+                          {meta.label && meta.label !== meta.code ? `${meta.code} - ${meta.label}` : meta.code}
+                        </Badge>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Ingredients */}
+                {product.ingredients && product.ingredients.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-[#11110a]">Bahan-bahan</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.ingredients.map((ingredient, index) => (
+                        <Badge 
+                          key={index} 
+                          variant="secondary"
+                          className="text-xs py-1 px-2 bg-[#f0f9ff] text-[#0c4a6e] hover:bg-[#f0f9ff]"
+                        >
+                          {ingredient}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Toppings */}
+                {product.toppings && product.toppings.length > 0 && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-[#11110a]">Topping</h3>
+                    <div className="flex flex-wrap gap-1.5">
+                      {product.toppings.map((topping, index) => (
+                        <Badge 
+                          key={index} 
+                          variant="secondary"
+                          className="text-xs py-1 px-2 bg-[#fef3c7] text-[#92400e] hover:bg-[#fef3c7]"
+                        >
+                          {topping}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Cup Information */}
+                {product.cupSize && (
+                  <div className="space-y-2">
+                    <h3 className="text-sm font-semibold text-[#11110a]">Cup Size</h3>
+                    <div className="text-sm text-[#11110a]/75 leading-relaxed">
+                      {product.cupSize}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

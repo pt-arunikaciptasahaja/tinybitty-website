@@ -50,15 +50,12 @@ export default function ProductSection({
   };
 
   return (
-    <section className="mb-12 md:mb-16">
-      <div className={`cookie-texture rounded-3xl md:rounded-[2rem] p-6 md:p-8 lg:p-10 ${getBackgroundClass(title)}`}>
-        <div className="text-center mb-6">
-          <h2 className="text-6xl md:text-6xl font-bold text-[#553d8f] mb-1 modak-regular">
+    <section className="mb-6 md:mb-8">
+      <div className={`cookie-texture rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 ${getBackgroundClass(title)}`}>
+        <div className="text-left mb-3 hidden md:block">
+          <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#553d8f] mb-1 modak-regular">
             {getDisplayTitle(title)}
-          </h2>
-          {/* <p className="text-gray-600 text-base md:text-lg font-semibold max-w-2xl mx-auto patrick-hand-sc-regular">
-            {description}
-          </p> */}
+          </h3>
         </div>
 
         {/* Carousel layout with 4 cards per slide */}
@@ -71,7 +68,7 @@ export default function ProductSection({
         >
           <CarouselContent className="-ml-4 md:-ml-2">
             {products.map((product, index) => (
-              <CarouselItem key={product.id} className="pl-4 md:pl-2 basis-[80%] sm:basis-1/2 lg:basis-1/4">
+              <CarouselItem key={product.id} className="pl-4 md:pl-2 basis-[80%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
                 <ProductCard product={product} />
               </CarouselItem>
             ))}

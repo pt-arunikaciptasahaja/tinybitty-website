@@ -10,6 +10,9 @@ export interface Product {
   image: string;
   variants: ProductVariant[];
   isNew: boolean;
+  ingredients?: string[];
+  toppings?: string[];
+  cupSize?: string;
 }
 
 export interface CartItem {
