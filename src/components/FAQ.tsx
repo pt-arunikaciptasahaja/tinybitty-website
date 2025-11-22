@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronUp, Truck, CreditCard, Phone, HelpCircle, Cookie, Snowflake, MessageCircle } from 'lucide-react';
+import { ChevronDown, ChevronUp, Truck, CreditCard, Phone, HelpCircle, Cookie, Snowflake, MessageCircle, MessageCircleQuestionMark, Smartphone } from 'lucide-react';
 
 export default function FAQ() {
   const [openItems, setOpenItems] = useState<number[]>([]);
@@ -261,7 +261,7 @@ export default function FAQ() {
       <div className="space-y-6">
         {faqCategories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="card-elevated">
-            <div className="bg-gradient-to-r from-secondary/10 to-accent/10 px-6 py-4 border-b border-border">
+            <div className="bg-[#ebeafd] from-secondary/10 to-accent/10 px-6 py-4 border-b border-border rounded-t-lg">
               <h3 className="text-xl font-bold text-primary flex items-center gap-3">
                 {category.icon}
                 {category.title}
@@ -305,7 +305,7 @@ export default function FAQ() {
       {/* Contact CTA */}
       <div className="card-elevated mt-6 md:mt-8 text-center">
         <div className="mb-6">
-          <Phone className="w-16 h-16 text-[#553d8f] mx-auto mb-4" />
+          <MessageCircleQuestionMark className="w-16 h-16 text-[#553d8f] mx-auto mb-4" />
         </div>
         <h3 className="text-2xl font-bold text-primary mb-4">
           Still Have <span className="text-[#553d8f]">Questions?</span>
@@ -319,7 +319,7 @@ export default function FAQ() {
           rel="noopener noreferrer"
           className="inline-flex items-center gap-2 bg-[#553d8f] hover:bg-[#553d8f]/90 text-primary-foreground px-4 py-2 text-sm md:px-6 md:py-3 md:text-base rounded-full font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
         >
-          <Phone className="w-4 h-4 md:w-5 md:h-5" />
+          <Smartphone className="w-4 h-4 md:w-5 md:h-5" />
           Chat with us on WhatsApp
         </a>
       </div>

@@ -18,7 +18,7 @@ export default function Hero() {
       <div
         className="cookie-texture rounded-2xl p-4 md:p-8 lg:p-10 h-[240px] lg:h-[370px] overflow-hidden relative pt-40 pb-8 md:pt-64 md:pb-40 bg-cover bg-center"
         style={{
-          backgroundImage: 'url("https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574663/hero_upprpg.png")',
+          backgroundImage: 'url("https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787147/hero_upprpg_1_cvrvne.png")',
           backgroundSize: 'cover',
           backgroundRepeat: 'no-repeat',
         }}

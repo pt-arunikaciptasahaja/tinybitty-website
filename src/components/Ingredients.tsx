@@ -1,4 +1,4 @@
-import { Sparkles, Leaf, Home } from 'lucide-react';
+import { Sparkles, Leaf, Home, ThumbsUp, Vegan } from 'lucide-react';
 
 export default function Ingredients() {
   return (
@@ -6,7 +6,7 @@ export default function Ingredients() {
       {/* Header */}
       <div className="text-center mb-8">
         <span className="badge badge-secondary mb-4 inline-flex items-center gap-2">
-          <Sparkles className="h-4 w-4" />
+          <ThumbsUp className="h-4 w-4" />
           Quality Ingredients, Honest Recipes
         </span>
 
@@ -40,16 +40,19 @@ export default function Ingredients() {
           🍬 Sugar
         </span>
 
-        <span className="px-4 py-1.5 bg-[#fff7e6] text-[#b45309] rounded-full text-sm font-medium border border-[#fdecc8] shadow-sm">
+        <span className="px-4 py-1.5 bg-[#FFEE91] text-[#b45309] rounded-full text-sm font-medium border border-[#fdecc8] shadow-sm">
           🧀 Cheese
         </span>
 
-        <span className="px-4 py-1.5 bg-[#fce7d6] text-[#9a3412] rounded-full text-sm font-medium border border-[#f8d4ba] shadow-sm">
+        <span className="px-4 py-1.5 bg-[#E2852E] text-white rounded-full text-sm font-medium border border-[#f8d4ba] shadow-sm">
           🌿 Cinnamon
         </span>
 
         <span className="px-4 py-1.5 bg-[#f4e7d5] text-[#92400e] rounded-full text-sm font-medium border border-[#ecd7b9] shadow-sm">
           🍯 Brown Sugar
+        </span>
+        <span className="px-4 py-1.5 bg-[#493628] text-white rounded-full text-sm font-medium border border-[#ecd7b9] shadow-sm">
+          🍫 Choco Chips
         </span>
       </div>
 
@@ -57,7 +60,7 @@ export default function Ingredients() {
       <div className="mb-8">
         <div className="rounded-2xl overflow-hidden border border-border shadow-sm mx-auto max-w-2xl">
           <img
-            src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574660/our-ingredients_eil5uh.png"
+            src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787771/yupp-generated-image-830030_1_hmsris.png"
             alt="Tiny Bitty baking ingredients"
             className="w-full h-full object-cover"
           />
@@ -70,7 +73,7 @@ export default function Ingredients() {
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-              <Leaf className="h-6 w-6 text-primary-foreground" />
+              <Vegan className="h-6 w-6 text-[#6b21a8]" />
             </div>
           </div>
           <div className="flex-1">
@@ -88,7 +91,7 @@ export default function Ingredients() {
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-              <Home className="h-6 w-6 text-primary-foreground" />
+              <Home className="h-6 w-6 text-[#6b21a8]" />
             </div>
           </div>
           <div className="flex-1">

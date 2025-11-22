@@ -9,7 +9,16 @@ import {
   Store, 
   Heart, 
   Leaf, 
-  Gift 
+  Gift, 
+  ScrollText,
+  HandFist,
+  ChefHat,
+  Salad,
+  HeartHandshake,
+  Rose,
+  Goal,
+  ArrowsUpFromLine,
+  Sparkle
 } from 'lucide-react';
 
 export default function OurStoryPage() {
@@ -21,7 +30,7 @@ export default function OurStoryPage() {
         {/* Hero Section */}
         <div className="card-standard text-center mb-8 mt-0">
           <span className="badge badge-primary mb-6 inline-flex items-center gap-2">
-            <Home className="w-4 h-4" />
+            <ScrollText className="w-4 h-4" />
             Our Journey
           </span>
           
@@ -44,13 +53,13 @@ export default function OurStoryPage() {
               {/* Chapter 1 */}
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-secondary rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary-foreground font-bold text-lg">2019</span>
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg p-1" style={{ backgroundColor: '#E6E6FA' }}>
+                    <span className="font-bold text-lg" style={{ color: '#563D8F' }}>2019</span>
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    <Sprout className="w-5 h-5 text-secondary" />
+                    <Sprout className="w-5 h-5" style={{ color: '#563D8F' }} />
                     The Beginning
                   </h3>
                   <p className="body-base">
@@ -63,15 +72,15 @@ export default function OurStoryPage() {
               {/* Chapter 2 */}
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg p-1">
-                    <span className="text-primary-foreground font-bold text-xs text-center leading-tight">
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg p-1" style={{ backgroundColor: '#FFB6C1' }}>
+                    <span className="font-bold text-xs text-center leading-tight" style={{ color: '#8B4555' }}>
                       PANDEMIC
                     </span>
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    <Dumbbell className="w-5 h-5 text-primary" />
+                    <HandFist className="w-5 h-5" style={{ color: '#8B4555' }} />
                     Growing Through Challenges
                   </h3>
                   <p className="body-base">
@@ -85,13 +94,13 @@ export default function OurStoryPage() {
               {/* Chapter 3 */}
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-accent rounded-full flex items-center justify-center shadow-lg">
-                    <Package className="w-6 h-6 text-primary-foreground" />
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg p-1" style={{ backgroundColor: '#B0E0E6' }}>
+                    <HeartHandshake className="w-6 h-6" style={{ color: '#2F5F6F' }} />
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    <Gift className="w-5 h-5 text-accent" />
+                    <Gift className="w-5 h-5" style={{ color: '#2F5F6F' }} />
                     Quality Over Quantity
                   </h3>
                   <p className="body-base">
@@ -106,13 +115,13 @@ export default function OurStoryPage() {
               {/* Chapter 4 */}
               <div className="flex items-start gap-6">
                 <div className="flex-shrink-0">
-                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg">
-                    <span className="text-primary-foreground font-bold text-lg">2024</span>
+                  <div className="w-20 h-20 rounded-full flex items-center justify-center shadow-lg p-1" style={{ backgroundColor: '#FFDAB9' }}>
+                    <span className="font-bold text-lg" style={{ color: '#8B5A2B' }}>2024</span>
                   </div>
                 </div>
                 <div className="flex-1">
                   <h3 className="heading-sm mb-4 flex items-center gap-2">
-                    <Store className="w-5 h-5 text-primary" />
+                    <Store className="w-5 h-5" style={{ color: '#8B5A2B' }} />
                     Growing Family
                   </h3>
                   <p className="body-base">
@@ -129,7 +138,7 @@ export default function OurStoryPage() {
           {/* Quote Section */}
           <div className="card-standard text-center">
             <div className="mb-4">
-              <Heart className="w-10 h-10 mx-auto text-accent" />
+              <Goal className="w-10 h-10 mx-auto text-[#563D8F]" />
             </div>
             <blockquote className="heading-md italic mb-6">
               "Because that's exactly what we're doing — creating homemade happiness, one cookie at a time."
@@ -138,29 +147,32 @@ export default function OurStoryPage() {
           </div>
 
           {/* Values Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="card-standard text-center">
-              <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                <Home className="w-6 h-6 text-primary-foreground" />
+          <div className="card-standard">
+            <h2 className="heading-lg text-center mb-8">Our Values</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#A594F9] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ChefHat className="w-6 h-6 text-[#563d8f]" />
+                </div>
+                <h4 className="font-bold text-primary mb-2">Artisanal Craftsmanship</h4>
+                <p className="body-sm">Meticulously handcrafted in small batches with unwavering attention to detail</p>
               </div>
-              <h4 className="font-bold text-primary mb-2">Homemade</h4>
-              <p className="body-sm">Every product made with love and care</p>
-            </div>
-            
-            <div className="card-standard text-center">
-              <div className="w-12 h-12 bg-accent-light rounded-full flex items-center justify-center mx-auto mb-4">
-                <Leaf className="w-6 h-6 text-primary" />
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#A594F9] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Sparkle className="w-6 h-6 text-primary" />
+                </div>
+                <h4 className="font-bold text-primary mb-2">Premium Ingredients</h4>
+                <p className="body-sm">Sourced from trusted suppliers, ensuring exceptional taste and nutritional value</p>
               </div>
-              <h4 className="font-bold text-primary mb-2">Quality</h4>
-              <p className="body-sm">Only the best ingredients make the cut</p>
-            </div>
-            
-            <div className="card-standard text-center">
-              <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center mx-auto mb-4">
-                <Gift className="w-6 h-6 text-primary-foreground" />
+              
+              <div className="text-center">
+                <div className="w-12 h-12 bg-[#A594F9] rounded-full flex items-center justify-center mx-auto mb-4">
+                  <ArrowsUpFromLine className="w-6 h-6 text-[#563d8f]" />
+                </div>
+                <h4 className="font-bold text-primary mb-2">Thoughtful Delivery</h4>
+                <p className="body-sm">Carefully packaged and delivered fresh to preserve quality and delight</p>
               </div>
-              <h4 className="font-bold text-primary mb-2">Care</h4>
-              <p className="body-sm">Your satisfaction is our priority</p>
             </div>
           </div>
         </div>
