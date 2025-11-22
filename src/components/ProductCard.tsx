@@ -480,7 +480,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
       {/* Image Modal */}
       <Dialog open={showImageModal} onOpenChange={setShowImageModal}>
-        <DialogContent className="max-w-lg w-full aspect-square rounded-2xl p-0 sm:p-6 overflow-hidden [&>button]:hidden sm:[&>button]:block">
+        <DialogContent className="max-w-lg w-full h-[80vh] rounded-2xl p-0 sm:p-10 overflow-hidden [&>button]:hidden sm:[&>button]:block">
           {/* Mobile Header with bigger close button */}
           <div className="flex items-center justify-between p-4 sm:p-0 sm:hidden border-b">
             <DialogTitle className="text-lg font-bold text-[#11110a] pr-8">
@@ -506,11 +506,12 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           
           {/* Scrollable Content Area */}
           <div className="flex-1 h-full overflow-y-auto overflow-x-hidden">
-            <div className="p-4 w-full box-border">
+            <div className="p-5 w-full box-border">
               <div className="space-y-1 md:space-y-3 w-full max-w-full">
+                
                 {/* Product Image - Responsive and Visible */}
-                <div className="flex justify-center mb-4">
-                  <div className="w-40 h-40 sm:w-48 sm:h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border border-gray-200">
+                <div className="flex">
+                  <div className="w-[370px] h-[370px] sm:w-[325px] sm:h-[325px] md:w-[325px] md:h-[325px] lg:w-[389px] lg:h-[389px] rounded-2xl overflow-hidden border border-gray-200 mb-3 md:mb-3">
                     <div
                       className="w-full h-full bg-cover bg-center bg-no-repeat"
                       style={{ backgroundImage: `url(${product.image})` }}
@@ -620,3 +621,4 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     </Card>
   );
 }
+
