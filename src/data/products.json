@@ -62,7 +62,7 @@
       "id": "mango",
       "name": "Mango",
       "description": "Rich mango juice with fun bites of chia seeds and nata de coco.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/mango-delight_wb2whc.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785933/WhatsApp_Image_2025-11-22_at_11.11.10_iwmttv.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -74,7 +74,7 @@
       "id": "guava",
       "name": "Guava",
       "description": "Fresh guava tang with chewy nata de coco and chia seeds.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780211/guava-delight_hx3tgm.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785942/WhatsApp_Image_2025-11-22_at_11.20.30_yzhrkw.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -86,7 +86,7 @@
       "id": "strawberry",
       "name": "Strawberry",
       "description": "Bright strawberry sip with chia seeds and nata de coco.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/strawberry-delight_y3xczp.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786126/WhatsApp_Image_2025-11-22_at_11.35.00_wkjibs.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -110,7 +110,7 @@
       "id": "avocado-coffee",
       "name": "Avocado Coffee",
       "description": "Avocado coffee dessert drink with creamy texture and sweet aroma.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780211/avocado-coffee-delight_qpql4r.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786332/WhatsApp_Image_2025-11-22_at_11.37.48_bj68up.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
