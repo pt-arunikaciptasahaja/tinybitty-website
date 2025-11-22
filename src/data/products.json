@@ -86,7 +86,7 @@
       "id": "strawberry",
       "name": "Strawberry",
       "description": "Bright strawberry sip with chia seeds and nata de coco.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786126/WhatsApp_Image_2025-11-22_at_11.35.00_wkjibs.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/strawberry-delight_y3xczp.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -95,16 +95,40 @@
       "isNew": false
     },
     {
+      "id": "strawberry tropicana",
+      "name": "Strawberry Tropicana",
+      "description": "Bright strawberry sip with chia seeds and nata de coco and tropicana slim sweetener.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786126/WhatsApp_Image_2025-11-22_at_11.35.00_wkjibs.jpg",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Strawberry juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": true
+    },
+    {
       "id": "soursop",
       "name": "Soursop",
       "description": "Creamy tropical soursop with fun nata de coco bites.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/soursop-delight_dr1bcw.jpg",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763792358/yupp-generated-image-560702_1_byflc6.png",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
       "ingredients": ["Soursop juice", "Sugar", "Water"],
       "toppings": ["Chia seeds", "Nata de coco"],
       "isNew": false
+    },
+    {
+      "id": "soursop tropicana",
+      "name": "Soursop Tropicana",
+      "description": "Creamy tropical soursop with fun nata de coco bites and tropicana slim sweetener.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/soursop-delight_dr1bcw.jpg",
+      "variants": [
+        { "size": "250ml", "price": 20000 }
+      ],
+      "ingredients": ["Soursop juice", "Sugar", "Water"],
+      "toppings": ["Chia seeds", "Nata de coco"],
+      "isNew": true
     },
     {
       "id": "avocado-coffee",
