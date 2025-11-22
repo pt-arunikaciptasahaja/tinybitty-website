@@ -274,13 +274,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
         </div>
 
         {/* Size section - dropdown for multi-size, plain text for single-size */}
-        <div 
-          className="w-full"
-          onClick={(e) => {
-            // Prevent any click events from bubbling up from this entire section
-            e.stopPropagation();
-          }}
-        >
+        <div className="w-full">
           {/* <label className="text-[11px] font-semibold tracking-wide text-[#11110a]/85 mb-1.5 block">
             Size
           </label> */}
@@ -329,23 +323,9 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   bg-white
                   shadow-lg
                   p-1.5
-                  pointer-events-auto
                   will-change-transform
                   scrollbar-thin scrollbar-thumb-[#C5B8FF] scrollbar-track-transparent
                 "
-                onClick={(e) => {
-                  // Prevent all clicks within the dropdown content from bubbling
-                  e.stopPropagation();
-                }}
-                onMouseDown={(e) => {
-                  // Prevent mouse events from passing through to content underneath
-                  e.preventDefault();
-                  e.stopPropagation();
-                }}
-                onMouseEnter={() => {
-                  // Ensure dropdown captures all pointer events
-                  // This prevents mouse events from leaking to underlying content
-                }}
               >
 
                 {product.variants.map((variant, index) => {
@@ -369,18 +349,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                           focus:text-[#581c87]
                           hover:bg-[#f8f9fa]
                           hover:text-[#581c87]
-                          pointer-events-auto
                         "
-                        onClick={(e) => {
-                          // Ensure clicks don't pass through to underlying content
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
-                        onMouseDown={(e) => {
-                          // Prevent mouse events from passing through
-                          e.stopPropagation();
-                          e.preventDefault();
-                        }}
                       >
                         <div className="flex items-center gap-2.5">
                           {/* Size icon pill */}
