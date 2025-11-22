@@ -1,5 +1,5 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { ShoppingBasket, FileText, Motorbike, Smartphone } from 'lucide-react';
+import { ShoppingBasket, FileText, Motorbike, Smartphone, Lightbulb, CircleQuestionMark, UserRoundPen } from 'lucide-react';
 
 export default function HowToOrder() {
     const steps = [
@@ -11,7 +11,7 @@ export default function HowToOrder() {
         },
         {
             id: 2,
-            icon: FileText,
+            icon: UserRoundPen,
             title: "Isi Data",
             desc: "Lengkapi nama, nomor WhatsApp, dan alamat pengiriman.",
         },
@@ -38,6 +38,7 @@ export default function HowToOrder() {
                 <Card className="border-2 border-[#F5D5C5]/40 shadow-2xl rounded-3xl overflow-hidden">
                     <CardHeader className="bg-gradient-to-r from-[#FFF0E6] to-[#FFF8F0] border-b border-[#F5D5C5]/40">
                         <CardTitle className="text-2xl font-bold text-[#8B5A3C] flex items-center justify-center gap-2">
+                        <CircleQuestionMark className="w-5 h-5 text-[#8B5A3C]" />
                             How to Order
                         </CardTitle>
                         <CardDescription className="text-[#A0685A] text-center">
@@ -81,9 +82,10 @@ export default function HowToOrder() {
                         {/* Tip / helper */}
                         <div className="mt-8 rounded-2xl border border-[#F5D5C5]/40 bg-white/60 backdrop-blur-sm px-4 py-4 md:px-5 md:py-4">
                             <div className="flex flex-col items-center gap-2 text-center text-[#8B5A3C] md:flex-row md:justify-center">
-                                <span className="text-lg">💡</span>
+                            <Lightbulb className="w-5 h-5 text-[#8B5A3C]" />
                                 <p className="text-xs md:text-sm font-medium">
-                                    Isi data selengkap & sejelas mungkin ya — supaya konfirmasi & pengiriman bisa diproses lebih cepat. ✨
+                                    Isi data selengkap & sejelas mungkin ya — supaya konfirmasi & pengiriman bisa diproses lebih cepat. 
+                                    ✨
                                 </p>
                             </div>
                         </div>

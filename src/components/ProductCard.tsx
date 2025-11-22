@@ -217,7 +217,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           style={{ backgroundImage: `url(${product.image})` }}
         />
         {product.isNew && (
-          <Badge className="absolute top-2 left-2 bg-[#D8CFF7] text-white text-[10px] px-2 py-0.5 shadow-md">
+          <Badge className="absolute top-2 left-2 bg-[#D8CFF7] border-[#553d8f]/30 text-white text-[10px] px-2 py-0.5 shadow-md">
             NEW
           </Badge>
         )}

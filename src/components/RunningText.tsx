@@ -2,7 +2,7 @@ import { motion } from "framer-motion";
 
 const upperText = ["COOKIES ✨", "JUICE ✨", "MACARONI SCHOTEL ✨"];
 const bottomText = [
-  " 🍪 NEW! Cheese Almond NEW!",
+  " 🍪 Cheese Almond NEW!",
   " 🍪 Choco Almond",
   " 🍪 Heavenly Bites",
   " 🍪 Oatmeal Raisin",
@@ -23,7 +23,7 @@ export default function RunningText() {
       <Marquee
         items={bottomText}
         size="md:text-2xl"
-        className="text-white md:text-2xl bg-[#553D8F] px-2 rounded-full"
+        className="text-white md:text-2xl bg-[#553D8F] px-3 rounded-full"
         speed={15}
         direction="left"
       />
@@ -32,14 +32,14 @@ export default function RunningText() {
 }
 
 function Marquee({ items, size, speed, direction, className }: any) {
-  // Standard distance (move 1 of 3 blocks)
-  const distance = "66.666%";
+  // Move one full block width for seamless loop
+  const distance = "118%";
 
   // If direction = right → reverse the animation
   const animateX =
     direction === "right"
-      ? ["-66.666%", "0%"]
-      : ["0%", "-66.666%"];
+      ? [`-${distance}`, "15%"]
+      : ["0%", `-${distance}`];
 
   return (
     <div className="overflow-hidden whitespace-nowrap mt-2 md:mt-3">
@@ -76,3 +76,4 @@ function Block({ items, size, className }: any) {
     </div>
   );
 }
+

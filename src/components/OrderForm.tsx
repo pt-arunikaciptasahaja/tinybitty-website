@@ -17,7 +17,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from '@/components/ui/use-toast';
 import Lottie from 'lottie-react';
 import remixAnimation from '@/data/Remix of assssa.json';
-import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText } from 'lucide-react';
+import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText, UserRoundPen, Smartphone, WalletCards, NotebookPen } from 'lucide-react';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
 
@@ -813,7 +813,9 @@ export default function OrderForm() {
                 name="name"
                 render={({ field }) => (
                   <FormItem className='mb-6'>
-                    <FormLabel className="text-[#5D4E8E] font-semibold">Nama Lengkap</FormLabel>
+                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+                    <UserRoundPen className="w-4 h-4" />
+                      Nama Lengkap</FormLabel>
                     <FormControl>
                       <Input
                         placeholder="Masukkan nama lengkap kamu"
@@ -831,7 +833,8 @@ export default function OrderForm() {
                 name="phone"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel className="text-[#5D4E8E] font-semibold">
+                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+                    <Smartphone className="w-4 h-4" />
                       Nomor WhatsApp
                     </FormLabel>
                     <FormControl>
@@ -1082,7 +1085,8 @@ export default function OrderForm() {
     render={({ field }) => (
       <FormItem>
         
-        <FormLabel className="text-[#5D4E8E] font-semibold">
+        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+        <Motorbike className="w-4 h-4" />
           Pilih Kurir / Metode Pengiriman
         </FormLabel>
         <Select
@@ -1374,8 +1378,9 @@ export default function OrderForm() {
     control={form.control}
     name="paymentMethod"
     render={({ field }) => (
-      <FormItem>
-        <FormLabel className="text-[#5D4E8E] font-semibold">
+      <FormItem className="mb-6">
+        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+        <WalletCards className="w-4 h-4" />
           Pilih Metode Pembayaran
         </FormLabel>
         <Select
@@ -1424,7 +1429,8 @@ export default function OrderForm() {
     name="notes"
     render={({ field }) => (
       <FormItem>
-        <FormLabel className="text-[#5D4E8E] font-semibold">
+        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
+        <NotebookPen className="w-4 h-4" />
           Catatan Tambahan (Opsional)
         </FormLabel>
         <FormControl>

@@ -62,7 +62,7 @@
       "id": "mango",
       "name": "Mango",
       "description": "Rich mango juice with fun bites of chia seeds and nata de coco.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575759/mangga_j5ypyx.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/mango-delight_wb2whc.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -74,7 +74,7 @@
       "id": "guava",
       "name": "Guava",
       "description": "Fresh guava tang with chewy nata de coco and chia seeds.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575757/jamboe_paeaex.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780211/guava-delight_hx3tgm.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -86,7 +86,7 @@
       "id": "strawberry",
       "name": "Strawberry",
       "description": "Bright strawberry sip with chia seeds and nata de coco.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763578117/ChatGPT_Image_Nov_20_2025_01_48_25_AM_tgwjdg.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/strawberry-delight_y3xczp.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -98,7 +98,7 @@
       "id": "soursop",
       "name": "Soursop",
       "description": "Creamy tropical soursop with fun nata de coco bites.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575776/sirsak_nhv0dv.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/soursop-delight_dr1bcw.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
@@ -110,7 +110,7 @@
       "id": "avocado-coffee",
       "name": "Avocado Coffee",
       "description": "Avocado coffee dessert drink with creamy texture and sweet aroma.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575766/alpukat_xrngbn.png",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780211/avocado-coffee-delight_qpql4r.jpg",
       "variants": [
         { "size": "250ml", "price": 20000 }
       ],
