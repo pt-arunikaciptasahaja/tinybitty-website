@@ -8,7 +8,7 @@ import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   return (
-    <>
+    <div className="global-container">
       <ScrollToTop />
       <Suspense fallback={<p>Loading...</p>}>
         <Routes>
@@ -18,7 +18,7 @@ function App() {
           <Route path="/our-story" element={<OurStoryPage />} />
         </Routes>
       </Suspense>
-    </>
+    </div>
   );
 }
 

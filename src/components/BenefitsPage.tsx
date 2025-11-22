@@ -13,7 +13,7 @@ export default function BenefitsPage() {
             <h1 className="text-3xl md:text-5xl bebas-neue-regular text-[#553d8f] mb-4">
               Why Choose Tiny Bitty?
             </h1>
-            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            <p className="text-lg text-gray-600 mx-auto">
               Discover what makes our homemade treats and fresh juices special
             </p>
           </div>

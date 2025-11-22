@@ -34,7 +34,7 @@ export default function HowToOrder() {
             id="how-to-order"
             className="mt-12 md:mt-16 mb-12 md:mb-16 py-16 bg-gradient-to-br from-[#FFF0E6] to-[#FFF8F0] how-to-order-texture rounded-3xl"
         >
-            <div className="container mx-auto px-4 max-w-4xl">
+            <div className="container mx-auto px-4 max-w-none">
                 <Card className="border-2 border-[#F5D5C5]/40 shadow-2xl rounded-3xl overflow-hidden">
                     <CardHeader className="bg-gradient-to-r from-[#FFF0E6] to-[#FFF8F0] border-b border-[#F5D5C5]/40">
                         <CardTitle className="text-2xl font-bold text-[#8B5A3C] flex items-center justify-center gap-2">

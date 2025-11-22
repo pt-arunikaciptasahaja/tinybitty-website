@@ -15,7 +15,7 @@ export default function Ingredients() {
           <span className="text-[#553d8f]">Know and Love</span>
         </h2>
 
-        <p className="body-base max-w-2xl mx-auto">
+        <p className="body-base max-w-none mx-auto">
           We believe cookies should taste like home. That's why we bake with real eggs,
           butter, flour, and pure cane sugar. Nothing artificial—only ingredients we
           trust and use in our own kitchen.
@@ -58,7 +58,7 @@ export default function Ingredients() {
 
       {/* Image */}
       <div className="mb-8">
-        <div className="rounded-2xl overflow-hidden border border-border shadow-sm mx-auto max-w-2xl">
+        <div className="rounded-2xl overflow-hidden border border-border shadow-sm mx-auto max-w-none">
           <img
             src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787771/yupp-generated-image-830030_1_hmsris.png"
             alt="Tiny Bitty baking ingredients"

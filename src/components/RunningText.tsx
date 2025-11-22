@@ -10,7 +10,7 @@ const bottomText = [
 
 export default function RunningText() {
   return (
-    <div className="overflow-hidden py-3 md:py-6 mb-6 md:mb-6 rounded-xl bg-[#f5f7f7]">
+    <div className="overflow-hidden py-3 md:py-6 mb-4 md:mb-6 rounded-xl bg-[#f5f7f7]">
       {/* LEFT → RIGHT */}
       <Marquee
         items={upperText}

@@ -5,6 +5,56 @@
 @tailwind utilities;
 
 @layer base {
+  html {
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  /* Hide scrollbar on desktop to prevent layout shift */
+  @media (min-width: 768px) {
+    html {
+      scrollbar-width: none; /* Firefox */
+    }
+    html::-webkit-scrollbar {
+      display: none; /* Chrome, Safari and Opera */
+    }
+  }
+
+  /* Global container for content centering on large screens */
+  body {
+    display: block;
+    min-height: 100vh;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  .global-container {
+    width: 100%;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    box-sizing: border-box;
+    overflow-x: hidden;
+  }
+
+  @media (min-width: 768px) {
+    .global-container {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .global-container {
+      padding: 0 2rem;
+    }
+  }
+
+  @media (min-width: 1440px) {
+    .global-container {
+      padding: 0 0rem;
+    }
+  }
+  
   :root {
     /* Pastel Lilac Design System */
     --background: 245 17% 97%;
@@ -203,7 +253,7 @@
   }
   
   .card-standard {
-    @apply bg-card rounded-2xl shadow-lg border border-border p-6 md:p-8;
+    @apply bg-card rounded-2xl shadow-lg border border-border p-6 md:p-6;
   }
   
   .card-elevated {

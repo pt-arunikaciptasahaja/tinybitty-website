@@ -41,12 +41,12 @@ export default function Benefits() {
             <span className="text-[#11110a]">Authentic Taste</span> from{" "}
             <span className="text-[#edadc3]">the Heart!</span>
           </h2>
-          <p className="text-lg text-[#11110a]/80 max-w-2xl mx-auto patrick-hand-sc-regular">
+          <p className="text-lg text-[#11110a]/80 mx-auto patrick-hand-sc-regular">
             From a kitchen full of love to your table - every product contains warmth and deliciousness that brightens your day
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-none mx-auto">
           {benefits.map((benefit, index) => (
             <div
               key={index}

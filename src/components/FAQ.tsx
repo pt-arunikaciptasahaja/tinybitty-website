@@ -310,7 +310,7 @@ export default function FAQ() {
         <h3 className="text-2xl font-bold text-primary mb-4">
           Still Have <span className="text-[#553d8f]">Questions?</span>
         </h3>
-        <p className="body-base mb-8 max-w-lg mx-auto">
+        <p className="body-base mb-8 mx-auto">
           Can't find the answer you're looking for? We're here to help!
         </p>
         <a
@@ -331,7 +331,7 @@ export default function FAQ() {
   Masih Bingung <span className="text-[#553d8f]">? 😁</span>
 </h3>
 
-<p className="body-base mb-8 max-w-lg mx-auto">
+<p className="body-base mb-8 mx-auto">
   Belum nemu jawaban yang kamu cari? Santai, tanya aja langsung!
 </p>
 

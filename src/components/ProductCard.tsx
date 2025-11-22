@@ -171,7 +171,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       let badgeClass = '';
       
       if (s.includes('mini')) {
-        code = 'Mini';
+        code = 'XS';
         badgeClass = 'bg-[#ffe4f0] text-[#b83263]';
       } else if (s.startsWith('s') || s.includes('small')) {
         code = 'S';
@@ -228,7 +228,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       {/* TOP: image section */}
       <div className="relative mb-2 md:mb-4 group">
         <div
-          className="w-full aspect-square rounded-2xl bg-cover bg-center bg-no-repeat"
+          className="w-full h-40 md:aspect-square rounded-2xl bg-cover bg-center bg-no-repeat"
           style={{ backgroundImage: `url(${product.image})` }}
         />
         {product.isNew && (
@@ -242,7 +242,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       <div className="flex flex-col flex-1 space-y-1 md:space-y-3">
         {/* Title with View Item button */}
         <div className="flex items-center justify-between gap-2">
-          <h3 className="text-sm md:text-base font-bold text-[#11110a] truncate leading-tight flex-1">
+          <h3 className="text-xs md:text-base font-bold text-[#11110a] truncate leading-tight flex-1">
             {product.name}
           </h3>
           <Button
@@ -252,14 +252,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
               setShowImageModal(true);
               e.stopPropagation();
             }}
-            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-1 py-0.5 h-auto text-[10px] font-medium shrink-0"
+            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-1 py-0.5 h-auto text-[11px] font-medium shrink-0"
           >
             Detail produk
           </Button>
         </div>
 
         {/* Price */}
-        <div className="text-sm md:text-base font-semibold text-[#11110a]">
+        <div className="text-sm md:text-sm font-semibold text-[#11110a]">
           Rp {selectedVariant.price.toLocaleString('id-ID')}
         </div>
 
@@ -305,7 +305,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   shadow-none
                   ring-0 focus:ring-0 focus-visible:ring-0 focus-visible:ring-offset-0
                   data-[state=open]:bg-white
-                  data-[state=open]:border-[#a3e2f5]
+                  data-[state=open]:border-[#C5B8FF]
                   transition-colors
                 "
               >
@@ -325,11 +325,13 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   max-h-[200px]
                   overflow-y-auto
                   rounded-2xl
-                  border border-[#e5e7eb]
+                  border border-[#C5B8FF]
                   bg-white
                   shadow-lg
                   p-1.5
                   pointer-events-auto
+                  will-change-transform
+                  scrollbar-thin scrollbar-thumb-[#C5B8FF] scrollbar-track-transparent
                 "
                 onClick={(e) => {
                   // Prevent all clicks within the dropdown content from bubbling
@@ -357,13 +359,16 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                           text-xs
                           py-1.5 px-2
                           rounded-full
-                          data-[state=checked]:bg-[#e0f2fe]
-                          data-[state=checked]:text-[#0f172a]
-                          data-[highlighted]:bg-[#f3f4f6]
-                          data-[highlighted]:text-[#111827]
+                          bg-white
+                          data-[state=checked]:bg-[#e9d5ff]
+                          data-[state=checked]:text-[#581c87]
+                          data-[highlighted]:bg-[#f8f9fa]
+                          data-[highlighted]:text-[#581c87]
                           cursor-pointer
-                          focus:bg-[#f3f4f6]
-                          focus:text-[#111827]
+                          focus:bg-[#f8f9fa]
+                          focus:text-[#581c87]
+                          hover:bg-[#f8f9fa]
+                          hover:text-[#581c87]
                           pointer-events-auto
                         "
                         onClick={(e) => {
@@ -382,7 +387,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                           <div
                             className={`
                               flex items-center justify-center
-                              w-6 h-6 md:w-7 md:h-7
+                              w-5 h-5 md:w-7 md:h-7
                               rounded-full
                               text-[11px] font-semibold
                               ${meta.badgeClass}
@@ -406,7 +411,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             </Select>
           ) : (
             /* Plain text for single-size products (juice) */
-            <div className="flex items-center justify-center w-full h-7 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[10px] font-semibold">
+            <div className="flex items-center justify-center w-full h-6 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[10px] font-semibold">
               {selectedVariant.size}
             </div>
           )}
@@ -414,7 +419,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
         {/* Bottom: Conditional UI - Beli button or Quantity controls */}
         <div 
-          className="mt-auto pt-2"
+          className="mt-auto pt-1"
           onClick={(e) => {
             // Prevent button clicks from bubbling to other elements
             e.stopPropagation();
@@ -429,7 +434,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="w-full rounded-full px-4 md:px-8 py-1.5 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+                className="w-full rounded-full px-3 md:px-8 py-1 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
               >
                 {isAdding ? (
                   <span className="flex items-center justify-center gap-1.5">
@@ -454,9 +459,9 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-6 w-6 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
-                <Minus className="w-4 h-4" />
+                <Minus className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
               <span className="text-base font-semibold w-6 text-center">
                 {quantity}
@@ -469,9 +474,9 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-6 w-6 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
               >
-                <Plus className="w-4 h-4" />
+                <Plus className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
             </div>
           )}

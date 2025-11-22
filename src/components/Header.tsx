@@ -48,15 +48,15 @@ export default function Header() {
   };
 
   return (
-    <header ref={headerRef} className="fixed top-4 left-0 right-0 z-50">
-      <div className="mx-4 md:mx-8 lg:mx-12 xl:mx-16">
-        <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-4 py-3">
+    <header ref={headerRef} className="fixed top-1 md:top-4 left-0 right-0 z-50">
+      <div className="w-full max-w-[1400px] mx-auto px-4 md:px-0">
+        <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-2 md:px-4 py-2 md:py-2">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3">
+            <Link to="/" className="flex items-center gap-2 md:gap-3">
               <img
                 src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574652/logo-purple_dlshle.png"
                 alt="Tiny Bitty - Freshly Baked Happiness"
-                className="h-16 md:h-20 w-auto object-contain"
+                className="h-12 md:h-16 lg:h-20 w-auto object-contain"
                 // style={{
                 //   filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
                 // }}

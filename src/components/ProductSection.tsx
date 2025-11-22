@@ -66,9 +66,9 @@ export default function ProductSection({
           }}
           className="w-full overflow-visible"
         >
-          <CarouselContent className="-ml-4 md:-ml-2">
+          <CarouselContent className="-ml-4 md:-ml-3">
             {products.map((product, index) => (
-              <CarouselItem key={product.id} className="pl-4 md:pl-2 basis-[80%] sm:basis-[45%] md:basis-[30%] lg:basis-[22%] xl:basis-[18%]">
+              <CarouselItem key={product.id} className="pl-4 md:pl-3 basis-[60%] sm:basis-[60%] md:basis-[35%] lg:basis-[28%] xl:basis-[23%]">
                 <ProductCard product={product} />
               </CarouselItem>
             ))}
