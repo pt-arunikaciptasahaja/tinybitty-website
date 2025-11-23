@@ -10,6 +10,50 @@ const ORIGIN_LNG = 106.8430274;
 const ORIGIN_ADDRESS = "Pesona Mungil, Pesona Khayangan, Mekar Jaya, Depok, West Java";
 
 /**
+ * Fetch data using JSONP technique (for APIs that support it)
+ */
+function fetchWithJSONP(url: string): Promise<any> {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
+    const script = document.createElement('script');
+    
+    // Create callback function
+    (window as any)[callbackName] = function(data: any) {
+      delete (window as any)[callbackName];
+      document.head.removeChild(script);
+      if (data && data.length > 0) {
+        resolve(data);
+      } else {
+        reject(new Error('No data received'));
+      }
+    };
+    
+    // Set up error handling
+    script.onerror = function() {
+      delete (window as any)[callbackName];
+      document.head.removeChild(script);
+      reject(new Error('JSONP request failed'));
+    };
+    
+    // Add callback parameter
+    const separator = url.includes('?') ? '&' : '?';
+    const jsonpUrl = url + separator + 'callback=' + callbackName;
+    
+    script.src = jsonpUrl;
+    document.head.appendChild(script);
+    
+    // Set timeout
+    setTimeout(() => {
+      if ((window as any)[callbackName]) {
+        delete (window as any)[callbackName];
+        document.head.removeChild(script);
+        reject(new Error('JSONP request timeout'));
+      }
+    }, 10000);
+  });
+}
+
+/**
  * SAFEST Nomitatim geocoding with:
  * - user-agent (required)
  * - indonesia bounded search
@@ -27,51 +71,204 @@ export async function geocodeAddress(address: string): Promise<{ lat: number; lo
     `https://nominatim.openstreetmap.org/search?` +
     `format=json&limit=1&countrycodes=id&addressdetails=1&` +
     `bounded=1&` +
-    `viewbox=95,-11,141,6&` + // Indonesia bounding box
+    `viewbox=105.0,-7.8,114.6,5.9&` + // Java island bounding box
     `q=${encoded}`;
+
+  // More reliable CORS proxy options with different approaches
+  const corsProxies = [
+    'https://corsproxy.io/?',
+    'https://api.allorigins.win/raw?url=',
+    // JSONP approach for Nominatim
+    null // null means JSONP approach
+  ];
+
+  // Try progressively simpler address versions for better geocoding success
+  const addressVersions = [
+    address, // Original full address
+    // Extract subdistrict/city from address
+    extractSubdistrictFromAddress(address),
+    // Extract just the city/regency
+    extractCityFromAddress(address),
+    // Extract just the province
+    extractProvinceFromAddress(address),
+    // Fallback to Jakarta general
+    "Jakarta, Indonesia"
+  ];
+
+  // Remove duplicates and empty strings
+  const uniqueAddresses = [...new Set(addressVersions.filter(addr => addr && addr.trim()))];
+  
+  console.log(`[DISTANCE GEOCODE] Will try ${uniqueAddresses.length} address variations for: ${address}`);
 
   let attempt = 0;
 
-  while (attempt < 3) {
+  while (attempt < uniqueAddresses.length) {
+    const currentAddress = uniqueAddresses[attempt];
+    console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1}/${uniqueAddresses.length} with: ${currentAddress}`);
+    
     try {
-      const response = await fetch(url, {
-        headers: {
-          "User-Agent": "YourAppName/1.0 (Contact: your-email@example.com)"
-        }
-      });
-
-      if (response.status === 429) {
-        await new Promise(res => setTimeout(res, 500)); // retry delay
-        attempt++;
-        continue;
+      const geocodeResult = await geocodeSingleAddress(currentAddress);
+      if (geocodeResult) {
+        console.log(`[DISTANCE GEOCODE] Success with simplified address: ${currentAddress}`);
+        geocodeCache.set(address, geocodeResult);
+        return geocodeResult;
       }
-
-      if (!response.ok) {
-        throw new Error(`Nominatim failed with ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!data || data.length === 0) {
-        throw new Error(`No coordinates found for address: ${address}`);
-      }
-
-      const result = {
-        lat: parseFloat(data[0].lat),
-        lon: parseFloat(data[0].lon)
-      };
-
-      geocodeCache.set(address, result);
-      return result;
-
     } catch (err: any) {
-      console.log(`[Geocode] Attempt ${attempt + 1} failed:`, err?.message);
-      attempt++;
-      await new Promise(res => setTimeout(res, 300));
+      console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1} failed:`, err?.message);
+    }
+    
+    attempt++;
+  }
+
+  throw new Error(`Failed to geocode address after trying ${uniqueAddresses.length} variations: ${address}`);
+}
+
+/**
+ * Geocode a single address with CORS proxy handling
+ */
+async function geocodeSingleAddress(address: string): Promise<{ lat: number; lon: number }> {
+  // More reliable CORS proxy options with different approaches
+  const corsProxies = [
+    'https://corsproxy.io/?', // More reliable proxy
+    'https://api.allorigins.win/raw?url=',
+    null // Will use JSONP approach
+  ];
+
+  const encoded = encodeURIComponent(address);
+
+  const url =
+    `https://nominatim.openstreetmap.org/search?` +
+    `format=json&limit=1&countrycodes=id&addressdetails=1&` +
+    `bounded=1&` +
+    `viewbox=105.0,-7.8,114.6,5.9&` + // Java island bounding box
+    `q=${encoded}`;
+
+  for (let proxyIndex = 0; proxyIndex < corsProxies.length; proxyIndex++) {
+    try {
+      // Handle JSONP approach
+      if (proxyIndex === 2 && corsProxies[2] === null) {
+        console.log(`[DISTANCE GEOCODE] Trying JSONP approach...`);
+        const jsonpResult = await fetchWithJSONP(url);
+        if (jsonpResult) {
+          const data = jsonpResult;
+          return {
+            lat: parseFloat(data[0].lat),
+            lon: parseFloat(data[0].lon)
+          };
+        } else {
+          throw new Error('JSONP failed');
+        }
+      } else {
+        const proxyUrl = corsProxies[proxyIndex] + encodeURIComponent(url);
+        
+        if (proxyIndex === 0) {
+          console.log(`[DISTANCE GEOCODE] Using proxy ${proxyIndex + 1} for: ${address}`);
+        }
+        
+        const response = await fetch(proxyUrl, {
+          headers: {
+            "User-Agent": "TinyBitty-Cookie/1.0"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error(`Proxy ${proxyIndex + 1} failed with status: ${response.status}`);
+        }
+
+        const data = await response.json();
+
+        if (!data || data.length === 0) {
+          throw new Error(`No coordinates found for address: ${address}`);
+        }
+
+        return {
+          lat: parseFloat(data[0].lat),
+          lon: parseFloat(data[0].lon)
+        };
+      }
+    } catch (proxyError) {
+      console.log(`[DISTANCE GEOCODE] Method ${proxyIndex + 1} failed:`, proxyError);
+      // Continue to next method
     }
   }
 
-  throw new Error(`Failed to geocode address after retries: ${address}`);
+  throw new Error(`All geocoding methods failed for: ${address}`);
+}
+
+/**
+ * Extract subdistrict from full address
+ */
+function extractSubdistrictFromAddress(address: string): string {
+  const parts = address.split(',').map(p => p.trim());
+  
+  // Common patterns for Indonesian addresses
+  // Try to find subdistrict (kelurahan/desa) + district (kecamatan) + city
+  
+  for (let i = 0; i < parts.length - 1; i++) {
+    const current = parts[i].toLowerCase();
+    const next = parts[i + 1].toLowerCase();
+    
+    // If current contains kelurahan/desa and next contains kecamatan, combine them
+    if ((current.includes('kelurahan') || current.includes('desa')) && 
+        (next.includes('kecamatan') || next.includes('district'))) {
+      return `${parts[i]}, ${parts[i + 1]}`;
+    }
+    
+    // If it's just the area name, combine with city
+    if (next.includes('jakarta') || next.includes('depok') || next.includes('bogor')) {
+      return `${parts[i]}, ${parts[i + 1]}`;
+    }
+  }
+  
+  // Fallback: use first 2-3 parts that contain location info
+  const locationParts = parts.filter(part => 
+    part.toLowerCase().includes('jakarta') || 
+    part.toLowerCase().includes('depok') || 
+    part.toLowerCase().includes('bogor') ||
+    part.toLowerCase().includes('kecamatan') ||
+    part.toLowerCase().includes('kelurahan')
+  );
+  
+  return locationParts.slice(0, 2).join(', ');
+}
+
+/**
+ * Extract city from full address
+ */
+function extractCityFromAddress(address: string): string {
+  const parts = address.split(',').map(p => p.trim());
+  
+  // Look for Jakarta, Depok, Bogor, etc.
+  const cityPart = parts.find(part => 
+    part.toLowerCase().includes('jakarta') || 
+    part.toLowerCase().includes('depok') || 
+    part.toLowerCase().includes('bogor') ||
+    part.toLowerCase().includes('tangerang') ||
+    part.toLowerCase().includes('bekasi')
+  );
+  
+  return cityPart || parts[parts.length - 1]; // Fallback to last part
+}
+
+/**
+ * Extract province from full address
+ */
+function extractProvinceFromAddress(address: string): string {
+  const addressLower = address.toLowerCase();
+  
+  if (addressLower.includes('jakarta') || addressLower.includes('depok') || addressLower.includes('bogor')) {
+    return 'DKI Jakarta, Indonesia';
+  }
+  
+  if (addressLower.includes('bandung')) {
+    return 'Jawa Barat, Indonesia';
+  }
+  
+  if (addressLower.includes('surabaya')) {
+    return 'Jawa Timur, Indonesia';
+  }
+  
+  return 'Indonesia';
 }
 
 /**
@@ -79,16 +276,48 @@ export async function geocodeAddress(address: string): Promise<{ lat: number; lo
  */
 export async function getDistanceKm(destination: string): Promise<number | null> {
   try {
+    console.log(`[DISTANCE] Calculating distance to: ${destination}`);
     const dest = await geocodeAddress(destination);
 
     const url =
       `https://router.project-osrm.org/route/v1/driving/` +
       `${ORIGIN_LNG},${ORIGIN_LAT};${dest.lon},${dest.lat}?overview=false`;
 
-    const response = await fetch(url);
+    // OSRM might also have CORS issues, try with CORS proxy
+    const corsProxies = [
+      'https://api.allorigins.win/raw?url=',
+      'https://cors-anywhere.herokuapp.com/',
+      'https://api.codetabs.com/v1/proxy?quest='
+    ];
 
-    if (!response.ok) {
-      throw new Error(`OSRM returned ${response.status}`);
+    let response: Response;
+    let lastError: any;
+
+    for (let proxyIndex = 0; proxyIndex < corsProxies.length; proxyIndex++) {
+      try {
+        const proxyUrl = corsProxies[proxyIndex] + encodeURIComponent(url);
+        console.log(`[DISTANCE] Trying OSRM proxy ${proxyIndex + 1}...`);
+        
+        response = await fetch(proxyUrl, {
+          headers: {
+            "User-Agent": "TinyBitty-Cookie/1.0"
+          }
+        });
+
+        if (response.ok) {
+          console.log(`[DISTANCE] OSRM proxy ${proxyIndex + 1} successful!`);
+          break;
+        } else {
+          lastError = new Error(`OSRM proxy ${proxyIndex + 1} failed with status: ${response.status}`);
+        }
+      } catch (proxyError) {
+        console.log(`[DISTANCE] OSRM proxy ${proxyIndex + 1} failed:`, proxyError);
+        lastError = proxyError;
+      }
+    }
+
+    if (!response || !response.ok) {
+      throw lastError || new Error('All OSRM CORS proxies failed');
     }
 
     const data = await response.json();
@@ -100,10 +329,12 @@ export async function getDistanceKm(destination: string): Promise<number | null>
     const meters = data.routes[0].legs[0].distance;
     const km = meters / 1000;
 
-    return Math.round(km * 10) / 10; // keep 1 decimal
+    const result = Math.round(km * 10) / 10; // keep 1 decimal
+    console.log(`[DISTANCE] Calculated distance: ${result}km`);
+    return result;
 
   } catch (err: any) {
-    console.log(`[Distance] Error:`, err?.message);
+    console.error(`[DISTANCE] Error calculating distance:`, err?.message);
     return null;
   }
 }
