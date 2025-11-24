@@ -89,6 +89,7 @@ export default function OrderForm() {
   }>>([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isSearchingAddress, setIsSearchingAddress] = useState(false);
+  const [isSelectingAddress, setIsSelectingAddress] = useState(false);
   
   const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
   const [hasCompletedDeliveryCalculation, setHasCompletedDeliveryCalculation] = useState(false);
@@ -497,9 +498,15 @@ export default function OrderForm() {
     const address = suggestion.address;
     const fullAddress = suggestion.display_name;
     
+    // Set flag to prevent search during selection
+    setIsSelectingAddress(true);
+    
     // Update the search field
     setAddressSearch(fullAddress);
     setShowSuggestions(false);
+    
+    // Reset flag after a short delay to allow state updates
+    setTimeout(() => setIsSelectingAddress(false), 100);
     
     // Try to extract administrative hierarchy if available
     if (address) {
@@ -604,7 +611,7 @@ export default function OrderForm() {
         // Show toast notification about Paxel alternative
         toast({
           title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
-          description: `Jarak pengiriman ${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+          description: `Jarak pengiriman ~${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
           variant: 'default',
         });
         calculationSuccess = false;
@@ -659,7 +666,7 @@ export default function OrderForm() {
           // Show toast notification about Paxel alternative
           toast({
             title: 'Maaf layanan ini tidak tersedia untuk gojek/grab',
-            description: `Jarak pengiriman ${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+            description: `Jarak pengiriman ~${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
             variant: 'default',
           });
           calculationSuccess = false;
@@ -732,13 +739,18 @@ export default function OrderForm() {
 
   // Trigger address search when user types
   useEffect(() => {
+    // Don't search if we're in the middle of selecting an address
+    if (isSelectingAddress) {
+      return;
+    }
+    
     if (addressSearch.length >= 3) {
       debouncedAddressSearch();
     } else {
       setSearchSuggestions([]);
       setShowSuggestions(false);
     }
-  }, [addressSearch, debouncedAddressSearch]);
+  }, [addressSearch, debouncedAddressSearch, isSelectingAddress]);
 
   // Generate full address for display purposes (includes detailed address)
   const generateFullAddress = useCallback(() => {
@@ -1071,8 +1083,7 @@ export default function OrderForm() {
   const isStep1Complete = form.watch('name') && form.watch('phone') &&
     form.watch('name').trim() !== '' && form.watch('phone').trim() !== '';
   
-  const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
-    (detailedAddress && detailedAddress.trim().length >= 8);
+  const isAddressComplete = (detailedAddress && detailedAddress.trim().length >= 8);
   
   const isStep2Complete = isAddressComplete;
   const isStep3Complete = deliveryMethod && deliveryMethod.trim() !== '';
@@ -1259,7 +1270,7 @@ export default function OrderForm() {
                         <div className="relative">
                           {/* <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /> */}
                           <Input
-                            placeholder="Contoh: Pesona Khayangan"
+                            placeholder="Masukkan Kode Pos: 12920"
                             {...field}
                             value={addressSearch || field.value}
                             onChange={(e) => {
@@ -1858,7 +1869,7 @@ export default function OrderForm() {
       })()}
       {errors.name && <div>• Nama lengkap</div>}
       {errors.phone && <div>• Nomor WhatsApp</div>}
-      {!isAddressComplete && <div>• Alamat lengkap (search + detail)</div>}
+      {(!detailedAddress || detailedAddress.trim().length < 8) && <div>• Alamat lengkap (detail alamat)</div>}
       {!deliveryMethod && <div>• Cek ongkir & pilih kurir</div>}
       {!paymentMethod && <div>• Metode pembayaran</div>}
     </div>

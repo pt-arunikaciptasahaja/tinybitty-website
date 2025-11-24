@@ -14,8 +14,8 @@ export const orderFormSchema = z.object({
       { message: 'Gunakan nomor Indonesia yang dimulai dengan 0 atau 62' }
     ),
 
-  // Legacy single address field for backward compatibility
-  address: z.string().min(8, 'Alamat minimal 8 karakter'),
+  // Legacy single address field for backward compatibility (now optional)
+  address: z.string().optional(),
   
   // New structured address fields (optional since address search is used)
   provinsi: z.string().optional(),

@@ -112,7 +112,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
     toast({
       title: 'Yeay, berhasil! ✨',
-      description: `${product.name} (${selectedVariant.size}) siap menikmati.`,
+      description: `${product.name} (${selectedVariant.size}) siap dinikmati.`,
     });
 
     setTimeout(() => {
@@ -147,7 +147,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     if (newQuantity === 0) {
       toast({
         title: 'Dihapus dari keranjang',
-        description: `${product.name} (${selectedVariant.size})`,
+        description: `${product.name} (${selectedVariant.size}) berhasil dihapus.`,
       });
     } else {
       toast({
