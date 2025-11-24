@@ -5,6 +5,14 @@ export interface LatLng {
   lng: number;
 }
 
+// OpenRouteService API Configuration
+export const ORS_CONFIG = {
+  API_KEY: import.meta.env.VITE_ORS_API_KEY || 'YOUR_API_KEY_HERE',
+  BASE_URL: 'https://api.openrouteservice.org/v2',
+  // Free API key for testing (replace with your own at openrouteservice.org)
+  FALLBACK_API_KEY: '5b3ce359785f0000000000000000000000000000000000000000'
+};
+
 // Fixed origin: your pickup point in DKI Jakarta
 export const ORIGIN_COORD: LatLng = {
   lat: -6.3838528,

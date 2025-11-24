@@ -1,12 +1,14 @@
-// Reliable Geocoding + OSRM + Delivery Fee Module
-// Fully rewritten for stability and proper OSRM parsing
+// Reliable Geocoding + Motorcycle Routing + Delivery Fee Module
+// Uses motorcycle routing without tolls via OpenRouteService API
+
+import { calculateMotorcycleRoute, getOrigin } from '../motorcycleRouting';
 
 // In-memory cache for geocoding results
 const geocodeCache = new Map<string, { lat: number; lon: number }>();
 
-// Fixed origin coordinates
-const ORIGIN_LAT = -6.3812283;
-const ORIGIN_LNG = 106.8430274;
+// Fixed origin coordinates (updated to match motorcycle routing)
+const ORIGIN_LAT = -6.3838528;
+const ORIGIN_LNG = 106.8420638;
 const ORIGIN_ADDRESS = "Pesona Mungil, Pesona Khayangan, Mekar Jaya, Depok, West Java";
 
 /**
@@ -272,69 +274,27 @@ function extractProvinceFromAddress(address: string): string {
 }
 
 /**
- * Get driving distance via OSRM
+ * Get motorcycle distance without tolls
  */
 export async function getDistanceKm(destination: string): Promise<number | null> {
   try {
-    console.log(`[DISTANCE] Calculating distance to: ${destination}`);
+    console.log(`[DISTANCE] Calculating motorcycle distance without tolls to: ${destination}`);
     const dest = await geocodeAddress(destination);
 
-    const url =
-      `https://router.project-osrm.org/route/v1/driving/` +
-      `${ORIGIN_LNG},${ORIGIN_LAT};${dest.lon},${dest.lat}?overview=false`;
+    // Use motorcycle routing instead of OSRM car routing
+    const origin = getOriginCoordinates();
+    const routingResult = await calculateMotorcycleRoute(
+      { lat: origin.lat, lng: origin.lon },
+      { lat: dest.lat, lng: dest.lon },
+      { excludeTolls: true } // Ensure tolls are excluded
+    );
 
-    // OSRM might also have CORS issues, try with CORS proxy
-    const corsProxies = [
-      'https://api.allorigins.win/raw?url=',
-      'https://cors-anywhere.herokuapp.com/',
-      'https://api.codetabs.com/v1/proxy?quest='
-    ];
-
-    let response: Response;
-    let lastError: any;
-
-    for (let proxyIndex = 0; proxyIndex < corsProxies.length; proxyIndex++) {
-      try {
-        const proxyUrl = corsProxies[proxyIndex] + encodeURIComponent(url);
-        console.log(`[DISTANCE] Trying OSRM proxy ${proxyIndex + 1}...`);
-        
-        response = await fetch(proxyUrl, {
-          headers: {
-            "User-Agent": "TinyBitty-Cookie/1.0"
-          }
-        });
-
-        if (response.ok) {
-          console.log(`[DISTANCE] OSRM proxy ${proxyIndex + 1} successful!`);
-          break;
-        } else {
-          lastError = new Error(`OSRM proxy ${proxyIndex + 1} failed with status: ${response.status}`);
-        }
-      } catch (proxyError) {
-        console.log(`[DISTANCE] OSRM proxy ${proxyIndex + 1} failed:`, proxyError);
-        lastError = proxyError;
-      }
-    }
-
-    if (!response || !response.ok) {
-      throw lastError || new Error('All OSRM CORS proxies failed');
-    }
-
-    const data = await response.json();
-
-    if (!data.routes?.[0]?.legs?.[0]?.distance) {
-      throw new Error(`OSRM: no valid route`);
-    }
-
-    const meters = data.routes[0].legs[0].distance;
-    const km = meters / 1000;
-
-    const result = Math.round(km * 10) / 10; // keep 1 decimal
-    console.log(`[DISTANCE] Calculated distance: ${result}km`);
+    const result = Math.round(routingResult.distance * 10) / 10; // keep 1 decimal
+    console.log(`[DISTANCE] Calculated motorcycle distance (no tolls): ${result}km`);
     return result;
 
   } catch (err: any) {
-    console.error(`[DISTANCE] Error calculating distance:`, err?.message);
+    console.error(`[DISTANCE] Error calculating motorcycle distance:`, err?.message);
     return null;
   }
 }

@@ -17,6 +17,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { useToast } from '@/components/ui/use-toast';
 import Lottie from 'lottie-react';
 import remixAnimation from '@/data/Remix of assssa.json';
+import AddressSearchInput from './AddressSearchInput';
+import { DistanceResult } from '@/lib/nominatimClient';
 import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText, UserRoundPen, Smartphone, WalletCards, NotebookPen } from 'lucide-react';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
@@ -79,18 +81,6 @@ export default function OrderForm() {
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
   const [isCalculatingDelivery, setIsCalculatingDelivery] = useState(false);
   
-  // Address search state for Gojek-style input
-  const [addressSearch, setAddressSearch] = useState('');
-  const [searchSuggestions, setSearchSuggestions] = useState<Array<{
-    display_name: string;
-    lat: string;
-    lon: string;
-    address?: any;
-  }>>([]);
-  const [showSuggestions, setShowSuggestions] = useState(false);
-  const [isSearchingAddress, setIsSearchingAddress] = useState(false);
-  const [isSelectingAddress, setIsSelectingAddress] = useState(false);
-  
   const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
   const [hasCompletedDeliveryCalculation, setHasCompletedDeliveryCalculation] = useState(false);
   const [hasCalculatedDelivery, setHasCalculatedDelivery] = useState(false);
@@ -99,441 +89,56 @@ export default function OrderForm() {
   
   // Debounced address calculation to prevent API calls on every keystroke
   const calculationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const addressSearchTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Address extraction helper functions for OrderForm
-  const extractSubdistrictFromAddress = useCallback((address: string): string => {
-    const parts = address.split(',').map(p => p.trim());
-    
-    // Common patterns for Indonesian addresses
-    // Try to find subdistrict (kelurahan/desa) + district (kecamatan) + city
-    
-    for (let i = 0; i < parts.length - 1; i++) {
-      const current = parts[i].toLowerCase();
-      const next = parts[i + 1].toLowerCase();
-      
-      // If current contains kelurahan/desa and next contains kecamatan, combine them
-      if ((current.includes('kelurahan') || current.includes('desa')) && 
-          (next.includes('kecamatan') || next.includes('district'))) {
-        return `${parts[i]}, ${parts[i + 1]}`;
-      }
-      
-      // If it's just the area name, combine with city
-      if (next.includes('jakarta') || next.includes('depok') || next.includes('bogor')) {
-        return `${parts[i]}, ${parts[i + 1]}`;
-      }
-    }
-    
-    // Fallback: use first 2-3 parts that contain location info
-    const locationParts = parts.filter(part => 
-      part.toLowerCase().includes('jakarta') || 
-      part.toLowerCase().includes('depok') || 
-      part.toLowerCase().includes('bogor') ||
-      part.toLowerCase().includes('kecamatan') ||
-      part.toLowerCase().includes('kelurahan')
-    );
-    
-    return locationParts.slice(0, 2).join(', ');
-  }, []);
+  const form = useForm<OrderFormData>({
+    resolver: zodResolver(orderFormSchema),
+    mode: 'onChange',
+    reValidateMode: 'onChange',
+    defaultValues: {
+      name: '',
+      phone: '',
+      address: '',
+      provinsi: 'DKI Jakarta',
+      kota: '',
+      kecamatan: '',
+      kelurahan: '',
+      detailedAddress: '',
+      deliveryMethod: undefined,
+      paymentMethod: undefined,
+      notes: '',
+    },
+  });
 
-  const extractCityFromAddress = useCallback((address: string): string => {
-    const parts = address.split(',').map(p => p.trim());
+  // Simple handler for new address search component
+  const handleAddressSelect = useCallback((result: DistanceResult) => {
+    console.log('[ORDER FORM] Address selected:', result);
     
-    // Look for Jakarta, Depok, Bogor, etc.
-    const cityPart = parts.find(part => 
-      part.toLowerCase().includes('jakarta') || 
-      part.toLowerCase().includes('depok') || 
-      part.toLowerCase().includes('bogor') ||
-      part.toLowerCase().includes('tangerang') ||
-      part.toLowerCase().includes('bekasi')
-    );
+    // Store the selected address in form
+    form.setValue('address', result.destination.label);
     
-    return cityPart || parts[parts.length - 1]; // Fallback to last part
-  }, []);
-
-  const extractProvinceFromAddress = useCallback((address: string): string => {
-    const addressLower = address.toLowerCase();
-    
-    if (addressLower.includes('jakarta') || addressLower.includes('depok') || addressLower.includes('bogor')) {
-      return 'DKI Jakarta, Indonesia';
-    }
-    
-    if (addressLower.includes('bandung')) {
-      return 'Jawa Barat, Indonesia';
-    }
-    
-    if (addressLower.includes('surabaya')) {
-      return 'Jawa Timur, Indonesia';
-    }
-    
-    return 'Indonesia';
-  }, []);
-
-  // JSONP helper function for OrderForm
-  const fetchWithJSONP = useCallback((url: string): Promise<any> => {
-    return new Promise((resolve, reject) => {
-      const callbackName = 'jsonp_callback_' + Math.round(100000 * Math.random());
-      const script = document.createElement('script');
-      
-      // Create callback function
-      (window as any)[callbackName] = function(data: any) {
-        delete (window as any)[callbackName];
-        document.head.removeChild(script);
-        if (data && data.length > 0) {
-          resolve(data);
-        } else {
-          reject(new Error('No data received'));
-        }
-      };
-      
-      // Set up error handling
-      script.onerror = function() {
-        delete (window as any)[callbackName];
-        document.head.removeChild(script);
-        reject(new Error('JSONP request failed'));
-      };
-      
-      // Add callback parameter
-      const separator = url.includes('?') ? '&' : '?';
-      const jsonpUrl = url + separator + 'callback=' + callbackName;
-      
-      script.src = jsonpUrl;
-      document.head.appendChild(script);
-      
-      // Set timeout
-      setTimeout(() => {
-        if ((window as any)[callbackName]) {
-          delete (window as any)[callbackName];
-          document.head.removeChild(script);
-          reject(new Error('JSONP request timeout'));
-        }
-      }, 10000);
-    });
-  }, []);
-
-  // Enhanced Gojek-style address search with CORS proxy and retry logic
-  const searchAddress = useCallback(async (query: string) => {
-    if (query.length < 3) {
-      console.log(`[ADDRESS SEARCH] Query too short (${query.length} chars), skipping search`);
-      setSearchSuggestions([]);
-      return;
-    }
-
-    console.log(`[ADDRESS SEARCH] Starting search for: "${query}"`);
-    setIsSearchingAddress(true);
-    
-    const searchWithRetry = async (searchQuery: string, retryCount = 0): Promise<any[]> => {
-      const maxRetries = 3;
-      const baseDelay = 500; // Start with 500ms delay
-      
-      // More reliable CORS proxy options with different approaches
-      const corsProxies = [
-        'https://corsproxy.io/?', // More reliable proxy
-        'https://api.allorigins.win/raw?url=',
-        null // Will use JSONP approach
-      ];
-      
-      try {
-        console.log(`[ADDRESS SEARCH] Attempt ${retryCount + 1}/${maxRetries + 1} for query: "${searchQuery}"`);
-        
-        // Enhanced search parameters focused on Java island only
-        const searchParams = new URLSearchParams({
-          format: 'json',
-          q: searchQuery,
-          limit: '5', // Increased from 3 to 5 for better options
-          addressdetails: '1',
-          countrycodes: 'id',
-          'accept-language': 'id,en',
-          featuretype: 'place,highway', // Focus on places and roads
-          // Java island bounding box: 105.0°E to 114.6°E, 5.9°S to 7.8°N
-          bounded: '1',
-          viewbox: '105.0,-7.8,114.6,5.9'
-        });
-        
-        const nominatimUrl = `https://nominatim.openstreetmap.org/search?${searchParams}`;
-        const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
-        
-        let response: Response;
-        let proxyIndex = 0;
-        let lastError: any;
-        
-        // Try with CORS proxies
-        while (proxyIndex < corsProxies.length) {
-          try {
-            // Handle JSONP approach
-            if (proxyIndex === 2 && corsProxies[2] === null) {
-              console.log(`Trying JSONP approach...`);
-              const jsonpResult = await fetchWithJSONP(nominatimUrl);
-              if (jsonpResult) {
-                // Convert JSONP result to response-like object
-                response = {
-                  ok: true,
-                  status: 200,
-                  json: () => Promise.resolve(jsonpResult)
-                } as Response;
-                console.log(`JSONP successful!`);
-                break;
-              } else {
-                throw new Error('JSONP failed');
-              }
-            } else {
-              const proxyUrl = corsProxies[proxyIndex] + encodeURIComponent(nominatimUrl);
-              
-              console.log(`Trying CORS proxy ${proxyIndex + 1}/${corsProxies.length}...`);
-              
-              response = await fetch(proxyUrl, {
-                headers: {
-                  'User-Agent': 'TinyBitty-Cookie/1.0',
-                  'Accept': 'application/json'
-                },
-                signal: controller.signal
-              });
-              
-              if (response.ok) {
-                console.log(`CORS proxy ${proxyIndex + 1} successful!`);
-                break;
-              } else {
-                lastError = new Error(`Proxy ${proxyIndex + 1} failed with status: ${response.status}`);
-                proxyIndex++;
-              }
-            }
-          } catch (proxyError) {
-            console.warn(`Method ${proxyIndex + 1} failed:`, proxyError);
-            lastError = proxyError;
-            proxyIndex++;
-          }
-        }
-        
-        clearTimeout(timeoutId);
-        
-        if (!response || !response.ok) {
-          throw lastError || new Error('All CORS proxies failed');
-        }
-        
-        const data = await response.json();
-        
-        // Filter and enhance results
-        const enhancedResults = data
-          .filter((item: any) => item.address && item.lat && item.lon)
-          .map((item: any) => ({
-            ...item,
-            // Add confidence score based on result quality
-            confidence: calculateConfidenceScore(item)
-          }))
-          .sort((a: any, b: any) => b.confidence - a.confidence); // Sort by confidence
-        
-        return enhancedResults;
-      } catch (error) {
-        console.warn(`Address search attempt ${retryCount + 1} failed:`, error);
-        
-        // Special handling for CORS errors
-        if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
-          console.log('CORS error detected, this is expected in browser environments');
-        }
-        
-        if (retryCount < maxRetries) {
-          const delay = baseDelay * Math.pow(2, retryCount); // Exponential backoff
-          console.log(`Retrying in ${delay}ms...`);
-          
-          await new Promise(resolve => setTimeout(resolve, delay));
-          return searchWithRetry(searchQuery, retryCount + 1);
-        }
-        
-        throw error;
-      }
-    };
-    
-    // Helper function to calculate confidence score for results
-    const calculateConfidenceScore = (item: any) => {
-      let score = 0;
-      
-      // Boost score for complete addresses
-      if (item.address.house_number) score += 10;
-      if (item.address.road) score += 8;
-      if (item.address.suburb || item.address.neighbourhood) score += 6;
-      if (item.address.city || item.address.town || item.address.village) score += 4;
-      if (item.address.state) score += 2;
-      
-      // Boost for certain place types
-      if (item.type === 'place' && item.class === 'place') score += 5;
-      if (item.type === 'highway') score += 3;
-      
-      // Boost for populated areas (higher importance)
-      if (item.importance && item.importance > 0.5) score += 3;
-      
-      return score;
-    };
-    
-    // Fallback search strategies
-    const tryFallbackSearches = async (originalQuery: string): Promise<any[]> => {
-      const fallbacks = [
-        // Try with "Jakarta" appended if not already present
-        originalQuery.includes('Jakarta') ? originalQuery : `${originalQuery}, Jakarta`,
-        // Try with common Indonesian city suffixes
-        `${originalQuery}, Indonesia`,
-        // Try without special characters
-        originalQuery.replace(/[,.]/g, ' ')
-      ];
-      
-      for (const fallbackQuery of fallbacks) {
-        try {
-          const results = await searchWithRetry(fallbackQuery);
-          if (results.length > 0) {
-            console.log(`Fallback search successful with query: ${fallbackQuery}`);
-            return results;
-          }
-        } catch (error) {
-          console.warn(`Fallback search failed for query: ${fallbackQuery}`, error);
-        }
-      }
-      
-      return [];
-    };
-    
-    try {
-      // Try progressively simpler address versions for better success rate
-      const addressVersions = [
-        query.trim().replace(/\s+/g, ' '), // Original cleaned query
-        extractSubdistrictFromAddress(query),
-        extractCityFromAddress(query),
-        extractProvinceFromAddress(query),
-        "Jakarta, Indonesia" // Final fallback
-      ];
-      
-      // Remove duplicates and empty strings
-      const uniqueQueries = [...new Set(addressVersions.filter(q => q && q.trim()))];
-      console.log(`[ADDRESS SEARCH] Will try ${uniqueQueries.length} address variations for: "${query}"`);
-      
-      let results: any[] = [];
-      
-      // Try each address variation until we get results
-      for (const addressVersion of uniqueQueries) {
-        console.log(`[ADDRESS SEARCH] Trying: "${addressVersion}"`);
-        
-        try {
-          const searchResults = await searchWithRetry(addressVersion);
-          if (searchResults.length > 0) {
-            console.log(`[ADDRESS SEARCH] Success with simplified address: "${addressVersion}"`);
-            results = searchResults;
-            break;
-          }
-        } catch (searchError) {
-          console.log(`[ADDRESS SEARCH] Failed for "${addressVersion}":`, searchError);
-        }
-      }
-      
-      // If still no results, try the fallback searches
-      if (results.length === 0) {
-        console.log('No results from progressive simplification, trying fallback searches...');
-        results = await tryFallbackSearches(query);
-      }
-      
-      // Final fallback: provide some helpful suggestions
-      if (results.length === 0) {
-        console.log('[ADDRESS SEARCH] All search attempts failed, providing manual entry guidance');
-        console.log('[ADDRESS SEARCH] Note: This could be due to CORS restrictions in browser environments');
-        results = [{
-          display_name: 'Ketik alamat lengkap secara manual',
-          lat: null,
-          lon: null,
-          address: null,
-          confidence: 0,
-          isManual: true,
-          isFallback: true
-        } as any];
-      }
-      
-      console.log(`[ADDRESS SEARCH] Returning ${results.length} results for query: "${query}"`);
-      setSearchSuggestions(results);
-    } catch (error) {
-      console.error('[ADDRESS SEARCH] All address search attempts failed:', error);
-      
-      // Check if it's a CORS error
-      const isCorsError = error instanceof TypeError && 
-                         (error.message.includes('Failed to fetch') || 
-                          error.message.includes('CORS') ||
-                          error.message.includes('blocked'));
-      
-      if (isCorsError) {
-        console.warn('[ADDRESS SEARCH] CORS error detected - this is expected when calling OpenStreetMap API directly from browser');
-        console.warn('[ADDRESS SEARCH] Consider using a CORS proxy or implementing server-side proxy');
-      }
-      
-      // Graceful degradation - show manual entry option
-      const fallbackSuggestion = {
-        display_name: 'Ketik alamat lengkap secara manual',
-        lat: null,
-        lon: null,
-        address: null,
-        confidence: 0,
-        isManual: true,
-        isFallback: true,
-        error: isCorsError 
-          ? 'CORS: Gunakan proxy atau server-side solution untuk akses API'
-          : 'Pencarian alamat gagal, silakan ketik alamat manual'
-      } as any;
-      
-      console.log('[ADDRESS SEARCH] Showing manual entry fallback');
-      setSearchSuggestions([fallbackSuggestion]);
-    } finally {
-      setIsSearchingAddress(false);
-    }
-  }, []);
-
-  // Debounced address search
-  const debouncedAddressSearch = useCallback(() => {
-    if (addressSearchTimeoutRef.current) {
-      clearTimeout(addressSearchTimeoutRef.current);
-    }
-    
-    addressSearchTimeoutRef.current = setTimeout(() => {
-      searchAddress(addressSearch);
-    }, 500); // 500ms debounce
-  }, [addressSearch, searchAddress]);
-
-  // Handle selecting an address from suggestions
-  const handleAddressSelect = useCallback((suggestion: any) => {
-    // Auto-fill the address fields based on the selected suggestion
-    const address = suggestion.address;
-    const fullAddress = suggestion.display_name;
-    
-    // Set flag to prevent search during selection
-    setIsSelectingAddress(true);
-    
-    // Update the search field
-    setAddressSearch(fullAddress);
-    setShowSuggestions(false);
-    
-    // Reset flag after a short delay to allow state updates
-    setTimeout(() => setIsSelectingAddress(false), 100);
-    
-    // Try to extract administrative hierarchy if available
-    if (address) {
-      const province = address.state || address.province || '';
-      const regency = address.city || address.regency || address.town || '';
-      const district = address.county || address.suburb || address.neighbourhood || '';
-      
-      // console.log('📍 [ADDRESS SELECTOR] Extracted administrative data:', { province, regency, district });
-      
-      // Update form fields
-      if (province) form.setValue('provinsi', province);
-      if (regency) form.setValue('kota', regency);
-      if (district) form.setValue('kecamatan', district);
-    }
-    
-    // Store coordinates for future use
-    form.setValue('address', fullAddress);
+    // Store distance for delivery calculations
+    setDeliveryDistance(result.distanceKm);
     
     // Reset delivery calculation since address changed
     setHasCompletedDeliveryCalculation(false);
     setDeliveryInfo(null);
     setIsDistanceTooFar(false);
-    setDeliveryDistance(null);
     setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
     form.setValue('deliveryMethod', undefined);
     form.setValue('paymentMethod', undefined);
-  }, []);
+    
+    // Show success feedback
+    toast({
+      title: 'Alamat ditemukan!',
+      description: `${result.destination.label} (${result.distanceKm} km)`,
+      variant: 'default',
+    });
+  }, [form, toast]);
+
+  // Watch for changes in detailed address and delivery method to calculate delivery cost
+  const detailedAddress = form.watch('detailedAddress');
+  const deliveryMethod = form.watch('deliveryMethod');
+  const paymentMethod = form.watch('paymentMethod');
 
   // Handle delivery method change - this is when we trigger ongkir calculation
   const handleDeliveryMethodChange = useCallback((method: string) => {
@@ -554,14 +159,14 @@ export default function OrderForm() {
     form.trigger('paymentMethod');
     
     // Trigger delivery calculation only when delivery method is selected (not for Paxel)
-    const address = form.getValues('address') || addressSearch;
+    const address = form.getValues('address');
     const detailedAddress = form.getValues('detailedAddress');
     
     if (address && method && method !== 'paxel') {
       // console.log('🚚 [SHIPPING CALCULATOR] Starting calculation for:', { address, method, detailedAddress });
       calculateDeliveryForAddress(address, method, detailedAddress);
     }
-  }, []);
+  }, [form]);
 
   // Separate function for delivery calculation (only triggered on delivery method selection)
   const calculateDeliveryForAddress = useCallback(async (address: string, method: string, detailedAddress?: string) => {
@@ -711,46 +316,7 @@ export default function OrderForm() {
       setHasCalculatedDelivery(calculationSuccess);
       console.log('[SHIPPING CALCULATOR] Calculation completed. Success:', calculationSuccess);
     }
-  }, []);
-
-  const form = useForm<OrderFormData>({
-    resolver: zodResolver(orderFormSchema),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
-    defaultValues: {
-      name: '',
-      phone: '',
-      address: '',
-      provinsi: 'DKI Jakarta',
-      kota: '',
-      kecamatan: '',
-      kelurahan: '',
-      detailedAddress: '',
-      deliveryMethod: undefined,
-      paymentMethod: undefined,
-      notes: '',
-    },
-  });
-
-  // Watch for changes in address and delivery method to calculate delivery cost
-  const detailedAddress = form.watch('detailedAddress');
-  const deliveryMethod = form.watch('deliveryMethod');
-  const paymentMethod = form.watch('paymentMethod');
-
-  // Trigger address search when user types
-  useEffect(() => {
-    // Don't search if we're in the middle of selecting an address
-    if (isSelectingAddress) {
-      return;
-    }
-    
-    if (addressSearch.length >= 3) {
-      debouncedAddressSearch();
-    } else {
-      setSearchSuggestions([]);
-      setShowSuggestions(false);
-    }
-  }, [addressSearch, debouncedAddressSearch, isSelectingAddress]);
+  }, [cart, getTotalPrice, toast]);
 
   // Generate full address for display purposes (includes detailed address)
   const generateFullAddress = useCallback(() => {
@@ -1255,7 +821,7 @@ export default function OrderForm() {
                 {isStep2Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
               </div>
 
-              {/* Gojek-style Address Search */}
+              {/* New Address Search Component */}
               <FormField
                 control={form.control}
                 name="address"
@@ -1267,56 +833,34 @@ export default function OrderForm() {
                     </FormLabel>
                     <div className="relative">
                       <FormControl>
-                        <div className="relative">
-                          {/* <Search className="absolute left-3 top-3 h-4 w-4 text-gray-400" /> */}
-                          <Input
-                            placeholder="Masukkan Kode Pos: 12920"
-                            {...field}
-                            value={addressSearch || field.value}
-                            onChange={(e) => {
-                              const value = e.target.value;
-                              setAddressSearch(value);
-                              field.onChange(value);
-                              setShowSuggestions(value.length >= 5);
-                              setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
-                              form.setValue('deliveryMethod', undefined);
-                              form.setValue('paymentMethod', undefined);
-                              setHasCompletedDeliveryCalculation(false);
-                              setDeliveryInfo(null);
-                              setIsDistanceTooFar(false);
-                              setDeliveryDistance(null);
-                            }}
-                            className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
-                            disabled={!isStep1Complete}
-                          />
-                          {isSearchingAddress && (
-                            <div className="absolute right-3 top-3">
-                              <div className="w-4 h-4 border-2 border-[#BFAAE3]/30 border-t-[#BFAAE3] rounded-full animate-spin"></div>
-                            </div>
-                          )}
-                        </div>
+                        <AddressSearchInput
+                          onSelect={(result) => {
+                            // Store the selected address in form
+                            form.setValue('address', result.destination.label);
+                            
+                            // Store distance for delivery calculations
+                            setDeliveryDistance(result.distanceKm);
+                            
+                            // Reset delivery calculation since address changed
+                            setHasCompletedDeliveryCalculation(false);
+                            setDeliveryInfo(null);
+                            setIsDistanceTooFar(false);
+                            setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+                            form.setValue('deliveryMethod', undefined);
+                            form.setValue('paymentMethod', undefined);
+                            
+                            // Show success feedback
+                            toast({
+                              title: 'Alamat ditemukan!',
+                              description: `${result.destination.label}`,
+                              variant: 'default',
+                            });
+                          }}
+                          placeholder="Ketik nama area atau kode pos…"
+                          disabled={!isStep1Complete}
+                          className="w-full"
+                        />
                       </FormControl>
-                      
-                      {/* Address Suggestions Dropdown */}
-                      {showSuggestions && searchSuggestions.length > 0 && (
-                        <div className="absolute z-50 w-full mt-1 bg-white border border-[#D8CFF7] rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                          {searchSuggestions.map((suggestion, index) => (
-                            <div
-                              key={index}
-                              className="p-3 hover:bg-[#F6F2FF] cursor-pointer border-b border-[#D8CFF7]/20 last:border-b-0"
-                              onClick={() => handleAddressSelect(suggestion)}
-                            >
-                              <div className="font-medium text-[#5D4E8E] text-sm flex items-center gap-2">
-                                <MapPin className="w-3 h-3" />
-                                {suggestion.display_name.split(',')[0]}
-                              </div>
-                              <div className="text-xs text-[#8978B4] mt-1">
-                                {suggestion.display_name}
-                              </div>
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                     <FormMessage />
                   </FormItem>
