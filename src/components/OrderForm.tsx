@@ -1034,7 +1034,7 @@ export default function OrderForm() {
     </div>
     <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
       {/* <Motorbike className="w-4 h-4" /> */}
-      Cek Ongkir Dulu Yuk!
+      Cek Ongkir
     </h3>
     {isStep3Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
   </div>
@@ -1502,7 +1502,7 @@ export default function OrderForm() {
 >
   <MessageCircle className="w-5 h-5" />
   {isStep4Complete && cart.length > 0
-    ? 'Yuk checkout via WhatsApp 🚀'
+    ? 'Checkout via WhatsApp! 🚀'
     : `Lanjut ke Langkah ${nextStep}`}
 </Button>
 
