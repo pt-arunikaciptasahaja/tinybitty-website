@@ -7,6 +7,7 @@ import { useCart } from '@/contexts/CartContext';
 import { buildWhatsAppMessage, sendWhatsAppOrder } from '@/lib/whatsapp';
 import { calculateShippingCost } from '@/lib/shippingService';
 import { calculateDeliveryCost, formatDeliveryCost } from '@/lib/deliveryCalculator';
+import { fbPixelTrack } from '@/lib/fbpixel';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -572,6 +573,33 @@ export default function OrderForm() {
   const handleWhatsAppRedirect = () => {
     if (!orderData) return;
     
+    // Track Purchase event for Facebook Pixel before redirect
+    const pixelData = {
+      content_ids: cart.map(item => item.productId),
+      content_type: 'product',
+      currency: 'IDR',
+      value: orderTotal,
+    };
+
+    console.log('🔍 [FB PIXEL] Purchase tracking:', {
+      event: 'Purchase',
+      data: pixelData,
+      customerName: orderData.name,
+      customerPhone: orderData.phone,
+      cartItemsCount: cart.length,
+      orderTotal: orderTotal,
+      deliveryCost: deliveryInfo?.cost || 0,
+      totalWithDelivery: orderTotal + (deliveryInfo?.cost || 0),
+      productIds: cart.map(item => item.productId),
+      productNames: cart.map(item => item.productName),
+      whatsappNumber: WHATSAPP_NUMBER,
+      timestamp: new Date().toISOString()
+    });
+
+    fbPixelTrack('Purchase', pixelData);
+
+    console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
+    
     const message = buildWhatsAppMessage(orderData, cart, orderTotal, deliveryInfo?.cost || 0, isDistanceTooFar, deliveryDistance);
     
     sendWhatsAppOrder(message, WHATSAPP_NUMBER);
@@ -621,6 +649,31 @@ export default function OrderForm() {
     setOrderData(data);
     setCustomerName(data.name);
     setOrderTotal(getTotalPrice());
+
+    // Track InitiateCheckout event for Facebook Pixel
+    const pixelData = {
+      content_ids: cart.map(item => item.productId),
+      content_name: cart.map(item => item.productName).join(', '),
+      content_type: 'product',
+      currency: 'IDR',
+      value: getTotalPrice(),
+    };
+
+    console.log('🔍 [FB PIXEL] InitiateCheckout tracking:', {
+      event: 'InitiateCheckout',
+      data: pixelData,
+      customerName: data.name,
+      customerPhone: data.phone,
+      cartItemsCount: cart.length,
+      totalValue: getTotalPrice(),
+      productIds: cart.map(item => item.productId),
+      productNames: cart.map(item => item.productName),
+      timestamp: new Date().toISOString()
+    });
+
+    fbPixelTrack('InitiateCheckout', pixelData);
+
+    console.log('✅ [FB PIXEL] InitiateCheckout event tracked successfully');
 
     setShowConfirmationModal(true);
   };

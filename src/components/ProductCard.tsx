@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Product } from '@/types/product';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,7 @@ import {
 import { Plus, Minus, Check, Star } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/components/ui/use-toast';
+import { fbPixelTrack } from '@/lib/fbpixel';
 
 interface ProductCardProps {
   product: Product;
@@ -38,9 +39,9 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
   const quantity = quantities[selectedVariantIndex] || 0;
   const hasItemInCart = quantity > 0;
 
-  // Dynamic rating and sales based on product name
-  const getProductRating = (productName: string) => {
-    const name = productName.toLowerCase();
+  // Optimized product rating and sales calculations with useMemo
+  const productRating = useMemo(() => {
+    const name = product.name.toLowerCase();
     
     // Best sellers get higher ratings
     if (name.includes('choco almond')) return 4.9;
@@ -49,10 +50,10 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     
     // Other products have slightly lower ratings
     return 4.5;
-  };
+  }, [product.name]);
 
-  const getProductSales = (productName: string) => {
-    const name = productName.toLowerCase();
+  const productSales = useMemo(() => {
+    const name = product.name.toLowerCase();
     
     // Best sellers have higher sales
     if (name.includes('choco almond')) return '245+';
@@ -70,10 +71,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     
     // Fallback for any other products
     return '75+';
-  };
-
-  const productRating = getProductRating(product.name);
-  const productSales = getProductSales(product.name);
+  }, [product.name]);
 
   // Sync component quantity state with actual cart state
   useEffect(() => {
@@ -94,70 +92,192 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     }
   }, [cart, product.id, selectedVariant.size, selectedVariantIndex]);
 
-  const handleAddToCart = () => {
-    setIsAdding(true);
+  // Enhanced constants for better maintainability
+  const ADD_TO_CART_DELAY = 600;
+  const TOAST_SUCCESS_DURATION = 3000;
 
-    addToCart({
-      productId: product.id,
-      productName: product.name,
-      variant: selectedVariant,
-      quantity: 1,
-      image: product.image,
-    });
+  // Validation helper functions for better error handling
+  const validateProductData = useCallback(() => {
+    const errors: string[] = [];
+    
+    if (!product?.id) errors.push('Product ID is missing');
+    if (!product?.name) errors.push('Product name is missing');
+    if (!selectedVariant?.size) errors.push('Variant size is missing');
+    if (!selectedVariant?.price || selectedVariant.price <= 0) errors.push('Invalid variant price');
+    if (!product?.image) errors.push('Product image is missing');
+    
+    return errors;
+  }, [product, selectedVariant]);
 
-    setQuantities(prev => ({
-      ...prev,
-      [selectedVariantIndex]: 1
-    }));
+  // Facebook Pixel tracking helper
+  const trackAddToCartEvent = useCallback(async () => {
+    try {
+      const pixelData = {
+        content_ids: [product.id],
+        content_name: product.name,
+        content_type: 'product',
+        currency: 'IDR',
+        value: selectedVariant.price,
+        content_variant: selectedVariant.size,
+      };
 
+      console.log('🔍 [FB PIXEL] AddToCart tracking:', {
+        event: 'AddToCart',
+        data: pixelData,
+        productId: product.id,
+        productName: product.name,
+        variant: selectedVariant.size,
+        price: selectedVariant.price,
+        timestamp: new Date().toISOString()
+      });
+
+      await fbPixelTrack('AddToCart', pixelData);
+      
+      console.log('✅ [FB PIXEL] AddToCart event tracked successfully');
+    } catch (error) {
+      // Fail silently - don't block user experience if tracking fails
+      console.warn('❌ [FB PIXEL] Failed to track AddToCart event:', error);
+    }
+  }, [product, selectedVariant]);
+
+  // Optimized toast helper
+  const showSuccessToast = useCallback(() => {
     toast({
       title: 'Yeay, berhasil! ✨',
-      description: `${product.name} (${selectedVariant.size}) siap dinikmati.`,
+      description: `${product.name} (${selectedVariant.size}) siap diminati.`,
+      duration: TOAST_SUCCESS_DURATION,
     });
+  }, [toast, product.name, selectedVariant.size]);
 
-    setTimeout(() => {
-      setIsAdding(false);
-    }, 600);
-  };
-
-  const handleIncreaseQuantity = () => {
-    const newQuantity = quantity + 1;
-    setQuantities(prev => ({
-      ...prev,
-      [selectedVariantIndex]: newQuantity
-    }));
-    
-    updateQuantity(product.id, selectedVariant.size, newQuantity);
-
+  // Error toast helper
+  const showErrorToast = useCallback((error: string) => {
     toast({
-      title: 'Jumlah diganti 😋',
-      description: `${newQuantity}x ${product.name} (${selectedVariant.size}) siap lanjut!`,
+      title: 'Gagal menambahkan ke keranjang',
+      description: error,
+      variant: 'destructive',
     });
-  };
+  }, [toast]);
 
-  const handleDecreaseQuantity = () => {
-    const newQuantity = Math.max(0, quantity - 1);
-    setQuantities(prev => ({
-      ...prev,
-      [selectedVariantIndex]: newQuantity
-    }));
-    
-    updateQuantity(product.id, selectedVariant.size, newQuantity);
-  
-    if (newQuantity === 0) {
-      toast({
-        title: 'Dihapus dari keranjang',
-        description: `${product.name} (${selectedVariant.size}) berhasil dihapus.`,
+  // Core add to cart logic with proper error handling
+  const addToCartOperation = useCallback(async () => {
+    try {
+      // Validate product data before proceeding
+      const validationErrors = validateProductData();
+      if (validationErrors.length > 0) {
+        showErrorToast(validationErrors.join(', '));
+        setIsAdding(false);
+        return;
+      }
+
+      // Add to cart with error handling
+      addToCart({
+        productId: product.id,
+        productName: product.name,
+        variant: selectedVariant,
+        quantity: 1,
+        image: product.image,
       });
-    } else {
+
+      // Update local state
+      setQuantities(prev => ({
+        ...prev,
+        [selectedVariantIndex]: 1
+      }));
+
+      // Show success feedback
+      showSuccessToast();
+
+      // Track the event (non-blocking)
+      trackAddToCartEvent();
+
+    } catch (error) {
+      console.error('Add to cart failed:', error);
+      showErrorToast('Terjadi kesalahan saat menambahkan produk ke keranjang');
+    } finally {
+      // Ensure loading state is reset
+      setIsAdding(false);
+    }
+  }, [product, selectedVariant, selectedVariantIndex, addToCart, showSuccessToast, showErrorToast, trackAddToCartEvent, validateProductData]);
+
+  // Main handler with performance optimizations
+  const handleAddToCart = useCallback(async () => {
+    // Prevent double-clicks and concurrent operations
+    if (isAdding) return;
+    
+    setIsAdding(true);
+    
+    try {
+      await addToCartOperation();
+    } catch (error) {
+      console.error('Unexpected error in handleAddToCart:', error);
+      showErrorToast('Terjadi kesalahan yang tidak terduga');
+      setIsAdding(false);
+    }
+  }, [isAdding, addToCartOperation, showErrorToast]);
+
+  // Enhanced quantity handlers with better error handling and performance
+  const handleIncreaseQuantity = useCallback(() => {
+    const newQuantity = quantity + 1;
+    
+    try {
+      setQuantities(prev => ({
+        ...prev,
+        [selectedVariantIndex]: newQuantity
+      }));
+      
+      updateQuantity(product.id, selectedVariant.size, newQuantity);
+
       toast({
-        title: 'Jumlah diperbarui',
-        description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
+        title: 'Jumlah diganti 😋',
+        description: `${newQuantity}x ${product.name} (${selectedVariant.size}) siap lanjut!`,
+        duration: TOAST_SUCCESS_DURATION,
+      });
+    } catch (error) {
+      console.error('Failed to increase quantity:', error);
+      toast({
+        title: 'Gagal memperbarui jumlah',
+        description: 'Silakan coba lagi',
+        variant: 'destructive',
       });
     }
-  };
+  }, [quantity, selectedVariantIndex, selectedVariant.size, product.id, product.name, updateQuantity, toast]);
+
+  const handleDecreaseQuantity = useCallback(() => {
+    const newQuantity = Math.max(0, quantity - 1);
+    
+    try {
+      setQuantities(prev => ({
+        ...prev,
+        [selectedVariantIndex]: newQuantity
+      }));
+      
+      updateQuantity(product.id, selectedVariant.size, newQuantity);
+    
+      if (newQuantity === 0) {
+        toast({
+          title: 'Dihapus dari keranjang',
+          description: `${product.name} (${selectedVariant.size}) berhasil dihapus.`,
+          duration: TOAST_SUCCESS_DURATION,
+        });
+      } else {
+        toast({
+          title: 'Jumlah diperbarui',
+          description: `${newQuantity}x ${product.name} (${selectedVariant.size})`,
+          duration: TOAST_SUCCESS_DURATION,
+        });
+      }
+    } catch (error) {
+      console.error('Failed to decrease quantity:', error);
+      toast({
+        title: 'Gagal memperbarui jumlah',
+        description: 'Silakan coba lagi',
+        variant: 'destructive',
+      });
+    }
+  }, [quantity, selectedVariantIndex, selectedVariant.size, product.id, product.name, updateQuantity, toast]);
   
-  const getSizeMeta = (size: string) => {
+  // Optimized size meta calculation with useCallback
+  const getSizeMeta = useCallback((size: string) => {
     const s = size.toLowerCase();
   
     // 🔹 For cookies with grams (Large 400gr, Medium 150gr, etc)
@@ -209,7 +329,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
       label: size,
       badgeClass: 'bg-gray-100 text-gray-700',
     };
-  };
+  }, []);
   
 
 
