@@ -579,6 +579,8 @@ export default function OrderForm() {
       content_type: 'product',
       currency: 'IDR',
       value: orderTotal,
+      customer_name: orderData.name,
+      customer_phone: orderData.phone,
     };
 
     console.log('🔍 [FB PIXEL] Purchase tracking:', {
@@ -657,6 +659,8 @@ export default function OrderForm() {
       content_type: 'product',
       currency: 'IDR',
       value: getTotalPrice(),
+      customer_name: data.name,
+      customer_phone: data.phone,
     };
 
     console.log('🔍 [FB PIXEL] InitiateCheckout tracking:', {
