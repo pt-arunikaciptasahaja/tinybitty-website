@@ -8,6 +8,7 @@ import { buildWhatsAppMessage, sendWhatsAppOrder } from '@/lib/whatsapp';
 import { calculateShippingCost } from '@/lib/shippingService';
 import { calculateDeliveryCost, formatDeliveryCost } from '@/lib/deliveryCalculator';
 import { fbPixelTrack } from '@/lib/fbpixel';
+import { downloadInvoicePDF } from '@/lib/invoiceGenerator';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
@@ -87,6 +88,7 @@ export default function OrderForm() {
   const [hasCalculatedDelivery, setHasCalculatedDelivery] = useState(false);
   const [isDistanceTooFar, setIsDistanceTooFar] = useState(false);
   const [deliveryDistance, setDeliveryDistance] = useState<number | null>(null);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   
   // Debounced address calculation to prevent API calls on every keystroke
   const calculationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
@@ -569,6 +571,49 @@ export default function OrderForm() {
       setDeliveryInfo(null);
     }
   }, [debouncedDeliveryCalculation]);
+
+  // Function to generate and download PDF invoice
+  const handleDownloadInvoice = async () => {
+    if (!orderData) return;
+    
+    setIsGeneratingPDF(true);
+    
+    try {
+      // Map delivery method to proper label
+      const getDeliveryMethodLabel = (method: string) => {
+        switch (method) {
+          case 'gosend': return 'GoSend Instant';
+          case 'gosendsameday': return 'GoSend Same Day';
+          case 'grab': return 'GrabExpress Instant';
+          case 'grabsameday': return 'GrabExpress Same Day';
+          case 'paxel': return 'Paxel';
+          default: return method || 'Not specified';
+        }
+      };
+      
+      downloadInvoicePDF(
+        orderData, 
+        cart, 
+        orderTotal, 
+        deliveryInfo?.cost || 0, 
+        getDeliveryMethodLabel(deliveryMethod || '')
+      );
+      
+      toast({
+        title: 'Invoice downloaded!',
+        description: 'Invoice has been downloaded to your device',
+      });
+    } catch (error) {
+      console.error('Error generating invoice:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to generate invoice. Please try again.',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   const handleWhatsAppRedirect = () => {
     if (!orderData) return;
@@ -1535,7 +1580,7 @@ export default function OrderForm() {
       <div className="text-center mb-6">
         <p className="text-[#5D4E8E] text-sm leading-relaxed mb-4">
           Tim Tiny Bitty akan menghubungi kamu melalui WhatsApp untuk konfirmasi pesanan,
-          alamat, dan detail pengiriman agar semuanya jelas dan rapi.
+          alamat, dan detail pengiriman agar pesananmu bisa segera diproses.
         </p>
 
         {/* Manual WhatsApp Button */}
@@ -1555,14 +1600,23 @@ export default function OrderForm() {
             Buka WhatsApp
           </Button>
 
+          <Button
+            onClick={handleDownloadInvoice}
+            disabled={isGeneratingPDF}
+            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2"
+          >
+            <FileText className="w-5 h-5" />
+            {isGeneratingPDF ? 'Generating...' : 'Download Invoice'}
+          </Button>
+
           <p className="text-[#8978B4] text-xs">
-            Klik tombol di atas untuk membuka WhatsApp dan mengirim pesan pesanan ke Tiny Bitty.
+            Klik tombol WhatsApp untuk konfirmasi pesanan, dan download invoice untuk menyimpan ke perangkat kamu.
           </p>
         </div>
 
-        <p className="text-[#8978B4] text-xs">
+        {/* <p className="text-[#8978B4] text-xs">
           Terima kasih sudah memilih Tiny Bitty.
-        </p>
+        </p> */}
       </div>
 
       <div className="flex justify-center">

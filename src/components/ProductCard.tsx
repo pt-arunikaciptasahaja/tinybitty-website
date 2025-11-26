@@ -144,7 +144,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
   const showSuccessToast = useCallback(() => {
     toast({
       title: 'Yeay, berhasil! ✨',
-      description: `${product.name} (${selectedVariant.size}) siap diminati.`,
+      description: `${product.name} (${selectedVariant.size}) siap dinikmati.`,
       duration: TOAST_SUCCESS_DURATION,
     });
   }, [toast, product.name, selectedVariant.size]);

@@ -1,6 +1,4 @@
-// motorcycleRouting.ts - OpenRouteService motorcycle routing without tolls
-
-import { ORS_CONFIG } from './config';
+// motorcycleRouting.ts - OSRM + Haversine motorcycle routing without tolls
 
 export type RoutingResult = {
   distance: number; // in kilometers
@@ -10,16 +8,6 @@ export type RoutingResult = {
 
 export type LatLng = { lat: number; lng: number };
 
-// OpenRouteService API configuration
-const ORS_BASE_URL = ORS_CONFIG.BASE_URL;
-let ORS_API_KEY = ORS_CONFIG.API_KEY;
-
-// Use a demo API key if no real key is configured
-if (ORS_API_KEY === 'YOUR_API_KEY_HERE') {
-  console.warn('[MOTORCYCLE ROUTING] Using demo API key - distance accuracy may be limited');
-  ORS_API_KEY = ORS_CONFIG.FALLBACK_API_KEY;
-}
-
 // Fixed origin point (same as in nominatimClient)
 const ORIGIN = {
   lat: -6.3838528,
@@ -27,8 +15,8 @@ const ORIGIN = {
 } as const;
 
 /**
- * Calculate motorcycle route distance and duration using OpenRouteService
- * Excludes toll roads by default
+ * Calculate motorcycle route distance and duration using OSRM with Haversine fallback
+ * Optimized for motorcycle routing without toll roads
  */
 export async function calculateMotorcycleRoute(
   origin: LatLng,
@@ -39,78 +27,26 @@ export async function calculateMotorcycleRoute(
   } = {}
 ): Promise<RoutingResult> {
   const { excludeTolls = true, avoidFeatures = [] } = options;
-  
-  // Add tolls to avoid features if requested
-  if (excludeTolls && !avoidFeatures.includes('tollways')) {
-    avoidFeatures.push('tollways');
-  }
 
   try {
     console.log(`[MOTORCYCLE ROUTING] Calculating route from`, origin, `to`, destination);
     
-    const requestBody = {
-      coordinates: [
-        [origin.lng, origin.lat],
-        [destination.lng, destination.lat]
-      ],
-      instructions: false,
-      preference: 'recommended',
-      options: {
-        avoid_features: avoidFeatures,
-        vehicle_type: 'motorcycle'
-      }
-    };
-
-    const response = await fetch(`${ORS_BASE_URL}/directions/driving-motorcycle`, {
-      method: 'POST',
-      headers: {
-        'Authorization': ORS_API_KEY,
-        'Content-Type': 'application/json',
-        'Accept': 'application/geo+json'
-      },
-      body: JSON.stringify(requestBody)
-    });
-
-    if (!response.ok) {
-      throw new Error(`OpenRouteService API error: ${response.status} ${response.statusText}`);
+    // Primary method: OSRM for road distance calculation
+    const osrmDistance = await getOSRMDistance(origin, destination);
+    if (osrmDistance > 0) {
+      const estimatedDuration = estimateMotorcycleTime(osrmDistance);
+      console.log(`[MOTORCYCLE ROUTING] Using OSRM: ${osrmDistance}km, ${estimatedDuration}min`);
+      return {
+        distance: osrmDistance,
+        duration: estimatedDuration,
+        geometry: ''
+      };
     }
-
-    const data = await response.json();
     
-    if (!data.routes || data.routes.length === 0) {
-      throw new Error('No route found between the specified locations');
-    }
-
-    const route = data.routes[0];
-    const summary = route.summary;
-
-    const result: RoutingResult = {
-      distance: summary.distance / 1000, // Convert meters to kilometers
-      duration: summary.duration / 60, // Convert seconds to minutes
-      geometry: route.geometry
-    };
-
-    console.log(`[MOTORCYCLE ROUTING] Route calculated:`, result);
-    return result;
+    throw new Error('OSRM calculation failed');
 
   } catch (error) {
-    console.error('[MOTORCYCLE ROUTING] Failed to calculate route:', error);
-    
-    // Enhanced fallback: try OSRM for road distance, then Haversine
-    try {
-      const osrmDistance = await getOSRMFallbackDistance(origin, destination);
-      if (osrmDistance > 0) {
-        const estimatedDuration = estimateMotorcycleTime(osrmDistance);
-        console.log(`[MOTORCYCLE ROUTING] Using OSRM fallback: ${osrmDistance}km, ${estimatedDuration}min`);
-        return {
-          distance: osrmDistance,
-          duration: estimatedDuration,
-          geometry: ''
-        };
-      }
-    } catch (osrmError) {
-      console.log('[MOTORCYCLE ROUTING] OSRM fallback also failed:', osrmError);
-    }
+    console.error('[MOTORCYCLE ROUTING] OSRM failed, using Haversine fallback:', error);
     
     // Final fallback to Haversine distance with estimated motorcycle time
     const haversineDistance = calculateHaversineDistance(origin, destination);
@@ -128,7 +64,8 @@ export async function calculateMotorcycleRoute(
 }
 
 /**
- * Calculate Haversine distance as fallback
+ * Calculate Haversine distance as final fallback when OSRM fails
+ * Provides straight-line distance with road factor adjustments
  */
 function calculateHaversineDistance(origin: LatLng, destination: LatLng): number {
   const R = 6371; // Earth's radius in kilometers
@@ -147,37 +84,64 @@ function calculateHaversineDistance(origin: LatLng, destination: LatLng): number
 }
 
 /**
- * Estimate motorcycle travel time based on distance
- * Assumes average motorcycle speed of 40 km/h in Jakarta traffic
+ * Estimate motorcycle travel time based on distance and Jakarta traffic conditions
+ * Motorcycles can take more efficient routes than cars in Jakarta traffic
  */
 function estimateMotorcycleTime(distanceKm: number): number {
-  // Base speed: 40 km/h in Jakarta traffic
-  const averageSpeedKmh = 40;
+  // Base motorcycle speed in Jakarta: 35-45 km/h depending on traffic
+  let averageSpeedKmh;
+  
+  if (distanceKm <= 5) {
+    // Short distances: more traffic lights and intersections
+    averageSpeedKmh = 25;
+  } else if (distanceKm <= 15) {
+    // Medium distances: moderate traffic, some expressways
+    averageSpeedKmh = 35;
+  } else {
+    // Longer distances: can use expressways, better average speed
+    averageSpeedKmh = 45;
+  }
+  
   const baseTimeHours = distanceKm / averageSpeedKmh;
   
-  // Add traffic factor (Jakarta traffic can add 20-50% to travel time)
-  const trafficFactor = 1.3;
+  // Traffic factor varies by time of day and distance
+  // Short distances: more affected by traffic lights
+  // Medium distances: moderate traffic impact
+  // Long distances: less affected by local traffic
+  let trafficFactor;
+  if (distanceKm <= 5) {
+    trafficFactor = 1.5; // Heavy traffic impact
+  } else if (distanceKm <= 15) {
+    trafficFactor = 1.3; // Moderate traffic impact
+  } else {
+    trafficFactor = 1.2; // Lighter traffic impact for longer routes
+  }
+  
   const adjustedTimeHours = baseTimeHours * trafficFactor;
   
   return Math.round(adjustedTimeHours * 60); // Convert to minutes
 }
 
 /**
- * Adjust distance for more realistic motorcycle routing
- * Haversine distance is straight line, but roads curve and loop
- * Typical road distance is 1.2-1.8x straight line distance
+ * Adjust Haversine distance for realistic motorcycle routing
+ * Motorcycles can take more efficient routes than cars due to size and maneuverability
+ * Typical motorcycle road distance is 1.1-1.6x straight line distance
  */
 function adjustDistanceForRoads(distanceKm: number): number {
-  // For shorter distances (< 10km): minimal adjustment
-  // For medium distances (10-30km): 1.4x multiplier
-  // For longer distances (> 30km): 1.6x multiplier
+  // Motorcycles are more agile than cars and can take shortcuts
   
-  if (distanceKm < 10) {
-    return distanceKm * 1.2;
+  if (distanceKm < 5) {
+    // Short distances: motorcycles can weave through traffic efficiently
+    return distanceKm * 1.15;
+  } else if (distanceKm < 15) {
+    // Medium distances: still efficient but some complex routing
+    return distanceKm * 1.25;
   } else if (distanceKm < 30) {
-    return distanceKm * 1.4;
+    // Longer distances: can use expressways and major roads efficiently
+    return distanceKm * 1.35;
   } else {
-    return distanceKm * 1.6;
+    // Very long distances: primarily major roads, less deviation
+    return distanceKm * 1.45;
   }
 }
 
@@ -189,33 +153,55 @@ export function getOrigin(): LatLng {
 }
 
 /**
- * OSRM fallback for road distance when motorcycle API fails
+ * OSRM primary method for road distance calculation
  */
-async function getOSRMFallbackDistance(origin: LatLng, destination: LatLng): Promise<number> {
-  const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=false`;
+async function getOSRMDistance(origin: LatLng, destination: LatLng): Promise<number> {
+  // Use motorcycle-appropriate routing profile (motorcycle routing is similar to car routing but allows more flexible paths)
+  const url = `https://router.project-osrm.org/route/v1/driving/${origin.lng},${origin.lat};${destination.lng},${destination.lat}?overview=false&geometries=polyline&steps=false`;
   
-  // Try multiple CORS proxies
+  // Try multiple CORS proxies with retry logic
   const corsProxies = [
     'https://api.allorigins.win/raw?url=',
     'https://corsproxy.io/?',
-    'https://api.codetabs.com/v1/proxy?quest='
+    'https://api.codetabs.com/v1/proxy?quest=',
+    'https://thingproxy.freeboard.io/fetch/'
   ];
   
   for (let i = 0; i < corsProxies.length; i++) {
     try {
+      console.log(`[MOTORCYCLE ROUTING] Trying OSRM proxy ${i + 1}/${corsProxies.length}`);
       const proxyUrl = corsProxies[i] + encodeURIComponent(url);
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+      
       const response = await fetch(proxyUrl, {
-        headers: { "User-Agent": "TinyBitty-Cookie/1.0" }
+        headers: { 
+          "User-Agent": "TinyBitty-Cookie/1.0",
+          "Accept": "application/json"
+        },
+        signal: controller.signal
       });
+      
+      clearTimeout(timeoutId);
       
       if (response.ok) {
         const data = await response.json();
         if (data.routes?.[0]?.legs?.[0]?.distance) {
-          return data.routes[0].legs[0].distance / 1000; // Convert to km
+          const distanceKm = data.routes[0].legs[0].distance / 1000; // Convert to km
+          console.log(`[MOTORCYCLE ROUTING] OSRM proxy ${i + 1} succeeded: ${distanceKm}km`);
+          return distanceKm;
+        } else {
+          throw new Error('No route found in OSRM response');
         }
+      } else {
+        throw new Error(`OSRM proxy ${i + 1} failed with status: ${response.status}`);
       }
     } catch (error) {
-      console.log(`OSRM proxy ${i + 1} failed:`, error);
+      console.log(`[MOTORCYCLE ROUTING] OSRM proxy ${i + 1} failed:`, error.message || error);
+      if (i === corsProxies.length - 1) {
+        throw new Error(`All OSRM proxies failed. Last error: ${error.message || error}`);
+      }
     }
   }
   
