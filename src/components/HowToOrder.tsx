@@ -32,7 +32,7 @@ export default function HowToOrder() {
     return (
         <section
             id="how-to-order"
-            className="mt-12 md:mt-16 mb-12 md:mb-16 py-16 bg-gradient-to-br from-[#FFF0E6] to-[#FFF8F0] how-to-order-texture rounded-3xl"
+            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 bg-gradient-to-br from-[#FFF0E6] to-[#FFF8F0] how-to-order-texture rounded-3xl"
         >
             <div className="container mx-auto px-4 max-w-none">
                 <Card className="border-2 border-[#F5D5C5]/40 shadow-2xl rounded-3xl overflow-hidden">
