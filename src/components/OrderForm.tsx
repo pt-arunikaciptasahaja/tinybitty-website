@@ -114,7 +114,7 @@ export default function OrderForm() {
 
   // Simple handler for new address search component
   const handleAddressSelect = useCallback((result: DistanceResult) => {
-    console.log('[ORDER FORM] Address selected:', result);
+    // console.log('[ORDER FORM] Address selected:', result);
     
     // Store the selected address in form
     form.setValue('address', result.destination.label);
@@ -198,7 +198,7 @@ export default function OrderForm() {
         return;
       }
       
-      console.log('[SHIPPING CALCULATOR] Primary calculation successful:', calculation);
+      // console.log('[SHIPPING CALCULATOR] Primary calculation successful:', calculation);
       
       // Extract distance from zone name
       const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
@@ -219,7 +219,7 @@ export default function OrderForm() {
         // Show toast notification about Paxel alternative
         toast({
           title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
-          description: `Jarak pengiriman ~${distance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+          description: `Jarak pengiriman ~${distance.toFixed(1)}km melebihi batas 40km. Gunakan Paxel untuk pengiriman.`,
           variant: 'default',
         });
         calculationSuccess = false;
@@ -249,12 +249,12 @@ export default function OrderForm() {
         
         calculationSuccess = true;
         setHasCompletedDeliveryCalculation(true);
-        console.log('[SHIPPING CALCULATOR] Delivery info set:', info);
+        // console.log('[SHIPPING CALCULATOR] Delivery info set:', info);
       }
     } catch (error) {
       console.log('[SHIPPING CALCULATOR] Primary calculation error:', error);
       try {
-        console.log('[SHIPPING CALCULATOR] Attempting fallback calculation...');
+        // console.log('[SHIPPING CALCULATOR] Attempting fallback calculation...');
         const fallbackCalculation = calculateDeliveryCost(address, method, cart, getTotalPrice());
         
         // Check for distance limit exceeded (for all GoSend/Grab methods) in fallback too
@@ -317,7 +317,7 @@ export default function OrderForm() {
         setHasCompletedDeliveryCalculation(true);
       }
       setHasCalculatedDelivery(calculationSuccess);
-      console.log('[SHIPPING CALCULATOR] Calculation completed. Success:', calculationSuccess);
+      // console.log('[SHIPPING CALCULATOR] Calculation completed. Success:', calculationSuccess);
     }
   }, [cart, getTotalPrice, toast]);
 
@@ -395,7 +395,7 @@ export default function OrderForm() {
       // and we haven't already calculated delivery for this specific combination
       // Skip calculation for Paxel as it uses external calculator
       if (isAddressComplete && deliveryMethod && deliveryMethod !== 'paxel' && !hasCompletedDeliveryCalculation) {
-        console.log('🟢 [DEBOUNCE] Starting new delivery calculation');
+        // console.log('🟢 [DEBOUNCE] Starting new delivery calculation');
         const calculateNewDelivery = async () => {
           setIsCalculatingDelivery(true);
           let calculationSuccess = false;
@@ -447,7 +447,7 @@ export default function OrderForm() {
                 formattedCost: formattedCost,
                 isValid: true
               };
-              console.log('🟢 [CALC] Setting deliveryInfo with successful calculation:', info);
+              // console.log('🟢 [CALC] Setting deliveryInfo with successful calculation:', info);
               setDeliveryInfo(info);
               
               // Only clear distance too far state if it's not a GoSend/Grab method for far distance
@@ -628,24 +628,24 @@ export default function OrderForm() {
       customer_phone: orderData.phone,
     };
 
-    console.log('🔍 [FB PIXEL] Purchase tracking:', {
-      event: 'Purchase',
-      data: pixelData,
-      customerName: orderData.name,
-      customerPhone: orderData.phone,
-      cartItemsCount: cart.length,
-      orderTotal: orderTotal,
-      deliveryCost: deliveryInfo?.cost || 0,
-      totalWithDelivery: orderTotal + (deliveryInfo?.cost || 0),
-      productIds: cart.map(item => item.productId),
-      productNames: cart.map(item => item.productName),
-      whatsappNumber: WHATSAPP_NUMBER,
-      timestamp: new Date().toISOString()
-    });
+    // console.log('🔍 [FB PIXEL] Purchase tracking:', {
+    //   event: 'Purchase',
+    //   data: pixelData,
+    //   customerName: orderData.name,
+    //   customerPhone: orderData.phone,
+    //   cartItemsCount: cart.length,
+    //   orderTotal: orderTotal,
+    //   deliveryCost: deliveryInfo?.cost || 0,
+    //   totalWithDelivery: orderTotal + (deliveryInfo?.cost || 0),
+    //   productIds: cart.map(item => item.productId),
+    //   productNames: cart.map(item => item.productName),
+    //   whatsappNumber: WHATSAPP_NUMBER,
+    //   timestamp: new Date().toISOString()
+    // });
 
     fbPixelTrack('Purchase', pixelData);
 
-    console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
+    // console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
     
     const message = buildWhatsAppMessage(orderData, cart, orderTotal, deliveryInfo?.cost || 0, isDistanceTooFar, deliveryDistance);
     
@@ -708,21 +708,21 @@ export default function OrderForm() {
       customer_phone: data.phone,
     };
 
-    console.log('🔍 [FB PIXEL] InitiateCheckout tracking:', {
-      event: 'InitiateCheckout',
-      data: pixelData,
-      customerName: data.name,
-      customerPhone: data.phone,
-      cartItemsCount: cart.length,
-      totalValue: getTotalPrice(),
-      productIds: cart.map(item => item.productId),
-      productNames: cart.map(item => item.productName),
-      timestamp: new Date().toISOString()
-    });
+    // console.log('🔍 [FB PIXEL] InitiateCheckout tracking:', {
+    //   event: 'InitiateCheckout',
+    //   data: pixelData,
+    //   customerName: data.name,
+    //   customerPhone: data.phone,
+    //   cartItemsCount: cart.length,
+    //   totalValue: getTotalPrice(),
+    //   productIds: cart.map(item => item.productId),
+    //   productNames: cart.map(item => item.productName),
+    //   timestamp: new Date().toISOString()
+    // });
 
     fbPixelTrack('InitiateCheckout', pixelData);
 
-    console.log('✅ [FB PIXEL] InitiateCheckout event tracked successfully');
+    // console.log('✅ [FB PIXEL] InitiateCheckout event tracked successfully');
 
     setShowConfirmationModal(true);
   };
@@ -842,10 +842,10 @@ export default function OrderForm() {
                   <FormItem className='mb-6'>
                     <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
                     <UserRoundPen className="w-4 h-4" />
-                      Nama Lengkap</FormLabel>
+                      Nama</FormLabel>
                     <FormControl>
                       <Input
-                        placeholder="Masukkan nama lengkap kamu"
+                        placeholder="Ketik nama lengkap"
                         {...field}
                         className="rounded-xl text-[#5D4E8E] border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
                       />
@@ -958,7 +958,6 @@ export default function OrderForm() {
                               variant: 'default',
                             });
                           }}
-                          placeholder="Ketik nama area atau kode pos…"
                           disabled={!isStep1Complete}
                           className="w-full"
                         />
@@ -1203,7 +1202,7 @@ export default function OrderForm() {
                       Estimasi Jarak
                     </div>
                     <div className="text-[#8978B4] font-medium">
-                      {deliveryInfo.zone}
+                      {`±${deliveryInfo.zone}`}
                     </div>
                   </div>
                 </div>
@@ -1244,7 +1243,7 @@ export default function OrderForm() {
 
             {/* Note: ongkir masih perkiraan */}
             <p className="text-xs md:text-sm text-[#8978B4] bg-white/60 rounded-lg px-3 py-2 border border-[#BFAAE3]/20">
-              Perkiraan ongkir. Ongkir final mengikuti aplikasi GoSend/GrabExpress
+              Ongkir final mengikuti aplikasi GoSend/GrabExpress/Paxel
               (belum termasuk tol/parkir/tip).
             </p>
           </>
@@ -1619,12 +1618,11 @@ export default function OrderForm() {
         </p> */}
       </div>
 
-      <div className="flex justify-center">
-        <div className="w-[340px] h-[200px] bg-[#F6F2FF] rounded-3xl flex items-center max-auto">
+      <div className="flex justify-center bg-[#F6F2FF] rounded-2xl">
+        <div className="w-[340px] h-[200px] flex items-center max-auto">
           <Lottie
             animationData={remixAnimation}
             loop={true}
-            // className="w-[340px] h-[200px]"
           />
         </div>
       </div>

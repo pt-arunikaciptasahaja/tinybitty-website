@@ -46,18 +46,18 @@ const getTimeUntilNextRequest = (): number => {
 export async function searchLocations(query: string): Promise<GeocodingResult[]> {
   // Validate input
   if (!query || query.trim().length < 3) {
-    console.log(`[NOMINATIM] Query too short (${query?.length} chars), skipping search`);
+    // console.log(`[NOMINATIM] Query too short (${query?.length} chars), skipping search`);
     return [];
   }
 
   const cleanQuery = query.trim();
-  console.log(`[NOMINATIM] Starting search for: "${cleanQuery}"`);
+  // console.log(`[NOMINATIM] Starting search for: "${cleanQuery}"`);
 
   try {
     // Wait for rate limit
     const waitTime = getTimeUntilNextRequest();
     if (waitTime > 0) {
-      console.log(`[NOMINATIM] Rate limiting - waiting ${waitTime}ms`);
+      // console.log(`[NOMINATIM] Rate limiting - waiting ${waitTime}ms`);
       await new Promise(resolve => setTimeout(resolve, waitTime));
     }
 
@@ -78,7 +78,7 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
 
     const searchUrl = `${NOMINATIM_BASE_URL}?${searchParams}`;
     
-    console.log(`[NOMINATIM] Making API request to: ${searchUrl}`);
+    // console.log(`[NOMINATIM] Making API request to: ${searchUrl}`);
 
     // Create abort controller for timeout
     const controller = new AbortController();
@@ -99,7 +99,7 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
     }
 
     const data = await response.json();
-    console.log(`[NOMINATIM] Raw API response:`, data);
+    // console.log(`[NOMINATIM] Raw API response:`, data);
 
     // Filter and enhance results
     const enhancedResults: GeocodingResult[] = data
@@ -119,7 +119,7 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
         return scoreB - scoreA;
       });
 
-    console.log(`[NOMINATIM] Returning ${enhancedResults.length} enhanced results`);
+    // console.log(`[NOMINATIM] Returning ${enhancedResults.length} enhanced results`);
     return enhancedResults;
 
   } catch (error) {

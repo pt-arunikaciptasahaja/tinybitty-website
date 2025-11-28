@@ -121,19 +121,19 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
         content_variant: selectedVariant.size,
       };
 
-      console.log('🔍 [FB PIXEL] AddToCart tracking:', {
-        event: 'AddToCart',
-        data: pixelData,
-        productId: product.id,
-        productName: product.name,
-        variant: selectedVariant.size,
-        price: selectedVariant.price,
-        timestamp: new Date().toISOString()
-      });
+      // console.log('🔍 [FB PIXEL] AddToCart tracking:', {
+      //   event: 'AddToCart',
+      //   data: pixelData,
+      //   productId: product.id,
+      //   productName: product.name,
+      //   variant: selectedVariant.size,
+      //   price: selectedVariant.price,
+      //   timestamp: new Date().toISOString()
+      // });
 
       await fbPixelTrack('AddToCart', pixelData);
       
-      console.log('✅ [FB PIXEL] AddToCart event tracked successfully');
+      // console.log('✅ [FB PIXEL] AddToCart event tracked successfully');
     } catch (error) {
       // Fail silently - don't block user experience if tracking fails
       console.warn('❌ [FB PIXEL] Failed to track AddToCart event:', error);

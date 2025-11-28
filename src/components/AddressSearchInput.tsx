@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { Input } from '@/components/ui/input';
 import { MapPin, Loader2 } from 'lucide-react';
 import { searchLocations, GeocodingResult, DistanceResult, calculateDistanceKm, getOrigin } from '@/lib/nominatimClient';
+import { cleanAddress } from '@/lib/utils';
 
 interface AddressSearchInputProps {
   onSelect: (result: DistanceResult) => void;
@@ -20,7 +21,7 @@ interface SearchState {
 
 export default function AddressSearchInput({ 
   onSelect, 
-  placeholder = "Ketik nama area atau kode pos…",
+  placeholder = "Ketik nama area atau kode pos",
   disabled = false,
   className = ""
 }: AddressSearchInputProps) {
@@ -60,7 +61,7 @@ export default function AddressSearchInput({
     setSearchState(prev => ({ ...prev, isSearching: true, error: null, hasSearched: true }));
 
     try {
-      console.log(`[ADDRESS INPUT] Searching for: "${searchQuery}"`);
+      // console.log(`[ADDRESS INPUT] Searching for: "${searchQuery}"`);
       
       const results = await searchLocations(searchQuery);
       
@@ -127,7 +128,7 @@ export default function AddressSearchInput({
    * Handle suggestion selection
    */
   const handleSelectSuggestion = useCallback((suggestion: GeocodingResult) => {
-    console.log('[ADDRESS INPUT] Selected suggestion:', suggestion);
+    // console.log('[ADDRESS INPUT] Selected suggestion:', suggestion);
     
     // Calculate distance from origin
     const origin = getOrigin();
@@ -143,12 +144,21 @@ export default function AddressSearchInput({
     };
     
     // Update UI state
-    setQuery(suggestion.label);
+    setQuery(cleanAddress(suggestion.label));
     setShowSuggestions(false);
     setSearchState({ isSearching: false, error: null, hasSearched: true });
     
+    // Create cleaned distance result
+    const cleanedResult: DistanceResult = {
+      destination: {
+        ...suggestion,
+        label: cleanAddress(suggestion.label)
+      },
+      distanceKm
+    };
+    
     // Call parent callback
-    onSelect(distanceResult);
+    onSelect(cleanedResult);
   }, [onSelect]);
 
   /**
@@ -200,10 +210,6 @@ export default function AddressSearchInput({
     <div className={`relative address-search-container ${className}`}>
       {/* Input Field */}
       <div className="relative">
-        <div className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10">
-          <MapPin className="w-4 h-4 text-gray-400" />
-        </div>
-        
         <Input
           type="text"
           placeholder={placeholder}
@@ -211,7 +217,7 @@ export default function AddressSearchInput({
           onChange={(e) => handleInputChange(e.target.value)}
           onKeyDown={handleKeyDown}
           disabled={disabled}
-          className="pl-10 pr-10 rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
+          className="pl-3 pr-10 rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
         />
         
         {/* Loading Indicator */}
@@ -250,12 +256,12 @@ export default function AddressSearchInput({
               {/* Main Label */}
               <div className="font-medium text-[#5D4E8E] text-sm flex items-center gap-2">
                 <MapPin className="w-3 h-3 text-[#BFAAE3]" />
-                {suggestion.label.split(',')[0]}
+                {cleanAddress(suggestion.label).split(',')[0]}
               </div>
               
               {/* Secondary Line - Full Address */}
               <div className="text-xs text-[#8978B4] mt-1 ml-5">
-                {suggestion.label}
+                {cleanAddress(suggestion.label)}
               </div>
               
               {/* Distance Info (for selected addresses) */}

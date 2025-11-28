@@ -100,23 +100,23 @@ export async function geocodeAddress(address: string): Promise<{ lat: number; lo
   // Remove duplicates and empty strings
   const uniqueAddresses = [...new Set(addressVersions.filter(addr => addr && addr.trim()))];
   
-  console.log(`[DISTANCE GEOCODE] Will try ${uniqueAddresses.length} address variations for: ${address}`);
+  // console.log(`[DISTANCE GEOCODE] Will try ${uniqueAddresses.length} address variations for: ${address}`);
 
   let attempt = 0;
 
   while (attempt < uniqueAddresses.length) {
     const currentAddress = uniqueAddresses[attempt];
-    console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1}/${uniqueAddresses.length} with: ${currentAddress}`);
+    // console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1}/${uniqueAddresses.length} with: ${currentAddress}`);
     
     try {
       const geocodeResult = await geocodeSingleAddress(currentAddress);
       if (geocodeResult) {
-        console.log(`[DISTANCE GEOCODE] Success with simplified address: ${currentAddress}`);
+        // console.log(`[DISTANCE GEOCODE] Success with simplified address: ${currentAddress}`);
         geocodeCache.set(address, geocodeResult);
         return geocodeResult;
       }
     } catch (err: any) {
-      console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1} failed:`, err?.message);
+      // console.log(`[DISTANCE GEOCODE] Attempt ${attempt + 1} failed:`, err?.message);
     }
     
     attempt++;
@@ -149,7 +149,7 @@ async function geocodeSingleAddress(address: string): Promise<{ lat: number; lon
     try {
       // Handle JSONP approach
       if (proxyIndex === 2 && corsProxies[2] === null) {
-        console.log(`[DISTANCE GEOCODE] Trying JSONP approach...`);
+        // console.log(`[DISTANCE GEOCODE] Trying JSONP approach...`);
         const jsonpResult = await fetchWithJSONP(url);
         if (jsonpResult) {
           const data = jsonpResult;
@@ -164,7 +164,7 @@ async function geocodeSingleAddress(address: string): Promise<{ lat: number; lon
         const proxyUrl = corsProxies[proxyIndex] + encodeURIComponent(url);
         
         if (proxyIndex === 0) {
-          console.log(`[DISTANCE GEOCODE] Using proxy ${proxyIndex + 1} for: ${address}`);
+          // console.log(`[DISTANCE GEOCODE] Using proxy ${proxyIndex + 1} for: ${address}`);
         }
         
         const response = await fetch(proxyUrl, {
@@ -189,7 +189,7 @@ async function geocodeSingleAddress(address: string): Promise<{ lat: number; lon
         };
       }
     } catch (proxyError) {
-      console.log(`[DISTANCE GEOCODE] Method ${proxyIndex + 1} failed:`, proxyError);
+      // console.log(`[DISTANCE GEOCODE] Method ${proxyIndex + 1} failed:`, proxyError);
       // Continue to next method
     }
   }
@@ -278,7 +278,7 @@ function extractProvinceFromAddress(address: string): string {
  */
 export async function getDistanceKm(destination: string): Promise<number | null> {
   try {
-    console.log(`[DISTANCE] Calculating motorcycle distance without tolls to: ${destination}`);
+    // console.log(`[DISTANCE] Calculating motorcycle distance without tolls to: ${destination}`);
     const dest = await geocodeAddress(destination);
 
     // Use motorcycle routing instead of OSRM car routing
@@ -290,7 +290,7 @@ export async function getDistanceKm(destination: string): Promise<number | null>
     );
 
     const result = Math.round(routingResult.distance * 10) / 10; // keep 1 decimal
-    console.log(`[DISTANCE] Calculated motorcycle distance (no tolls): ${result}km`);
+    // console.log(`[DISTANCE] Calculated motorcycle distance (no tolls): ${result}km`);
     return result;
 
   } catch (err: any) {

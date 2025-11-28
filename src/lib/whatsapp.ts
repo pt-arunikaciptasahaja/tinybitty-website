@@ -1,4 +1,5 @@
 import { CartItem, OrderFormData } from '@/types/product';
+import { cleanAddress } from '@/lib/utils';
 
 export const buildWhatsAppMessage = (
   orderData: OrderFormData,
@@ -59,7 +60,7 @@ export const buildWhatsAppMessage = (
 
     // Add main address from search-based system (this already includes city/province)
     if (data.address) {
-      parts.push(toCamelCase(data.address.trim()));
+      parts.push(toCamelCase(cleanAddress(data.address.trim())));
     }
 
     return parts.join(', ');

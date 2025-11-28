@@ -35,7 +35,7 @@ export async function calculateShippingCost(
   cart: LegacyCartItem[] = []
 ): Promise<LegacyDeliveryCalculation> {
   try {
-    console.log(`[ShippingService] Calculating costs for: ${destination}`);
+    // console.log(`[ShippingService] Calculating costs for: ${destination}`);
     
     // Get rates from the new shipping engine
     const shippingRates: ShippingRates = await calculateShipping(destination);

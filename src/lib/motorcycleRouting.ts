@@ -29,13 +29,13 @@ export async function calculateMotorcycleRoute(
   const { excludeTolls = true, avoidFeatures = [] } = options;
 
   try {
-    console.log(`[MOTORCYCLE ROUTING] Calculating route from`, origin, `to`, destination);
+    // console.log(`[MOTORCYCLE ROUTING] Calculating route from`, origin, `to`, destination);
     
     // Primary method: OSRM for road distance calculation
     const osrmDistance = await getOSRMDistance(origin, destination);
     if (osrmDistance > 0) {
       const estimatedDuration = estimateMotorcycleTime(osrmDistance);
-      console.log(`[MOTORCYCLE ROUTING] Using OSRM: ${osrmDistance}km, ${estimatedDuration}min`);
+      // console.log(`[MOTORCYCLE ROUTING] Using OSRM: ${osrmDistance}km, ${estimatedDuration}min`);
       return {
         distance: osrmDistance,
         duration: estimatedDuration,
@@ -53,7 +53,7 @@ export async function calculateMotorcycleRoute(
     const adjustedDistance = adjustDistanceForRoads(haversineDistance);
     const estimatedDuration = estimateMotorcycleTime(adjustedDistance);
     
-    console.log(`[MOTORCYCLE ROUTING] Using Haversine fallback: ${haversineDistance}km → ${adjustedDistance}km, ${estimatedDuration}min`);
+    // console.log(`[MOTORCYCLE ROUTING] Using Haversine fallback: ${haversineDistance}km → ${adjustedDistance}km, ${estimatedDuration}min`);
     
     return {
       distance: adjustedDistance,
@@ -169,7 +169,7 @@ async function getOSRMDistance(origin: LatLng, destination: LatLng): Promise<num
   
   for (let i = 0; i < corsProxies.length; i++) {
     try {
-      console.log(`[MOTORCYCLE ROUTING] Trying OSRM proxy ${i + 1}/${corsProxies.length}`);
+      // console.log(`[MOTORCYCLE ROUTING] Trying OSRM proxy ${i + 1}/${corsProxies.length}`);
       const proxyUrl = corsProxies[i] + encodeURIComponent(url);
       
       const controller = new AbortController();
@@ -189,7 +189,7 @@ async function getOSRMDistance(origin: LatLng, destination: LatLng): Promise<num
         const data = await response.json();
         if (data.routes?.[0]?.legs?.[0]?.distance) {
           const distanceKm = data.routes[0].legs[0].distance / 1000; // Convert to km
-          console.log(`[MOTORCYCLE ROUTING] OSRM proxy ${i + 1} succeeded: ${distanceKm}km`);
+          // console.log(`[MOTORCYCLE ROUTING] OSRM proxy ${i + 1} succeeded: ${distanceKm}km`);
           return distanceKm;
         } else {
           throw new Error('No route found in OSRM response');

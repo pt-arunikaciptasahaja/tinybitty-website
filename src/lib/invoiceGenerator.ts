@@ -1,5 +1,6 @@
 import jsPDF from 'jspdf';
 import { CartItem, OrderFormData } from '@/types/product';
+import { cleanAddress } from '@/lib/utils';
 
 // Informasi bisnis
 const BUSINESS_INFO = {
@@ -133,7 +134,7 @@ export const generateInvoicePDF = (
   doc.text(`WhatsApp: ${orderData.phone}`, pageWidth / 2 + margin, yPosition);
   
   // Alamat (tangani alamat panjang)
-  const fullAddress = `${orderData.detailedAddress || ''} ${orderData.address ? ', ' + orderData.address : ''}`;
+  const fullAddress = `${orderData.detailedAddress || ''} ${orderData.address ? ', ' + cleanAddress(orderData.address) : ''}`;
   const addressLines = doc.splitTextToSize(fullAddress.trim(), pageWidth / 2 - margin - 10);
   addressLines.forEach((line: string, index: number) => {
     if (index < 3) { // Batasi 3 baris

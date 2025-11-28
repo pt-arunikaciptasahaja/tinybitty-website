@@ -29,12 +29,12 @@ export interface FBPixelTrackFunction {
  * @param data - Optional event data
  */
 export const fbPixelTrack: FBPixelTrackFunction = (event, data = {}) => {
-  console.log(`🚀 [FB PIXEL TRACKER] Event: ${event}`, data);
+  // console.log(`🚀 [FB PIXEL TRACKER] Event: ${event}`, data);
   
   if (typeof window !== "undefined" && window.fbq) {
     try {
       window.fbq("track", event, data);
-      console.log(`✅ [FB PIXEL TRACKER] Successfully sent ${event} event`);
+      // console.log(`✅ [FB PIXEL TRACKER] Successfully sent ${event} event`);
     } catch (error) {
       console.error(`❌ [FB PIXEL TRACKER] Error sending ${event} event:`, error);
     }
