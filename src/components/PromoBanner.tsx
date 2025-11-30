@@ -33,6 +33,12 @@ const banners: Banner[] = [
     desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
     mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
     alt: 'New Collection Banner'
+  },
+  {
+    id: 'promo-4',
+    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
+    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
+    alt: 'New Collaboration Banner'
   }
   // Future banners will be added here
 ];
@@ -78,8 +84,8 @@ export default function PromoBanner() {
   }
 
   return (
-    <section className="w-full py-8 md:py-12 lg:py-16 pb-4 md:pb-8 lg:pb-6 bg-[#F6F7F7] rounded-lg">
-      <div className="container mx-auto px-4">
+    <section className="mt-10 md:mt-30 mb-2 md:mb-4 pt-16 md:pt-32 pb-0">
+      <div className="container mx-auto px-1 md:px-4">
         <div className="relative">
           <Carousel className="w-full" setApi={setApi}>
             <CarouselContent>
@@ -90,16 +96,30 @@ export default function PromoBanner() {
                     <img
                       src={banner.desktopImage}
                       alt={banner.alt}
-                      className="hidden md:block w-full h-auto object-cover"
+                      className="hidden md:block w-full h-128 object-cover"
                       loading="lazy"
+                      onClick={() => {
+                        if (banner.id === 'promo-4') {
+                          document.getElementById('tokyo-crumb')?.scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                          document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
                     />
                     
                     {/* Mobile Image */}
                     <img
                       src={banner.mobileImage}
                       alt={banner.alt}
-                      className="block md:hidden w-full h-auto object-cover"
+                      className="block md:hidden w-full h-32 object-contain"
                       loading="lazy"
+                      onClick={() => {
+                        if (banner.id === 'promo-4') {
+                          document.getElementById('tokyo-crumb')?.scrollIntoView({ behavior: 'smooth' });
+                        } else {
+                          document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' });
+                        }
+                      }}
                     />
                     
                     {/* Optional overlay for clickable banners */}

@@ -13,6 +13,7 @@ interface ProductSectionProps {
   description: string;
   products: Product[];
   icon: string;
+  id?: string;
 }
 
 export default function ProductSection({
@@ -20,6 +21,7 @@ export default function ProductSection({
   description,
   products,
   icon,
+  id,
 }: ProductSectionProps) {
   // Define pastel background colors for each category
   const getBackgroundClass = (title: string) => {
@@ -30,6 +32,8 @@ export default function ProductSection({
         return 'bg-purple-50';
       case 'macaroni schotel':
         return 'bg-blue-50';
+      case 'tokyo crumb':
+        return 'bg-green-50';
       default:
         return 'bg-orange-50';
     }
@@ -44,15 +48,17 @@ export default function ProductSection({
         return 'Fruity Splash';
       case 'macaroni schotel':
         return 'Hearty Bites';
+      case 'tokyo crumb':
+        return 'Tokyo Crumb';
       default:
         return title;
     }
   };
 
   return (
-    <section className="mb-6 md:mb-8">
+    <section id={id} className="mb-6 md:mb-8">
       <div className={`cookie-texture rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 ${getBackgroundClass(title)}`}>
-        <div className="text-left mb-3 hidden md:block">
+        <div className="text-left mb-3 md:block">
           <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#553d8f] mb-1 modak-regular">
             {getDisplayTitle(title)}
           </h3>

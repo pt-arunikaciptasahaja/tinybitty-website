@@ -29,10 +29,17 @@ export default function Home() {
     return 0;
   });
 
+  const sortedTokyoCrumb = [...productsData.tokyo_crumb].sort((a, b) => {
+    if (a.isNew && !b.isNew) return -1;
+    if (!a.isNew && b.isNew) return 1;
+    return 0;
+  });
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#f5f7f7' }}>
       <Header />
-      <Hero />
+      {/* <Hero /> */}
+      <PromoBanner />
       
       <RunningText />
       
@@ -57,9 +64,17 @@ export default function Home() {
           products={sortedMacaroni}
           icon="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/mac-icon_kuyjid.png"
         />
+        
+        <ProductSection
+          title="Tokyo Crumb"
+          description="Roti segar hasil kolaborasi dengan Tokyo Crumb—empuk, lembut, dan dibuat dengan kualitas premium untuk setiap Gigitan spesialmu."
+          products={sortedTokyoCrumb}
+          icon="🍞"
+          id="tokyo-crumb"
+        />
       </main>
 
-      <PromoBanner />
+      
 
       <HowToOrder />
 

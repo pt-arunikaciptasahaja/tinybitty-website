@@ -158,5 +158,67 @@
       "cupSize": "Cup Ø 8cm • tall 3.5cm",
       "isNew": false
     }
+  ],
+  "tokyo_crumb": [
+    {
+      "id": "white-bread",
+      "name": "White Bread",
+      "description": "-",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/white_afgdv2.png",
+      "variants": [
+        { "size": "Whole sliced loaf", "price": 79000 },
+        { "size": "2-slice pack", "price": 20000 }
+      ],
+      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt"],
+      "isNew": true
+    },
+    {
+      "id": "wheat-bread",
+      "name": "Wheat Bread",
+      "description": "-",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/gandum_oxdnn6.png",
+      "variants": [
+        { "size": "Whole sliced loaf", "price": 89000 },
+        { "size": "2-slice pack", "price": 20000 }
+      ],
+      "ingredients": ["High-Protein Flour", "Wheat Flour", "Eggs", "Milk", "Margarine", "Coconut Milk", "Salt"],
+      "isNew": true
+    },
+    {
+      "id": "cheese-filled-bread",
+      "name": "Cheese-filled Bread",
+      "description": "-",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/keju_piadcp.png",
+      "variants": [
+        { "size": "Whole sliced loaf", "price": 89000 },
+        { "size": "2-slice pack", "price": 20000 }
+      ],
+      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt", "Cheese"],
+      "isNew": true
+    },
+    {
+      "id": "chocolate-filled-bread",
+      "name": "Chocolate-filled Bread",
+      "description": "-",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/choc_puexcc.png",
+      "variants": [
+        { "size": "Whole sliced loaf", "price": 89000 },
+        { "size": "2-slice pack", "price": 20000 }
+      ],
+      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt", "Chocolate"],
+      "isNew": true
+    },
+    {
+      "id": "vegan-wheat-bread",
+      "name": "Vegan Wheat Bread",
+      "description": "-",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764487211/ChatGPT_Image_Nov_30_2025_02_18_22_PM_1_lemrfv.png",
+      "variants": [
+        { "size": "Whole sliced loaf", "price": 89000 },
+        { "size": "2-slice pack", "price": 20000 }
+      ],
+      "ingredients": ["High-Protein Flour", "Wheat Flour", "Eggs", "Milk", "Olive Oil", "Seeds", "Walnuts", "Salt"],
+      "isNew": true
+    }
   ]
 }

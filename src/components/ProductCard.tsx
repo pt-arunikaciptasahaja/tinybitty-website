@@ -27,7 +27,44 @@ interface ProductCardProps {
 }
 
 export default function ProductCard({ product, className = '' }: ProductCardProps) {
-  const [selectedVariantIndex, setSelectedVariantIndex] = useState(0);
+  // Default to appropriate size based on product type
+  const getDefaultVariantIndex = (product: Product) => {
+    // Check if this is a Tokyo Crumb product (bread products)
+    const isTokyoCrumb = product.ingredients && 
+      product.ingredients.includes('High-Protein Flour') &&
+      (product.ingredients.includes('Butter') || product.ingredients.includes('Margarine'));
+    
+    if (isTokyoCrumb) {
+      // For Tokyo Crumb products, default to "2-slice pack"
+      const slicePackIndex = product.variants.findIndex(variant => 
+        variant.size.toLowerCase().includes('slice pack') || 
+        variant.size.toLowerCase().includes('2-slice')
+      );
+      return slicePackIndex !== -1 ? slicePackIndex : 0;
+    }
+    
+    // For cookie products, default to Mini/XS variant
+    if (product.ingredients && product.ingredients.includes('Flour') && 
+        product.ingredients.includes('Eggs') && 
+        product.ingredients.includes('Australian Butter')) {
+      const miniIndex = product.variants.findIndex(variant => 
+        variant.size.toLowerCase().includes('mini') || 
+        variant.size.toLowerCase().includes('30gr')
+      );
+      return miniIndex !== -1 ? miniIndex : 0;
+    }
+    
+    // Default to first variant for other products
+    return 0;
+  };
+
+  const [selectedVariantIndex, setSelectedVariantIndex] = useState(getDefaultVariantIndex(product));
+
+  // Update selected variant index when product changes
+  useEffect(() => {
+    const defaultIndex = getDefaultVariantIndex(product);
+    setSelectedVariantIndex(defaultIndex);
+  }, [product]);
   const [quantities, setQuantities] = useState<Record<number, number>>({});
   const [isAdding, setIsAdding] = useState(false);
   const [showImageModal, setShowImageModal] = useState(false);
@@ -280,6 +317,15 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
   const getSizeMeta = useCallback((size: string) => {
     const s = size.toLowerCase();
   
+    // 🔹 For Tokyo Crumb products (bread variants) - hide badge
+    if (s.includes('sliced') || s.includes('slice') || s.includes('bread')) {
+      return {
+        code: '',                 // no badge code for bread
+        label: size,              // show full size description
+        badgeClass: '',           // empty badge class to hide
+      };
+    }
+  
     // 🔹 For cookies with grams (Large 400gr, Medium 150gr, etc)
     if (/g[r]?/i.test(size)) {
       // Extract grams
@@ -335,7 +381,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-2 md:p-4 shadow-lg hover:shadow-xl transition-shadow duration-300 overflow-hidden ${className}`}
+      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-2 md:p-4 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden ${className}`}
       onClick={(e) => {
         // Prevent all clicks from bubbling up to carousel or other components
         e.stopPropagation();
@@ -471,21 +517,23 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                           hover:text-[#581c87]
                         "
                       >
-                        <div className="flex items-center gap-2.5">
-                          {/* Size icon pill */}
-                          <div
-                            className={`
-                              flex items-center justify-center
-                              w-5 h-5 md:w-7 md:h-7
-                              rounded-full
-                              text-[11px] font-semibold
-                              ${meta.badgeClass}
-                            `}
-                          >
-                            {meta.code}
-                          </div>
+                        <div className={`flex items-center ${meta.badgeClass ? 'gap-2.5' : 'gap-0'}`}>
+                          {/* Size icon pill - only show if badgeClass exists */}
+                          {meta.badgeClass && (
+                            <div
+                              className={`
+                                flex items-center justify-center
+                                w-5 h-5 md:w-7 md:h-7
+                                rounded-full
+                                text-[11px] font-semibold
+                                ${meta.badgeClass}
+                              `}
+                            >
+                              {meta.code}
+                            </div>
+                          )}
 
-                          {/* Texts - for cookies show only grams, for macaroni show only number */}
+                          {/* Texts - always show */}
                           <div className="flex flex-col leading-tight">
                             <span className="text-[11px] font-semibold text-[#11110a]">
                               {meta.label}
@@ -654,7 +702,9 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                                 : 'bg-gray-100 text-gray-700 hover:bg-gray-100'
                             }`}
                           >
-                            {meta.label && meta.label !== meta.code ? `${meta.code} - ${meta.label}` : meta.code}
+                            {meta.badgeClass ? 
+                              (meta.label && meta.label !== meta.code ? `${meta.code} - ${meta.label}` : meta.code)
+                              : meta.label}
                           </Badge>
                         );
                       })}
@@ -664,7 +714,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   {/* Ingredients */}
                   {product.ingredients && product.ingredients.length > 0 && (
                     <div className="space-y-2 w-full">
-                      <h3 className="text-sm font-semibold text-[#11110a]">Bahan-bahan</h3>
+                      <h3 className="text-sm font-semibold text-[#11110a]">Ingredients:</h3>
                       <div className="flex flex-wrap gap-1.5 w-full max-w-full">
                         {product.ingredients.map((ingredient, index) => (
                           <Badge 
