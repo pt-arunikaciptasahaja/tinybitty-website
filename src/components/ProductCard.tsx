@@ -84,9 +84,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     if (name.includes('choco almond')) return 4.9;
     if (name.includes('soursop') || name.includes('sirsak')) return 4.8;
     if (name.includes('macaroni')) return 4.8;
+    if (name.includes('cheese-filled')) return 5.0;
+    if (name.includes('vegan')) return 4.8;
     
     // Other products have slightly lower ratings
-    return 4.5;
+    return 4.9;
   }, [product.name]);
 
   const productSales = useMemo(() => {
@@ -101,10 +103,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     if (name.includes('chocolate')) return '156+';
     if (name.includes('vanilla')) return '134+';
     if (name.includes('strawberry')) return '98+';
-    if (name.includes('cheese')) return '167+';
+    if (name.includes('cheese')) return '197+';
     if (name.includes('orange')) return '112+';
     if (name.includes('apple')) return '87+';
     if (name.includes('mango')) return '143+';
+    if (name.includes('white')) return '148+';
     
     // Fallback for any other products
     return '75+';

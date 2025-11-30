@@ -24,8 +24,8 @@ const banners: Banner[] = [
   },
   {
     id: 'promo-2',
-    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764347726/yupp-generated-image-826819_1_zetrna.jpg',
-    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764347726/yupp-generated-image-826819_1_zetrna.jpg',
+    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
+    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
     alt: 'Special Offer Banner'
   },
   {
