@@ -777,7 +777,7 @@ export default function OrderForm() {
 
   return (
 <section id="order" className="mb-12 md:mb-16 py-16 order-form-texture rounded-3xl">
-  <div className="container mx-auto px-4 max-w-none">
+  <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
     <Card className="border-2 border-[#D8CFF7]/40 shadow-2xl rounded-3xl overflow-hidden w-full md:w-1/2 md:mx-auto">
       <CardHeader className="bg-[#F6F2FF] border-b border-[#D8CFF7]/40">
         <CardTitle className="text-2xl font-bold text-[#5D4E8E] flex items-center gap-2">

@@ -3,6 +3,7 @@ import Hero from './Hero';
 import RunningText from './RunningText';
 import ProductSection from './ProductSection';
 import PromoBanner from './PromoBanner';
+import Testimonials from './Testimonials';
 import HowToOrder from './HowToOrder';
 import OrderForm from './OrderForm';
 import Footer from './Footer';
@@ -77,6 +78,8 @@ export default function Home() {
       
 
       <HowToOrder />
+
+      <Testimonials />
 
       <OrderForm />
 
