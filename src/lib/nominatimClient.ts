@@ -27,9 +27,6 @@ const NOMINATIM_BASE_URL = 'https://nominatim.openstreetmap.org/search';
 const RATE_LIMIT_DELAY = 1000; // 1 second
 let lastRequestTime = 0;
 
-// Debounce timer for input
-let debounceTimer: NodeJS.Timeout | null = null;
-
 /**
  * Calculate time to wait until next request is allowed
  */
@@ -86,11 +83,13 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
 
     const response = await fetch(searchUrl, {
       headers: {
-        'User-Agent': 'tinybitty-location-search/1.0 (contact: your-email@example.com)',
+        // 'User-Agent': 'tinybitty-location-search/1.0 (contact: your-email@example.com)',
         'Accept-Language': 'id,en',
       },
       signal: controller.signal
     });
+
+    // const response = await fetch(searchUrl, { signal: controller.signal });
 
     clearTimeout(timeoutId);
 
