@@ -7,6 +7,7 @@ import { useCart } from '@/contexts/CartContext';
 import { buildWhatsAppMessage, sendWhatsAppOrder } from '@/lib/whatsapp';
 import { calculateShippingCost } from '@/lib/shippingService';
 import { calculateDeliveryCost, formatDeliveryCost } from '@/lib/deliveryCalculator';
+import { calculateDeliveryCostWithDistance } from '@/lib/shipping/fastCalculate';
 import { fbPixelTrack } from '@/lib/fbpixel';
 import { downloadInvoicePDF } from '@/lib/invoiceGenerator';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,48 @@ import { DistanceResult } from '@/lib/nominatimClient';
 import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText, UserRoundPen, Smartphone, WalletCards, NotebookPen } from 'lucide-react';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
+
+// Helper function to format cost ranges like "Rp 45K - Rp 55K"
+const formatCostRange = (formattedCost: string): string => {
+  // Handle Indonesian number format (thousands separated by dots)
+  const costMatch = formattedCost.match(/[\d.]+/g);
+  if (costMatch && costMatch.length > 0) {
+    // Take the first number found and remove dots for thousands separator
+    const costStr = costMatch[0].replace(/\./g, '');
+    const cost = parseInt(costStr);
+    
+    // Skip if parsing failed or cost is 0
+    if (isNaN(cost) || cost <= 0) {
+      return formattedCost;
+    }
+    
+    // Check if cost has the buffer (costs with buffer are >= 11000)
+    let baseCost: number;
+    if (cost >= 11000) {
+      baseCost = cost - 10000; // Remove the 10K buffer
+    } else {
+      // If cost is small (< 11000), it's likely the base cost already
+      // For very small costs, add a reasonable buffer for estimation
+      baseCost = Math.max(0, Math.floor(cost * 0.8));
+    }
+    
+    // Convert to thousands format for cleaner display
+    const formatThousands = (amount: number) => {
+      if (amount >= 1000) {
+        return `Rp ${Math.round(amount / 1000)}K`;
+      }
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0
+      }).format(amount);
+    };
+    
+    return `${formatThousands(baseCost)} - ${formatThousands(cost)}`;
+  }
+  return formattedCost;
+};
 
 const getETA = (method: string): string => {
   switch (method.toLowerCase()) {
@@ -120,6 +163,7 @@ export default function OrderForm() {
     form.setValue('address', result.destination.label);
     
     // Store distance for delivery calculations
+    // This distance will be used instead of parsing from zone names in delivery calculations
     setDeliveryDistance(result.distanceKm);
     
     // Reset delivery calculation since address changed
@@ -180,11 +224,55 @@ export default function OrderForm() {
     
     try {
       // console.log('🚚 [SHIPPING CALCULATOR] Attempting primary calculation...');
-      // Use the existing ongkir calculation logic
+      
+      // FAST PATH: Use direct distance if available (much faster, no API calls)
+      if (deliveryDistance && deliveryDistance > 0) {
+        const calculation = await calculateDeliveryCostWithDistance(deliveryDistance, method);
+        const formattedCost = new Intl.NumberFormat('id-ID', {
+          style: 'currency',
+          currency: 'IDR',
+          minimumFractionDigits: 0,
+          maximumFractionDigits: 0
+        }).format(calculation.cost);
+        
+        const estimatedTime = getETA(method);
+        
+        const info = {
+          cost: calculation.cost,
+          zone: calculation.zone.name,
+          time: estimatedTime,
+          formattedCost: formattedCost,
+          isValid: true
+        };
+        setDeliveryInfo(info);
+        
+        // Check if GoSend/Grab delivery is not available due to distance > 40km
+        const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
+        if (isGoSendGrabMethod && deliveryDistance > 40) {
+          setDeliveryInfo(null);
+          setHasCompletedDeliveryCalculation(false);
+          setIsDistanceTooFar(true);
+
+          
+          toast({
+            title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
+            description: `Jarak pengiriman ~${deliveryDistance.toFixed(1)}km melebihi batas 40km. Gunakan Paxel untuk pengiriman.`,
+            variant: 'default',
+          });
+          calculationSuccess = false;
+        } else {
+          calculationSuccess = true;
+          setHasCompletedDeliveryCalculation(true);
+        }
+        
+        return;
+      }
+      
+      // SLOW PATH: Fallback to API-based calculation when no direct distance
       const calculation = await calculateShippingCost(address, method, cart);
       
       if (!calculation.isValidAddress) {
-        console.log('[SHIPPING CALCULATOR] Primary calculation failed: Invalid address');
+
         const info = {
           cost: 0,
           zone: '',
@@ -200,10 +288,13 @@ export default function OrderForm() {
       
       // console.log('[SHIPPING CALCULATOR] Primary calculation successful:', calculation);
       
-      // Extract distance from zone name
-      const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
-      const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
-      setDeliveryDistance(distance);
+      // Use the distance from address search if available, otherwise extract from zone name
+      let distance = deliveryDistance;
+      if (!distance) {
+        const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+        distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+        setDeliveryDistance(distance);
+      }
       
       // Check if any GoSend/Grab method is selected and distance > 40km
       const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
@@ -214,7 +305,7 @@ export default function OrderForm() {
         setDeliveryInfo(null);
         setHasCompletedDeliveryCalculation(false);
         setIsDistanceTooFar(true);
-        console.log('[SHIPPING CALCULATOR] GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { method, distance });
+
         
         // Show toast notification about Paxel alternative
         toast({
@@ -252,16 +343,64 @@ export default function OrderForm() {
         // console.log('[SHIPPING CALCULATOR] Delivery info set:', info);
       }
     } catch (error) {
-      console.log('[SHIPPING CALCULATOR] Primary calculation error:', error);
+
       try {
         // console.log('[SHIPPING CALCULATOR] Attempting fallback calculation...');
+        
+        // FAST PATH: Use direct distance if available in fallback too
+        if (deliveryDistance && deliveryDistance > 0) {
+          const fallbackCalculation = await calculateDeliveryCostWithDistance(deliveryDistance, method);
+          const formattedCost = new Intl.NumberFormat('id-ID', {
+            style: 'currency',
+            currency: 'IDR',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+          }).format(fallbackCalculation.cost);
+          
+          const estimatedTime = getETA(method);
+          
+          const info = {
+            cost: fallbackCalculation.cost,
+            zone: fallbackCalculation.zone.name,
+            time: estimatedTime,
+            formattedCost: formattedCost,
+            isValid: true
+          };
+          setDeliveryInfo(info);
+          
+          // Check if GoSend/Grab delivery is not available due to distance > 40km
+          const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
+          if (isGoSendGrabMethod && deliveryDistance > 40) {
+            setDeliveryInfo(null);
+            setHasCompletedDeliveryCalculation(false);
+            setIsDistanceTooFar(true);
+  
+            
+            toast({
+              title: 'Maaf layanan ini tidak tersedia untuk gojek/grab',
+              description: `Jarak pengiriman ~${deliveryDistance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
+              variant: 'default',
+            });
+            calculationSuccess = false;
+          } else {
+            calculationSuccess = true;
+            setHasCompletedDeliveryCalculation(true);
+          }
+          
+          return;
+        }
+        
+        // SLOW PATH: Fallback to the old delivery calculator
         const fallbackCalculation = calculateDeliveryCost(address, method, cart, getTotalPrice());
         
         // Check for distance limit exceeded (for all GoSend/Grab methods) in fallback too
         const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
-        const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
-        const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
-        setDeliveryDistance(distance);
+        let distance = deliveryDistance;
+        if (!distance) {
+          const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+          distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+          setDeliveryDistance(distance);
+        }
         
         // Check if GoSend/Grab delivery is not available due to distance > 40km
         if (isGoSendGrabMethod && distance > 40) {
@@ -269,7 +408,7 @@ export default function OrderForm() {
           setDeliveryInfo(null);
           setHasCompletedDeliveryCalculation(false);
           setIsDistanceTooFar(true);
-          console.log('[SHIPPING CALCULATOR] Fallback: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { method, distance });
+
           
           // Show toast notification about Paxel alternative
           toast({
@@ -401,6 +540,44 @@ export default function OrderForm() {
           let calculationSuccess = false;
           
           try {
+            // FAST PATH: Use direct distance if available (much faster, no API calls)
+            if (deliveryDistance && deliveryDistance > 0) {
+              const calculation = await calculateDeliveryCostWithDistance(deliveryDistance, deliveryMethod);
+              const formattedCost = new Intl.NumberFormat('id-ID', {
+                style: 'currency',
+                currency: 'IDR',
+                minimumFractionDigits: 0,
+                maximumFractionDigits: 0
+              }).format(calculation.cost);
+              
+              const estimatedTime = getETA(deliveryMethod);
+              
+              const info = {
+                cost: calculation.cost,
+                zone: calculation.zone.name,
+                time: estimatedTime,
+                formattedCost: formattedCost,
+                isValid: true
+              };
+              setDeliveryInfo(info);
+              
+              // Check if GoSend/Grab delivery is not available due to distance > 40km
+              const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
+              if (isGoSendGrabMethod && deliveryDistance > 40) {
+                setDeliveryInfo(null);
+                setHasCompletedDeliveryCalculation(false);
+                setIsDistanceTooFar(true);
+
+                calculationSuccess = false;
+              } else {
+                calculationSuccess = true;
+                setHasCompletedDeliveryCalculation(true);
+              }
+              
+              return;
+            }
+            
+            // SLOW PATH: Fallback to API-based calculation when no direct distance
             const calculation = await calculateShippingCost(fullAddress, deliveryMethod, cart);
             
             if (!calculation.isValidAddress) {
@@ -417,10 +594,13 @@ export default function OrderForm() {
               return;
             }
             
-            // Extract distance from calculation result
-            const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
-            const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
-            setDeliveryDistance(distance);
+            // Use the distance from address search if available, otherwise extract from zone name
+            let distance = deliveryDistance;
+            if (!distance) {
+              const distanceMatch = calculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+              distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+              setDeliveryDistance(distance);
+            }
             
             // Check if GoSend/Grab delivery is not available due to distance > 40km
             const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
@@ -428,7 +608,7 @@ export default function OrderForm() {
               setDeliveryInfo(null);
               setHasCompletedDeliveryCalculation(false);
               setIsDistanceTooFar(true);
-              console.log('🟠 [CALC] Debounced: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { deliveryMethod, distance });
+
               calculationSuccess = false;
             } else {
               const formattedCost = new Intl.NumberFormat('id-ID', {
@@ -460,19 +640,60 @@ export default function OrderForm() {
             }
           } catch (error) {
             try {
+              // FAST PATH: Use direct distance if available in fallback too
+              if (deliveryDistance && deliveryDistance > 0) {
+                const fallbackCalculation = await calculateDeliveryCostWithDistance(deliveryDistance, deliveryMethod);
+                const formattedCost = new Intl.NumberFormat('id-ID', {
+                  style: 'currency',
+                  currency: 'IDR',
+                  minimumFractionDigits: 0,
+                  maximumFractionDigits: 0
+                }).format(fallbackCalculation.cost);
+                
+                const estimatedTime = getETA(deliveryMethod);
+                
+                const info = {
+                  cost: fallbackCalculation.cost,
+                  zone: fallbackCalculation.zone.name,
+                  time: estimatedTime,
+                  formattedCost: formattedCost,
+                  isValid: true
+                };
+                setDeliveryInfo(info);
+                
+                // Check if GoSend/Grab delivery is not available due to distance > 40km
+                const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
+                if (isGoSendGrabMethod && deliveryDistance > 40) {
+                  setDeliveryInfo(null);
+                  setHasCompletedDeliveryCalculation(false);
+                  setIsDistanceTooFar(true);
+
+                  calculationSuccess = false;
+                } else {
+                  calculationSuccess = true;
+                  setHasCompletedDeliveryCalculation(true);
+                }
+                
+                return;
+              }
+              
+              // SLOW PATH: Fallback to the old delivery calculator
               const fallbackCalculation = calculateDeliveryCost(fullAddress, deliveryMethod, cart, getTotalPrice());
               
-              // Check distance in fallback calculation too
-              const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
-              const distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
-              setDeliveryDistance(distance);
+              // Use the distance from address search if available, otherwise extract from zone name
+              let distance = deliveryDistance;
+              if (!distance) {
+                const distanceMatch = fallbackCalculation.zone.name.match(/(\d+\.?\d*)\s*km/i);
+                distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
+                setDeliveryDistance(distance);
+              }
               
               const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
               if (isGoSendGrabMethod && distance > 40) {
                 setDeliveryInfo(null);
                 setHasCompletedDeliveryCalculation(false);
                 setIsDistanceTooFar(true);
-                console.log('🟠 [CALC] Fallback: GoSend/Grab delivery not available due to distance - showing Paxel alternative:', { deliveryMethod, distance });
+
                 calculationSuccess = false;
               } else {
                 const info = {
@@ -595,7 +816,7 @@ export default function OrderForm() {
         orderData, 
         cart, 
         orderTotal, 
-        deliveryInfo?.cost || 0, 
+        0, // Exclude ongkir cost since it's estimated and will be confirmed via WhatsApp
         getDeliveryMethodLabel(deliveryMethod || '')
       );
       
@@ -647,7 +868,7 @@ export default function OrderForm() {
 
     // console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
     
-    const message = buildWhatsAppMessage(orderData, cart, orderTotal, deliveryInfo?.cost || 0, isDistanceTooFar, deliveryDistance);
+    const message = buildWhatsAppMessage(orderData, cart, orderTotal, 0, isDistanceTooFar, deliveryDistance);
     
     sendWhatsAppOrder(message, WHATSAPP_NUMBER);
     
@@ -937,6 +1158,7 @@ export default function OrderForm() {
                       <FormControl>
                         <AddressSearchInput
                           onSelect={(result) => {
+                            console.log("result: ", result)
                             // Store the selected address in form
                             form.setValue('address', result.destination.label);
                             
@@ -1202,7 +1424,7 @@ export default function OrderForm() {
                       Estimasi Jarak
                     </div>
                     <div className="text-[#8978B4] font-medium">
-                      {`±${deliveryInfo.zone}`}
+                      {`${deliveryInfo.zone}`}
                     </div>
                   </div>
                 </div>
@@ -1234,7 +1456,7 @@ export default function OrderForm() {
                       Perkiraan Ongkir
                     </div>
                     <div className="text-white font-bold text-lg">
-                      {deliveryInfo.formattedCost}
+                      {formatCostRange(deliveryInfo.formattedCost)}
                     </div>
                   </div>
                 </div>
@@ -1243,8 +1465,7 @@ export default function OrderForm() {
 
             {/* Note: ongkir masih perkiraan */}
             <p className="text-xs md:text-sm text-[#8978B4] bg-white/60 rounded-lg px-3 py-2 border border-[#BFAAE3]/20">
-              Ongkir final mengikuti aplikasi GoSend/GrabExpress/Paxel
-              (belum termasuk tol/parkir/tip).
+              💡 <strong>Rentang perkiraan ongkir:</strong> {formatCostRange(deliveryInfo.formattedCost)} (harga final mengikuti aplikasi kurir)
             </p>
           </>
         ) : isCalculatingDelivery ? (
@@ -1470,7 +1691,7 @@ export default function OrderForm() {
           <div className="flex justify-between text-sm">
             <span className="text-[#8978B4]">Perkiraan Ongkir</span>
             <span className="font-medium text-[#5D4E8E]">
-              {deliveryInfo.formattedCost}
+              {formatCostRange(deliveryInfo.formattedCost)}
             </span>
           </div>
         ) : deliveryMethod === 'paxel' ? (
@@ -1757,28 +1978,26 @@ export default function OrderForm() {
                   <div className="flex justify-between text-sm">
                     <span className="text-[#8978B4]">Perkiraan Ongkir</span>
                     <span className="text-[#5D4E8E]">
-                      Rp {deliveryInfo.cost.toLocaleString('id-ID')}
-                    </span>
-                  </div>
-                  <div className="border-t border-[#D8CFF7]/40 pt-2">
-                    <div className="flex justify-between font-bold text-lg">
-                      <span className="text-[#5D4E8E]">Total Pembayaran</span>
-                      <span className="text-[#BFAAE3]">
-                        Rp {(getTotalPrice() + deliveryInfo.cost).toLocaleString('id-ID')}
-                      </span>
-                    </div>
-                  </div>
-                </>
-              ) : deliveryMethod === 'paxel' ? (
-                <>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-                    <span className="text-[#5D4E8E]">
-                      Konfirmasi via WhatsApp
+                      {formatCostRange(deliveryInfo.formattedCost)}
                     </span>
                   </div>
                 </>
-              ) : ""}
+              ) : (
+                <div className="flex justify-between text-sm">
+                  <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+                  <span className="text-[#5D4E8E]">
+                    Konfirmasi via WhatsApp
+                  </span>
+                </div>
+              )}
+              {/* <div className="border-t border-[#D8CFF7]/40 pt-2">
+                <div className="flex justify-between font-bold text-lg">
+                  <span className="text-[#5D4E8E]">Total Produk (Ongkir akan dikonfirmasi via WhatsApp)</span>
+                  <span className="text-[#BFAAE3]">
+                    Rp {getTotalPrice().toLocaleString('id-ID')}
+                  </span>
+                </div>
+              </div> */}
             </div>
           </div>
 

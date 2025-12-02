@@ -287,10 +287,10 @@ export default function CartSheet({ children }: CartSheetProps) {
 
                         <div className="flex items-center justify-between border-t border-[#D8CFF7]/40 pt-2 mt-2">
                           <span className="font-semibold text-[#5D4E8E]">
-                            Perkiraan total
+                            Total produk (Ongkir dikonfirmasi via WhatsApp)
                           </span>
                           <span className="font-bold text-[#A088D9]">
-                            Rp {total.toLocaleString('id-ID')}
+                            Rp {getTotalPrice().toLocaleString('id-ID')}
                           </span>
                         </div>
 

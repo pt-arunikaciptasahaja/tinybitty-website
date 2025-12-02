@@ -228,6 +228,33 @@ function toRadians(degrees: number): number {
 }
 
 /**
+ * Enhanced distance calculation with road-based option
+ */
+export async function calculateDistanceWithRoadOption(
+  origin: LatLng, 
+  destination: LatLng,
+  useRoadDistance: boolean = false
+): Promise<number> {
+  if (!useRoadDistance) {
+    return calculateDistanceKm(origin, destination);
+  }
+  
+  try {
+    // Import dynamically to avoid circular dependencies
+    const { calculateRoadDistance } = await import('./roadRouting');
+    const roadDistance = await calculateRoadDistance(destination, {
+      excludeTolls: true,
+      fallbackToHaversine: true
+    });
+    
+    return roadDistance || calculateDistanceKm(origin, destination);
+  } catch (error) {
+    console.warn('[NOMINATIM] Road distance calculation failed, falling back to Haversine:', error);
+    return calculateDistanceKm(origin, destination);
+  }
+}
+
+/**
  * Get the fixed origin coordinates
  */
 export function getOrigin(): LatLng {
