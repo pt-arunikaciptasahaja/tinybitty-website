@@ -39,30 +39,30 @@ interface TestimonialsProps {
 const customTestimonials: CustomTestimonial[] = [
   {
     id: '1',
-    name: 'Sarah Wijaya',
-    handle: '@sarah_wijaya',
-    text: 'Cookiesnya enak banget, anakku langsung rebutan 😅 Manisnya pas, dan teksturnya tuh bikin nagih. Buat bekal sekolah juga aman.',
+    name: 'Danielle Mottoh',
+    handle: '@dani_elle',
+    text: "Cookiesnya enak banget… rasanya comforting gitu loh 😭✨ Abis lari pagi cici bawa ke kantor, buka laptop bentar doang, eh udah abis aja. Cici manja approved! 🤌💼💖",
     rating: 5,
     product: 'Heavenly Bites',
-    avatar: 'https://images.unsplash.com/photo-1494790108755-2616b612b786?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764689287/WhatsApp_Image_2025-12-02_at_22.26.08_ftryfk.jpg'
   },
   {
     id: '2', 
-    name: 'Budi Santoso',
-    handle: '@budi_santoso',
-    text: 'Cookiesnya enak parah sih… crunchy tapi dalemnya masih lembut. Dimakan sambil nonton drama langsung habis 😭🔥',
+    name: 'Fajar Tri S',
+    handle: '@kapten_kawan',
+    text: "Cookiesnya enak parah sih… crunchy di luar, lembut di dalem. Dimakan sambil nyetem gitar langsung auto-ludes 😭🔥 Rasanya tuh kayak chord yang pas—nggak perlu mikir, tinggal nikmatin.",
     rating: 5,
     product: 'Choco Almond',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face'
+    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687494/1688027213818_r7plzv.jpg'
   },
   {
     id: '3',
-    name: 'Maya Putri',
-    handle: '@maya_putri',
-    text: 'Juice-nya seger banget, kerasa buah asli. Aku suka minum pagi-pagi biar melek, dan anakku juga doyan. Win-win banget.',
+    name: 'Al Saputra',
+    handle: '@al_saputra',
+    text: 'Juice-nya seger banget, mau dijadiin pre-run boost atau recovery abis lari juga masuk banget. Bikin badan auto-ready buat ngegas pace 5 🤙',
     rating: 5,
-    product: 'Mixed Berry Juice',
-    avatar: 'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop&crop=face'
+    product: 'Strawberry Juice',
+    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687574/1718872032695_aea6ym.jpg'
   }
 ];
 
@@ -113,7 +113,15 @@ const InstagramEmbed = ({ url, caption, className = '' }: InstagramEmbedProps) =
             if (embedRef.current) {
               const iframes = embedRef.current.querySelectorAll('iframe');
               iframes.forEach((iframe: any) => {
-                iframe.style.height = '794px';
+                // Set responsive height based on screen size
+                const screenWidth = window.innerWidth;
+                let height = '794px';
+                if (screenWidth >= 1024) {
+                  height = '680px';
+                } else if (screenWidth >= 768) {
+                  height = '950px';
+                }
+                iframe.style.height = height;
                 iframe.style.width = '100%';
               });
             }
@@ -128,7 +136,15 @@ const InstagramEmbed = ({ url, caption, className = '' }: InstagramEmbedProps) =
         if (embedRef.current) {
           const iframes = embedRef.current.querySelectorAll('iframe');
           iframes.forEach((iframe: any) => {
-            iframe.style.height = '794px';
+            // Set responsive height based on screen size
+            const screenWidth = window.innerWidth;
+            let height = '794px';
+            if (screenWidth >= 1024) {
+              height = '680px';
+            } else if (screenWidth >= 768) {
+              height = '950px';
+            }
+            iframe.style.height = height;
             iframe.style.width = '100%';
           });
         }
@@ -168,6 +184,29 @@ const InstagramEmbed = ({ url, caption, className = '' }: InstagramEmbedProps) =
             height: 100% !important;
             max-width: 100% !important;
             min-height: 794px !important;
+          }
+          /* Desktop view - increase height */
+          @media (min-width: 768px) {
+            .instagram-embed-container {
+              height: 950px !important;
+            }
+            .instagram-media {
+              height: 950px !important;
+            }
+            .instagram-media iframe {
+              min-height: 950px !important;
+            }
+          }
+          @media (min-width: 1024px) {
+            .instagram-embed-container {
+              height: 680px !important;
+            }
+            .instagram-media {
+              height: 680px !important;
+            }
+            .instagram-media iframe {
+              min-height: 680px !important;
+            }
           }
           @media (max-width: 640px) {
             .instagram-media {
@@ -371,12 +410,12 @@ export default function Testimonials({ className = '' }: TestimonialsProps) {
 
             {/* Instagram Style Posts */}
             <div>
-              <h3 className="text-2xl font-semibold text-[#553d8f] mb-8 text-center">
+              {/* <h3 className="text-2xl font-semibold text-[#553d8f] mb-8 text-center" style={{ fontFamily: "'Josefin Slab', serif" }}>
                 From Our Instagram
-              </h3>
+              </h3> */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-1 md:gap-6 px-1 md:px-0 max-w-full overflow-hidden">
                 {instagramTestimonials.map((instagram) => (
-                  <div key={instagram.id} className="flex h-full min-h-[800px] w-full">
+                  <div key={instagram.id} className="flex h-full min-h-[680px] md:min-h-[950px] lg:min-h-[680px] w-full">
                     <InstagramPostCard instagram={instagram} />
                   </div>
                 ))}

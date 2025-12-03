@@ -567,14 +567,14 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
         >
           {!hasItemInCart ? (
             /* Show Beli button when not in cart */
-            <div className="w-full">
+            <div className="w-full h-10 md:h-12 flex items-center justify-center">
               <Button
                 onClick={(e) => {
                   handleAddToCart();
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="w-full rounded-full px-3 md:px-8 py-1 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+                className="w-full rounded-full px-3 md:px-8 py-1 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap h-full flex items-center justify-center"
               >
                 {isAdding ? (
                   <span className="flex items-center justify-center gap-1.5">
@@ -590,7 +590,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             </div>
           ) : (
             /* Show quantity controls when in cart */
-            <div className="flex items-center justify-center gap-3">
+            <div className="w-full h-10 md:h-12 flex items-center justify-center gap-3">
               <Button
                 variant="outline"
                 size="icon"
@@ -599,11 +599,11 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-6 w-6 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10 flex items-center justify-center"
               >
                 <Minus className="w-3 h-3 md:w-4 md:h-4" />
               </Button>
-              <span className="text-base font-semibold w-6 text-center">
+              <span className="text-base font-semibold w-8 text-center min-w-[2rem]">
                 {quantity}
               </span>
               <Button
@@ -614,7 +614,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   e.stopPropagation();
                 }}
                 disabled={isAdding}
-                className="h-6 w-6 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10"
+                className="h-8 w-8 md:h-10 md:w-10 rounded-full border-[#a3e2f5]/40 hover:bg-[#a3e2f5]/10 flex items-center justify-center"
               >
                 <Plus className="w-3 h-3 md:w-4 md:h-4" />
               </Button>

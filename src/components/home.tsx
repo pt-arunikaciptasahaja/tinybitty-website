@@ -5,6 +5,7 @@ import ProductSection from './ProductSection';
 import PromoBanner from './PromoBanner';
 import Testimonials from './Testimonials';
 import HowToOrder from './HowToOrder';
+import HampersSection from './HampersSection';
 import OrderForm from './OrderForm';
 import Footer from './Footer';
 import productsData from '@/data/products.json';
@@ -75,7 +76,7 @@ export default function Home() {
         />
       </main>
 
-      
+      <HampersSection />
 
       <HowToOrder />
 
