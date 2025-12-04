@@ -48,7 +48,7 @@ const bottomImages = [
 
 export default function RunningText() {
   return (
-    <div className="overflow-hidden py-3 md:py-6 mb-4 md:mb-6 rounded-xl bg-[#f5f7f7]">
+    <div className="overflow-hidden py-3 md:py-6 mb-4 md:mb-6 rounded-xl bg-[#f7f7f7]">
       {/* LEFT → RIGHT */}
       <Marquee
         items={upperText}
@@ -111,7 +111,7 @@ function Block({ items, size, className, onImageClick }: any) {
             <button
               key={i}
               onClick={onImageClick}
-              className="w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white shadow-lg flex-shrink-0 bg-white p-1 hover:shadow-xl hover:scale-105 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-[#C5B8FF] focus:ring-offset-2 cursor-pointer"
+              className="w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white flex-shrink-0 bg-white p-1 hover:shadow-xl duration-300 focus:outline-none focus:ring-2 focus:ring-[#C5B8FF] focus:ring-offset-2 cursor-pointer"
               aria-label={`Lihat hamper ${i + 1}`}
             >
               <img

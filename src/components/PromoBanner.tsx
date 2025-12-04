@@ -16,12 +16,12 @@ interface Banner {
 }
 
 const banners: Banner[] = [
-  {
-    id: 'promo-1',
-    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764293161/desktop_plkknz.png',
-    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764293160/mobile_isfqyp.png',
-    alt: 'Promo Banner'
-  },
+  // {
+  //   id: 'promo-1',
+  //   desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764293161/desktop_plkknz.png',
+  //   mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764293160/mobile_isfqyp.png',
+  //   alt: 'Promo Banner'
+  // },
   {
     id: 'promo-2',
     desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
@@ -34,12 +34,12 @@ const banners: Banner[] = [
     mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
     alt: 'New Collection Banner'
   },
-  {
-    id: 'promo-4',
-    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
-    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
-    alt: 'New Collaboration Banner'
-  }
+  // {
+  //   id: 'promo-4',
+  //   desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
+  //   mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764489656/yupp-generated-image-510684_1_w9xhx1.jpg',
+  //   alt: 'New Collaboration Banner'
+  // }
   // Future banners will be added here
 ];
 
@@ -91,7 +91,7 @@ export default function PromoBanner() {
             <CarouselContent>
               {banners.map((banner) => (
                 <CarouselItem key={banner.id}>
-                  <div className="relative w-full rounded-lg overflow-hidden shadow-lg">
+                  <div className="relative w-full rounded-2xl overflow-hidden shadow-lg">
                     {/* Desktop Image */}
                     <img
                       src={banner.desktopImage}
@@ -138,8 +138,8 @@ export default function PromoBanner() {
             {/* Show navigation buttons only if there are multiple banners */}
             {banners.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 bg-gradient-to-r from-purple-200 to-purple-300 hover:from-purple-300 hover:to-purple-400 border-purple-200 shadow-sm hidden md:flex" />
-                <CarouselNext className="right-2 bg-gradient-to-r from-purple-200 to-purple-300 hover:from-purple-300 hover:to-purple-400 border-purple-200 shadow-sm hidden md:flex" />
+                <CarouselPrevious className="left-2 bg-[#fff] hover:bg-[#f7f7f7] border-[#fff] shadow-sm hidden md:flex" />
+                <CarouselNext className="right-2 bg-[#fff] hover:bg-[#f7f7f7] border-[#fff] shadow-sm hidden md:flex" />
               </>
             )}
           </Carousel>
@@ -156,7 +156,7 @@ export default function PromoBanner() {
                   }}
                   className={`rounded-full transition-all duration-500 ${
                     index === currentBanner 
-                      ? 'bg-gradient-to-r from-purple-200 to-purple-300 w-8 h-2 shadow-sm' 
+                      ? 'bg-[#553d8f] w-8 h-2 shadow-sm' 
                       : 'bg-purple-100 hover:bg-purple-200 w-2 h-2 hover:w-6'
                   }`}
                   aria-label={`Go to banner ${index + 1}`}

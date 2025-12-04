@@ -26,6 +26,7 @@ import {
 import { useToast } from '@/components/ui/use-toast';
 import { Plus, Minus, Check, Star } from 'lucide-react';
 import { fbPixelTrack } from '@/lib/fbpixel';
+import SnowAnimation from './SnowAnimation';
 
 // Seasonal hamper data with Christmas theme
 const seasonalHampers = [
@@ -276,7 +277,7 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
   return (
     <>
       <Card
-        className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden mx-auto min-h-[494.5px] max-h-[600px]`}
+        className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-3 md:p-4transition-shadow duration-300 overflow-hidden mx-auto min-h-[494.5px] max-h-[600px]`}
         style={{ width: '281.96px' }}
         onClick={(e) => {
           // Prevent all clicks from bubbling up to carousel or other components
@@ -294,19 +295,11 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
             style={{ backgroundImage: `url(${hamper.image})` }}
           />
           <div className="absolute top-2 right-2">
-            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fff5f5] text-[#d26969] border border-[#ffd1d1] shadow-md backdrop-blur-sm">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-[#fff5f5] text-[#d26969] border shadow-md backdrop-blur-sm">
               {hamper.seasonal}
             </span>
           </div>
-        </div>
-
-        {/* BOTTOM: content section - Full featured */}
-        <div className="flex flex-col flex-1 space-y-2 md:space-y-3">
-          {/* Title with View Item button */}
-          <div className="flex items-center justify-between gap-2">
-            <h3 className="text-sm md:text-base font-bold text-[#11110a] truncate leading-tight flex-1">
-              {hamper.name}
-            </h3>
+          <div className="absolute bottom-2 left-2">
             <Button
               variant="ghost"
               size="sm"
@@ -314,11 +307,19 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                 setShowDetailModal(true);
                 e.stopPropagation();
               }}
-              className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-2 py-1 h-auto text-[11px] font-medium shrink-0"
+              className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-2 py-1 h-auto text-[11px] font-medium shrink-0 bg-white/90 backdrop-blur-sm border border-[#553d8f]/20 shadow-md"
             >
               Detail produk
             </Button>
           </div>
+        </div>
+
+        {/* BOTTOM: content section - Full featured */}
+        <div className="flex flex-col flex-1 space-y-2 md:space-y-3">
+          {/* Title */}
+          <h3 className="text-sm md:text-base font-bold text-[#11110a] truncate leading-tight">
+            {hamper.name}
+          </h3>
 
           {/* Price */}
           <div className="text-sm md:text-base font-semibold text-[#11110a]">
@@ -672,16 +673,17 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
 export default function HampersSection() {
   return (
     <section id="hampers-section" className="mb-6 md:mb-8 relative">
-      <div className="bg-[#D6E6D9] rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden">
+      <div className="bg-gradient-to-br from-[#E8F4FD] via-[#F0F8FF] to-[#F5F8FC] rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden border border-[#B3D9FF]/30">
+        <SnowAnimation />
         <div className="relative z-10">
           <div className="text-left mb-6 md:mb-8 relative z-10">
-            <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#1a4d3a] mb-3 modak-regular drop-shadow-lg">
+            <h3 className="text-3xl md:text-4xl lg:text-5xl font-bold text-[#553d8f] mb-3 modak-regular drop-shadow-lg">
               Tiny Bitty Hampers
             </h3>
-            <p className="text-base md:text-lg text-[#2d5a4a] mb-4 leading-relaxed max-w-2xl drop-shadow-sm">
+            <p className="text-base md:text-lg text-[#553d8f]/80 mb-4 leading-relaxed max-w-2xl drop-shadow-sm">
             Seasonal goodies wrapped with love—made for gifting, sharing, and enjoying cozy moments together.
             </p>
-            <div className="h-1 w-16 bg-gradient-to-r from-[#8fbc8f] to-[#6b8e6b] rounded-full"></div>
+            <div className="h-1 w-16 bg-gradient-to-r from-[#553d8f] to-[#8B7BD8] rounded-full"></div>
           </div>
 
           {/* Responsive Layout - Mobile: 50:50, Desktop: 36:64 */}
@@ -691,7 +693,7 @@ export default function HampersSection() {
             <div className="lg:col-span-4">
               <div className="aspect-square rounded-2xl overflow-hidden">
                 <img 
-                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1764770031/4719587_kzz7yl.jpg" 
+                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1764868823/girl-her-mother-enjoying-winter-activities_1_cfnexr.png" 
                   alt="Tiny Bitty Hampers Collection"
                   className="w-full h-full object-cover"
                 />

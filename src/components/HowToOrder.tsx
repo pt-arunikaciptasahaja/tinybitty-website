@@ -32,11 +32,11 @@ export default function HowToOrder() {
     return (
         <section
             id="how-to-order"
-            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 bg-gradient-to-br from-purple-50 to-[#553d8f]/10 how-to-order-texture rounded-3xl"
+            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-[#C5B8FF]/20 border"
         >
             <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-                <Card className="border-2 border-purple-200/60 shadow-2xl rounded-3xl overflow-hidden">
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-[#553d8f]/10 border-b border-purple-200/60">
+                <Card className="rounded-3xl overflow-hidden">
+                    <CardHeader className="bg-gradient-to-r from-purple-50 to-[#553d8f]/10">
                         <CardTitle className="text-2xl font-bold text-[#553d8f] flex items-center justify-center gap-2">
                         <CircleQuestionMark className="w-5 h-5 text-[#553d8f]" />
                             How to Order

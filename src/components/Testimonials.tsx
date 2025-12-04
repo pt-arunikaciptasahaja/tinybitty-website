@@ -387,9 +387,9 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
 export default function Testimonials({ className = '' }: TestimonialsProps) {
   return (
     <section id="testimonials"
-    className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 bg-gradient-to-br from-purple-50 to-[#553d8f]/10 testimonials-texture rounded-3xl">
+    className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-[#C5B8FF]/20 border">
       <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-        <Card className="border-2 border-purple-200/60 shadow-2xl rounded-3xl overflow-hidden">
+        <Card className="rounded-3xl overflow-hidden">
           <CardContent className="w-full max-w-none p-3 md:p-4 lg:p-6">
             {/* Section Header */}
             <div className="text-center mb-12">

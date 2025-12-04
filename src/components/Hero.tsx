@@ -7,7 +7,7 @@ export default function Hero() {
     <section className="mt-10 md:mt-30 mb-2 md:mb-4 pt-16 md:pt-32 pb-0">
       <div className="w-full max-w-[1400px] mx-auto px-0">
         <div
-          className="cookie-texture rounded-3xl p-4 md:p-8 lg:p-10 min-h-[140px] md:min-h-[320px] lg:min-h-[370px] overflow-hidden relative flex items-center justify-center bg-cover bg-center"
+          className="rounded-3xl p-4 md:p-8 lg:p-10 min-h-[140px] md:min-h-[320px] lg:min-h-[370px] overflow-hidden relative flex items-center justify-center bg-cover bg-center"
           style={{
             backgroundImage: 'url("https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787147/hero_upprpg_1_cvrvne.png")',
             backgroundSize: 'cover',

@@ -384,15 +384,15 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
   return (
     <Card
-      className={`flex flex-col border border-[#a3e2f5]/30 rounded-3xl bg-white p-2 md:p-4 shadow-md hover:shadow-lg transition-shadow duration-300 overflow-hidden ${className}`}
-      onClick={(e) => {
-        // Prevent all clicks from bubbling up to carousel or other components
-        e.stopPropagation();
-      }}
-      onMouseDown={(e) => {
-        // Prevent mouse events that might trigger unwanted interactions
-        e.stopPropagation();
-      }}
+      className={`flex flex-col rounded-3xl bg-white p-2 md:p-4 duration-300 overflow-hidden ${className}`}
+      // onClick={(e) => {
+      //   // Prevent all clicks from bubbling up to carousel or other components
+      //   e.stopPropagation();
+      // }}
+      // onMouseDown={(e) => {
+      //   // Prevent mouse events that might trigger unwanted interactions
+      //   e.stopPropagation();
+      // }}
     >
       {/* TOP: image section */}
       <div className="relative mb-2 md:mb-4 group">
@@ -405,26 +405,26 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             NEW
           </Badge>
         )}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={(e) => {
+            setShowImageModal(true);
+            e.stopPropagation();
+          }}
+          className="absolute bottom-2 right-2 text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-2 py-1 h-auto text-[11px] font-medium shadow-md bg-white/90 backdrop-blur-sm"
+        >
+          Detail produk
+        </Button>
       </div>
 
       {/* BOTTOM: content section */}
       <div className="flex flex-col flex-1 space-y-1 md:space-y-3">
-        {/* Title with View Item button */}
-        <div className="flex items-center justify-between gap-2">
+        {/* Title */}
+        <div className="flex items-center gap-2">
           <h3 className="text-xs md:text-base font-bold text-[#11110a] truncate leading-tight flex-1">
             {product.name}
           </h3>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={(e) => {
-              setShowImageModal(true);
-              e.stopPropagation();
-            }}
-            className="text-[#553d8f] hover:text-[#553d8f] hover:bg-[#553d8f]/10 px-1 py-0.5 h-auto text-[11px] font-medium shrink-0"
-          >
-            Detail produk
-          </Button>
         </div>
 
         {/* Price */}
@@ -551,7 +551,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             </Select>
           ) : (
             /* Plain text for single-size products (juice) */
-            <div className="flex items-center justify-center w-full h-6 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[10px] font-semibold">
+            <div className="flex items-center justify-center w-full h-8 rounded-full bg-[#D8CFF7] text-[#553d8f] text-[10px] font-semibold">
               {selectedVariant.size}
             </div>
           )}
