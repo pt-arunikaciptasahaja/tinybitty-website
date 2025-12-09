@@ -349,13 +349,13 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
             </ul>
           </div>
 
-          {/* Spacer to match height - invisible content for consistent layout */}
+          {/* Spacer to match height - cookie hampers have 3 items, juice has 4 */}
           {!isJuiceHamper && (
             <div className="h-6"></div>
           )}
 
           {/* Size section - Consistent height for all hampers */}
-          <div className="w-full h-10 md:h-10 flex items-center mb-2">
+          <div className={`w-full h-10 md:h-10 flex items-center mb-1 ${!isJuiceHamper ? 'mt-3' : ''}`}>
             {isJuiceHamper ? (
               /* Dropdown for multi-size products (juice hampers) */
               <Select
@@ -475,7 +475,7 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
 
           {/* Bottom: Conditional UI - Beli button or Quantity controls */}
           <div 
-            className="mt-auto pt-2"
+            className="mt-auto pt-0"
             onClick={(e) => {
               // Prevent button clicks from bubbling to other elements
               e.stopPropagation();
@@ -483,14 +483,14 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
           >
             {!hasItemInCart ? (
               /* Show Beli button when not in cart */
-              <div className="w-full">
+              <div className="w-full h-10 md:h-12 flex items-center justify-center">
                 <Button
                   onClick={(e) => {
                     handleAddToCart();
                     e.stopPropagation();
                   }}
                   disabled={isAdding || !currentPrice}
-                  className="w-full rounded-full px-4 md:px-6 py-2 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap"
+                  className="w-full rounded-full px-3 md:px-8 py-1 md:py-2.5 text-sm font-semibold bg-[#553d8f] hover:bg-[#553d8f] text-white shadow-md relative overflow-hidden whitespace-nowrap h-full flex items-center justify-center"
                 >
                   {isAdding ? (
                     <span className="flex items-center justify-center gap-1.5">
