@@ -4,6 +4,7 @@ import Home from "./components/home";
 import FAQPage from "./components/FAQPage";
 import IngredientsPage from "./components/IngredientsPage";
 import OurStoryPage from "./components/OurStoryPage";
+import NotFound from "./components/NotFound";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
@@ -16,6 +17,7 @@ function App() {
           <Route path="/faq" element={<FAQPage />} />
           <Route path="/ingredients" element={<IngredientsPage />} />
           <Route path="/our-story" element={<OurStoryPage />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
     </div>
