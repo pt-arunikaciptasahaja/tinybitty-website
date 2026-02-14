@@ -85,7 +85,7 @@ const HeroSection = () => {
         }}
       />
 
-      <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10 w-full h-full pt-16 md:pt-0">
+      <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10 w-full h-full pt-32 md:pt-0">
         {/* Left: Typography */}
         <div className="text-left max-w-2xl">
           <motion.p
