@@ -13,13 +13,14 @@ const scrollToHampersSection = () => {
 
 // const upperText = ["COOKIES ✨", "JUICE ✨", "MACARONI SCHOTEL ✨"];
 // Eid/Ramadan themed text
+// Eid/Ramadan themed text with stickers
 const upperText = [
-  "EID MUBARAK ✨",
-  "SWEET TREATS FOR RAMADAN 🌙",
-  "SHARE THE JOY OF EID 🕌",
-  "BITE-SIZED HAPPINESS 🍪",
-  "CELEBRATE WITH TINY BITTY ✨",
-  "RAMADAN SPECIALS 🎁"
+  { text: "EID MUBARAK", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker1_bgdbvs.jpg" },
+  { text: "SWEET TREATS FOR RAMADAN", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker2_fzyyfq.jpg" },
+  { text: "SHARE THE JOY OF EID", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker3_q0kfsb.jpg" },
+  { text: "BITE-SIZED HAPPINESS", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker1_bgdbvs.jpg" },
+  { text: "CELEBRATE WITH TINY BITTY", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker2_fzyyfq.jpg" },
+  { text: "RAMADAN SPECIALS", sticker: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker3_q0kfsb.jpg" }
 ];
 
 
@@ -103,9 +104,10 @@ function Marquee({ items, size, speed = 25, direction = "left", className }: any
 
 function Block({ items, size, className, onImageClick }: any) {
   return (
-    <div className="flex gap-8 md:gap-6 pr-8 md:pr-10">
-      {items.map((item: string, i: number) => {
-        const isImage = item.startsWith("http");
+    <div className="flex items-center gap-8 md:gap-6 pr-8 md:pr-10">
+      {items.map((item: any, i: number) => {
+        const isStringItem = typeof item === "string";
+        const isImage = isStringItem && item.startsWith("http");
 
         if (isImage) {
           return (
@@ -125,14 +127,26 @@ function Block({ items, size, className, onImageClick }: any) {
           );
         }
 
+        // Handle object items (text + sticker)
+        const text = isStringItem ? item : item.text;
+        const sticker = !isStringItem ? item.sticker : null;
+
         return (
-          <span
-            key={i}
-            className={`font-extrabold tracking-wider ${size} ${className || "text-secondary"}`}
-            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900 }}
-          >
-            {item}
-          </span>
+          <div key={i} className="flex items-center gap-4">
+            <span
+              className={`font-extrabold tracking-wider ${size} ${className || "text-secondary"}`}
+              style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900 }}
+            >
+              {text}
+            </span>
+            {sticker && (
+              <img
+                src={sticker}
+                alt="sticker"
+                className="w-10 h-10 md:w-16 md:h-16 rounded-full object-cover border-2 border-secondary/20 shadow-sm"
+              />
+            )}
+          </div>
         );
       })}
     </div>

@@ -151,27 +151,39 @@ export default function OurStoryPage() {
             <h2 className="heading-lg font-montserrat text-center mb-8">Our Values</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
-                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ChefHat className="w-6 h-6 text-white" />
+                <div className="mx-auto mb-4">
+                  <img
+                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker2_fzyyfq.jpg"
+                    alt="Artisanal"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                  />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Artisanal Craftsmanship</h4>
-                <p className="body-sm">Meticulously handcrafted in small batches with unwavering attention to detail</p>
+                <p className="body-sm">Handmade. Small batch. Precision in every bite.</p>
               </div>
 
               <div className="text-center">
-                <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Sparkle className="w-6 h-6 text-white" />
+                <div className="mx-auto mb-4">
+                  <img
+                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker1_bgdbvs.jpg"
+                    alt="Premium"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                  />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Premium Ingredients</h4>
-                <p className="body-sm">Sourced from trusted suppliers, ensuring exceptional taste and nutritional value</p>
+                <p className="body-sm">Fresh. Real. Carefully selected.</p>
               </div>
 
               <div className="text-center">
-                <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center mx-auto mb-4">
-                  <ArrowsUpFromLine className="w-6 h-6 text-white" />
+                <div className="mx-auto mb-4">
+                  <img
+                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker3_q0kfsb.jpg"
+                    alt="Delivery"
+                    className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                  />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Thoughtful Delivery</h4>
-                <p className="body-sm">Carefully packaged and delivered fresh to preserve quality and delight</p>
+                <p className="body-sm">Securely packed. Freshly delivered. Thoughtfully handled.</p>
               </div>
             </div>
           </div>

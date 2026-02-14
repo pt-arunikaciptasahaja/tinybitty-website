@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import FloatingCookie from "./FloatingCookie";
 import MagneticButton from "./ui/MagneticButton";
@@ -8,7 +8,7 @@ import heavenlyBites from "@/assets/cookie-heavenly-bites.png";
 import harvestHaven from "@/assets/cookie-harvest-haven.png";
 import desertCrown from "@/assets/cookie-desert-crown.png";
 
-const cookies = [
+const cookiesData = [
   {
     src: goldenCrunch,
     name: "Golden Crunch",
@@ -49,7 +49,17 @@ const cookies = [
 
 const HeroSection = () => {
   const [isPaused, setIsPaused] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const scrollToProducts = () => {
     const productsSection = document.getElementById('products');
@@ -80,8 +90,12 @@ const HeroSection = () => {
             )
           `,
           backgroundSize: "320px 100%",
-          WebkitMaskImage: "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
-          maskImage: "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
+          WebkitMaskImage: isMobile
+            ? "radial-gradient(circle at 50% 35%, transparent 0%, black 85%)"
+            : "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
+          maskImage: isMobile
+            ? "radial-gradient(circle at 50% 35%, transparent 0%, black 85%)"
+            : "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
         }}
       />
 
@@ -105,7 +119,23 @@ const HeroSection = () => {
           >
             Tiny Bites.
             <br />
-            <span className="text-accent">Big Cravings.</span>
+            <span className="text-accent">
+              Big{" "}
+              <motion.span
+                className="relative inline-block cursor-default"
+                whileHover="hover"
+              >
+                Cravings.
+                <motion.div
+                  className="absolute -bottom-1 left-0 h-1 md:h-2 bg-secondary/40 rounded-full"
+                  initial={{ width: 0 }}
+                  variants={{
+                    hover: { width: "100%" }
+                  }}
+                  transition={{ duration: 0.3, ease: "easeOut" }}
+                />
+              </motion.span>
+            </span>
           </motion.h1>
 
           <motion.p
@@ -141,14 +171,16 @@ const HeroSection = () => {
         </div>
 
         {/* Right: Floating Cookies Animation */}
-        <div className="relative h-[500px] md:h-[600px] w-full flex items-center justify-center">
+        <div className="relative h-[400px] md:h-[600px] w-full flex items-center justify-center">
           {/* Animation Container */}
           <div className="relative w-full h-full max-w-[500px] max-h-[500px]">
             <div className="absolute inset-0 flex items-center justify-center">
-              {cookies.map((cookie) => (
+              {cookiesData.map((cookie) => (
                 <FloatingCookie
                   key={cookie.name}
                   {...cookie}
+                  size={isMobile ? cookie.size * 0.5 : cookie.size}
+                  orbitRadius={isMobile ? cookie.orbitRadius * 0.55 : cookie.orbitRadius}
                   mouseX={0.5}
                   mouseY={0.5}
                   isPaused={isPaused}

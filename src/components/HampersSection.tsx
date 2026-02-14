@@ -678,7 +678,9 @@ export default function HampersSection() {
   return (
     <section id="hampers-section" className="mb-6 md:mb-8 relative font-montserrat">
       <div className="border border-secondary/20 rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden bg-secondary/5">
-        <CookieFallingAnimation />
+        {/* <div className="hidden md:block">
+          <CookieFallingAnimation />
+        </div> */}
         <div className="relative z-10">
           <div className="text-left mb-6 md:mb-8 relative z-10">
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#F1ABA2] mb-1 font-montserrat-heading">
@@ -694,7 +696,7 @@ export default function HampersSection() {
           <div className="grid grid-cols-1 lg:grid-cols-11 gap-4 md:gap-6 lg:gap-8">
 
             {/* Left Side - Image (36% on desktop, 50% on mobile) */}
-            <div className="lg:col-span-4">
+            <div className="hidden lg:col-span-4 lg:block">
               <div className="aspect-square rounded-2xl overflow-hidden">
                 <img
                   src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068105/ramadan_theme_p7aqqh.png"

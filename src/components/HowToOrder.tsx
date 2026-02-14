@@ -36,13 +36,13 @@ export default function HowToOrder() {
             className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-secondary/5 border border-secondary/10"
         >
             <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-                <Card className="rounded-3xl overflow-hidden border-none shadow-xl">
-                    <CardHeader className="bg-gradient-to-r from-background to-secondary/10">
-                        <CardTitle className="text-2xl font-bold text-secondary flex items-center justify-center gap-2">
-                            <CircleQuestionMark className="w-5 h-5 text-primary" />
+                <Card className="rounded-3xl overflow-hidden border-none shadow-xl bg-white">
+                    <CardHeader className="bg-white pb-2">
+                        <CardTitle className="text-2xl md:text-3xl font-bold text-primary flex items-center justify-center gap-2 font-montserrat-heading">
+                            <CircleQuestionMark className="w-6 h-6 text-primary" />
                             How to Order
                         </CardTitle>
-                        <CardDescription className="text-secondary/70 text-center">
+                        <CardDescription className="text-secondary/70 text-center text-sm md:text-base">
                             Empat langkah mudah buat menikmati menu Tiny Bitty di rumah. ✨
                         </CardDescription>
                     </CardHeader>
