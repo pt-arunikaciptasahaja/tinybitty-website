@@ -105,8 +105,8 @@ export default function ProductSection({
 
                 {/* Built-in carousel navigation */}
                 <div className="hidden md:block">
-                  <CarouselPrevious className="h-10 w-10 text-primary border-none bg-white/80 backdrop-blur-sm hover:bg-primary hover:text-white shadow-md transition-all duration-300" />
-                  <CarouselNext className="h-10 w-10 text-primary border-none bg-white/80 backdrop-blur-sm hover:bg-primary hover:text-white shadow-md transition-all duration-300" />
+                  <CarouselPrevious className="h-10 w-10 text-primary border-none bg-white/90 backdrop-blur-sm hover:bg-primary hover:text-white shadow-md transition-all duration-300 z-50 -left-4" />
+                  <CarouselNext className="h-10 w-10 text-primary border-none bg-white/90 backdrop-blur-sm hover:bg-primary hover:text-white shadow-md transition-all duration-300 z-50 -right-4" />
                 </div>
               </Carousel>
             </TabsContent>
