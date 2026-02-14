@@ -1,39 +1,166 @@
-import { Button } from '@/components/ui/button';
-import { Menu } from 'lucide-react';
+import { motion } from "framer-motion";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import FloatingCookie from "./FloatingCookie";
+import MagneticButton from "./ui/MagneticButton";
+import goldenCrunch from "@/assets/cookie-golden-crunch.png";
+import heavenlyBites from "@/assets/cookie-heavenly-bites.png";
+import harvestHaven from "@/assets/cookie-harvest-haven.png";
+import desertCrown from "@/assets/cookie-desert-crown.png";
 
-export default function Hero() {
+const cookies = [
+  {
+    src: goldenCrunch,
+    name: "Golden Crunch",
+    size: 250,
+    orbitRadius: 200,
+    orbitSpeed: 35,
+    startAngle: 0,
+    floatDelay: 0,
+  },
+  {
+    src: heavenlyBites,
+    name: "Heavenly Bites",
+    size: 220,
+    orbitRadius: 200,
+    orbitSpeed: 35,
+    startAngle: Math.PI * 0.5,
+    floatDelay: 0,
+  },
+  {
+    src: harvestHaven,
+    name: "Harvest Haven",
+    size: 235,
+    orbitRadius: 200,
+    orbitSpeed: 35,
+    startAngle: Math.PI,
+    floatDelay: 0,
+  },
+  {
+    src: desertCrown,
+    name: "Desert Crown",
+    size: 240,
+    orbitRadius: 200,
+    orbitSpeed: 35,
+    startAngle: Math.PI * 1.5,
+    floatDelay: 0,
+  },
+];
+
+const HeroSection = () => {
+  const [isPaused, setIsPaused] = useState(false);
+  const navigate = useNavigate();
+
+  const scrollToProducts = () => {
+    const productsSection = document.getElementById('products');
+    if (productsSection) {
+      productsSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
 
   return (
-    <section className="mt-10 md:mt-30 mb-2 md:mb-4 pt-16 md:pt-32 pb-0">
-      <div className="w-full max-w-[1400px] mx-auto px-0">
-        <div
-          className="rounded-3xl p-4 md:p-8 lg:p-10 min-h-[140px] md:min-h-[320px] lg:min-h-[370px] overflow-hidden relative flex items-center justify-center bg-cover bg-center"
-          style={{
-            backgroundImage: 'url("https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787147/hero_upprpg_1_cvrvne.png")',
-            backgroundSize: 'cover',
-            backgroundRepeat: 'no-repeat',
-          }}
-        >
-          <div className="absolute inset-0 bg-black/40"></div>
+    <section
+      className="relative min-h-screen flex items-center overflow-hidden noise-bg"
+    >
+      {/* Subtle radial gradient - Shifted to left for text focus */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: `
+            linear-gradient(
+              90deg,
+              hsl(var(--muted) / 0.2) 0px, hsl(var(--muted) / 0.2) 20px, transparent 20px, transparent 40px,
+              hsl(var(--muted) / 0.2) 40px, hsl(var(--muted) / 0.2) 60px, transparent 60px, transparent 80px,
+              hsl(var(--muted) / 0.2) 80px, hsl(var(--muted) / 0.2) 100px, transparent 100px, transparent 120px,
+              hsl(var(--muted) / 0.2) 120px, hsl(var(--muted) / 0.2) 140px, transparent 140px, transparent 160px,
+              hsl(var(--accent) / 0.2) 160px, hsl(var(--accent) / 0.2) 180px, transparent 180px, transparent 200px,
+              hsl(var(--accent) / 0.2) 200px, hsl(var(--accent) / 0.2) 220px, transparent 220px, transparent 240px,
+              hsl(var(--accent) / 0.2) 240px, hsl(var(--accent) / 0.2) 260px, transparent 260px, transparent 280px,
+              hsl(var(--accent) / 0.2) 280px, hsl(var(--accent) / 0.2) 300px, transparent 300px, transparent 320px
+            )
+          `,
+          backgroundSize: "320px 100%",
+          WebkitMaskImage: "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
+          maskImage: "radial-gradient(circle at 20% 50%, transparent 0%, black 70%)",
+        }}
+      />
 
-          <div className="relative z-10 text-center px-4">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-7xl delius-regular mb-4 md:mb-6 leading-tight text-[#F4EEFF] tracking-wide drop-shadow-2xl md:drop-shadow-lg">
-              The Taste of Home,<br />
-              Without Leaving Yours
-            </h1>
+      <div className="container mx-auto px-6 grid md:grid-cols-2 gap-12 items-center relative z-10 w-full h-full pt-16 md:pt-0">
+        {/* Left: Typography */}
+        <div className="text-left max-w-2xl">
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.6 }}
+            className="text-lg font-laila font-bold tracking-[0.1em] text-accent mb-4"
+          >
+            Artisan Baked · Small Batch
+          </motion.p>
 
-            <div className="flex justify-center w-full">
-              <Button
-                onClick={() => document.getElementById('products')?.scrollIntoView({ behavior: 'smooth' })}
-                className="bg-[#553d8f] hover:bg-[#553d8f]/90 text-white px-4 py-2 md:px-8 md:py-6 flex items-center justify-center gap-2 rounded-full font-light text-sm md:text-xl shadow-lg hover:shadow-xl transition-all duration-300"
-              >
-                <Menu className="w-4 h-4 md:w-6 md:h-6" />
-                Lihat Menu
-              </Button>
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.7 }}
+            className="text-6xl md:text-8xl font-montserrat-heading tracking-tight leading-[0.9] text-foreground mb-6"
+          >
+            Tiny Bites.
+            <br />
+            <span className="text-accent">Big Cravings.</span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.6 }}
+            className="text-base md:text-lg text-muted-foreground mb-10 font-medium leading-relaxed max-w-md"
+          >
+            Handcrafted cookies made with the finest ingredients.
+            Every bite tells a story of passion and craft.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.8, duration: 0.6 }}
+            className="flex items-center justify-start gap-4"
+          >
+            <MagneticButton
+              variant="primary"
+              className="text-white"
+              onClick={scrollToProducts}
+            >
+              Shop Now
+            </MagneticButton>
+            <MagneticButton
+              variant="secondary"
+              onClick={() => navigate('/our-story')}
+            >
+              Our Story
+            </MagneticButton>
+          </motion.div>
+        </div>
+
+        {/* Right: Floating Cookies Animation */}
+        <div className="relative h-[500px] md:h-[600px] w-full flex items-center justify-center">
+          {/* Animation Container */}
+          <div className="relative w-full h-full max-w-[500px] max-h-[500px]">
+            <div className="absolute inset-0 flex items-center justify-center">
+              {cookies.map((cookie) => (
+                <FloatingCookie
+                  key={cookie.name}
+                  {...cookie}
+                  mouseX={0.5}
+                  mouseY={0.5}
+                  isPaused={isPaused}
+                  onHoverChange={setIsPaused}
+                />
+              ))}
             </div>
           </div>
         </div>
       </div>
     </section>
   );
-}
+};
+
+export default HeroSection;

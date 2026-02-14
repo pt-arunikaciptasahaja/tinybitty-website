@@ -4,6 +4,7 @@ import CartSheet from './CartSheet';
 import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion';
 
 export default function Header() {
   const { getTotalItems } = useCart();
@@ -34,7 +35,7 @@ export default function Header() {
   const handleNavigation = (hash: string) => {
     // Navigate to homepage
     navigate('/');
-    
+
     // Wait a moment for navigation to complete, then scroll to section
     setTimeout(() => {
       const element = document.querySelector(hash);
@@ -52,56 +53,65 @@ export default function Header() {
       <div className="w-full max-w-[1400px] mx-auto px-4 md:px-0">
         <div className="bg-white/60 backdrop-blur-md border border-white/20 rounded-2xl shadow-xl px-2 md:px-4 py-2 md:py-2">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-2 md:gap-3">
-              <img
-                src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574652/logo-purple_dlshle.png"
-                alt="Tiny Bitty - Freshly Baked Happiness"
-                className="h-12 md:h-16 lg:h-20 w-auto object-contain"
-                // style={{
-                //   filter: 'invert(20%) sepia(100%) saturate(3000%) hue-rotate(255deg) brightness(0.6) contrast(1.8)'
-                // }}
-              />
+            <Link to="/" className="flex items-center gap-2 md:gap-3 group">
+              <motion.div
+                whileHover={{
+                  scale: 1.1,
+                  rotate: [0, -2, 2, -2, 0],
+                }}
+                transition={{
+                  scale: { duration: 0.2 },
+                  rotate: { duration: 0.4, ease: "easeInOut" }
+                }}
+                className="relative"
+              >
+                <img
+                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1770742943/New_Logo_Tiny_Bitty_20260130_104635_0001_dsaafx_e_background_removal_f_png_cyeeux.png"
+                  alt="Tiny Bitty - Freshly Baked Happiness"
+                  className="h-12 md:h-16 lg:h-24 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(241,171,162,0.6)]"
+                />
+              </motion.div>
             </Link>
-            
+
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center gap-6">
               <button
                 onClick={() => handleNavigation('#products')}
-                className="text-sm font-medium text-[#553d8f] nav-link-hover bg-transparent border-0 cursor-pointer"
+                className="text-sm font-medium text-secondary nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Products
               </button>
               <Link
                 to="/faq"
-                className="text-sm font-medium text-[#553d8f] nav-link-hover"
+                className="text-sm font-medium text-secondary nav-link-hover"
               >
                 FAQ
               </Link>
               <Link
                 to="/ingredients"
-                className="text-sm font-medium text-[#553d8f] nav-link-hover"
+                className="text-sm font-medium text-secondary nav-link-hover"
               >
                 Ingredients
               </Link>
               <Link
                 to="/our-story"
-                className="text-sm font-medium text-[#553d8f] nav-link-hover"
+                className="text-sm font-medium text-secondary nav-link-hover"
               >
                 Our Story
               </Link>
               <button
                 onClick={() => handleNavigation('#order')}
-                className="text-sm font-medium text-[#553d8f] nav-link-hover bg-transparent border-0 cursor-pointer"
+                className="text-sm font-medium text-secondary nav-link-hover bg-transparent border-0 cursor-pointer"
               >
                 Order
               </button>
-              
+
               {/* Cart Icon */}
               <CartSheet>
                 <div className="relative p-2 rounded-full hover:bg-gray-100 transition-all duration-200 cursor-pointer">
-                  <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
+                  <ShoppingCart className="w-6 h-6 text-secondary" />
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 bg-[#C5B8FF] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                    <Badge className="absolute -top-1 -right-1 bg-primary text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
                       {getTotalItems()}
                     </Badge>
                   )}
@@ -114,33 +124,32 @@ export default function Header() {
               {/* Mobile Cart Icon */}
               <CartSheet>
                 <div className="relative p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
-                  <ShoppingCart className="w-6 h-6 text-[#553d8f]" />
+                  <ShoppingCart className="w-6 h-6 text-secondary" />
                   {getTotalItems() > 0 && (
-                    <Badge className="absolute -top-1 -right-1 bg-[#C5B8FF] text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
+                    <Badge className="absolute -top-1 -right-1 bg-primary text-white text-xs min-w-[18px] h-[18px] flex items-center justify-center rounded-full">
                       {getTotalItems()}
                     </Badge>
                   )}
                 </div>
               </CartSheet>
-              
+
               {/* Burger Menu Button */}
               <button
                 onClick={toggleMenu}
                 className="p-2 rounded-full hover:bg-gray-100 transition-all duration-200"
               >
                 {isMenuOpen ? (
-                  <X className="w-6 h-6 text-[#553d8f] transition-transform duration-200" />
+                  <X className="w-6 h-6 text-secondary transition-transform duration-200" />
                 ) : (
-                  <Menu className="w-6 h-6 text-[#553d8f] transition-transform duration-200" />
+                  <Menu className="w-6 h-6 text-secondary transition-transform duration-200" />
                 )}
               </button>
             </div>
           </div>
 
           {/* Mobile Menu */}
-          <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-            isMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
-          }`}>
+          <div className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${isMenuOpen ? 'max-h-80 opacity-100' : 'max-h-0 opacity-0'
+            }`}>
             <div className="mt-4 pb-4 border-t border-white/20 relative z-10">
               <nav className="flex flex-col gap-4 mt-4">
                 <button
@@ -148,27 +157,27 @@ export default function Header() {
                     handleNavigation('#products');
                     toggleMenu();
                   }}
-                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
+                  className="text-sm font-medium text-secondary hover:text-secondary transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Products
                 </button>
                 <Link
                   to="/faq"
-                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-secondary hover:text-secondary transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   FAQ
                 </Link>
                 <Link
                   to="/ingredients"
-                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-secondary hover:text-secondary transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   Ingredients
                 </Link>
                 <Link
                   to="/our-story"
-                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
+                  className="text-sm font-medium text-secondary hover:text-secondary transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50"
                   onClick={toggleMenu}
                 >
                   Our Story
@@ -178,7 +187,7 @@ export default function Header() {
                     handleNavigation('#order');
                     toggleMenu();
                   }}
-                  className="text-sm font-medium text-[#553d8f] hover:text-[#553d8f] transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
+                  className="text-sm font-medium text-secondary hover:text-secondary transition-all duration-200 px-2 py-1 rounded-lg hover:bg-gray-50 bg-transparent border-0 cursor-pointer text-left"
                 >
                   Order
                 </button>

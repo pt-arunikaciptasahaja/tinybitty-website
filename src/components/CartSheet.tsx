@@ -103,12 +103,12 @@ export default function CartSheet({ children }: CartSheetProps) {
   const triggerContent = children || (
     <Button
       size="lg"
-      className="fixed bottom-6 right-6 z-40 bg-[#BFAAE3] hover:bg-[#A088D9] text-white shadow-2xl rounded-full px-6 py-6 flex items-center gap-2 transition-all"
+      className="fixed bottom-6 right-6 z-40 bg-primary hover:bg-primary/90 text-white shadow-2xl rounded-full px-6 py-6 flex items-center gap-2 transition-all"
     >
       <ShoppingCart className="w-5 h-5" />
       <span className="font-semibold">Keranjang</span>
       {getTotalItems() > 0 && (
-        <Badge className="bg-white text-[#A088D9] ml-1">{getTotalItems()}</Badge>
+        <Badge className="bg-white text-primary ml-1 shadow-sm border-none">{getTotalItems()}</Badge>
       )}
     </Button>
   );
@@ -118,17 +118,17 @@ export default function CartSheet({ children }: CartSheetProps) {
       <SheetTrigger asChild>{triggerContent}</SheetTrigger>
 
       <SheetContent
-        className="w-full sm:max-w-lg flex flex-col overflow-hidden"
+        className="w-full sm:max-w-lg flex flex-col overflow-hidden border-l border-secondary/20"
         style={{
-          backgroundColor: '#DFDBE5',
-          backgroundImage: 'url("data:image/svg+xml,%3Csvg width=\'6\' height=\'6\' viewBox=\'0 0 6 6\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'%236b33c3\' fill-opacity=\'0.12\' fill-rule=\'evenodd\'%3E%3Cpath d=\'M5 0h1L0 6V5zM6 5v1H5z\'/%3E%3C/g%3E%3C/svg%3E")'
+          backgroundColor: 'hsl(var(--background))',
+          backgroundImage: `url("data:image/svg+xml,%3Csvg width='6' height='6' viewBox='0 0 6 6' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='%23559083' fill-opacity='0.1' fill-rule='evenodd'%3E%3Cpath d='M5 0h1L0 6V5zM6 5v1H5z'/%3E%3C/g%3E%3C/svg%3E")`
         }}
       >
         <SheetHeader>
-          <SheetTitle className="text-2xl font-bold text-[#5D4E8E]">
+          <SheetTitle className="text-2xl font-bold text-primary">
             Ringkasan Keranjang
           </SheetTitle>
-          <SheetDescription className="text-[#8978B4]">
+          <SheetDescription className="text-secondary/70">
             {cart.length === 0
               ? 'Keranjang belanja kamu masih kosong.'
               : `Cek dulu ${getTotalItems()} item sebelum lanjut isi data pesanan.`}
@@ -138,11 +138,11 @@ export default function CartSheet({ children }: CartSheetProps) {
         {/* KERANJANG KOSONG */}
         {cart.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-            <ShoppingCart className="w-20 h-20 text-[#D8CFF7] mb-4" />
-            <p className="text-[#8978B4] mb-4">Belum ada produk di keranjang.</p>
+            <ShoppingCart className="w-20 h-20 text-secondary/20 mb-4" />
+            <p className="text-secondary/70 mb-4">Belum ada produk di keranjang.</p>
             <Button
               onClick={handleStartShopping}
-              className="bg-[#BFAAE3] hover:bg-[#A088D9] text-white rounded-xl"
+              className="bg-primary hover:bg-primary/90 text-white rounded-xl px-8"
             >
               Lihat menu
             </Button>
@@ -156,7 +156,7 @@ export default function CartSheet({ children }: CartSheetProps) {
                   {cart.map((item) => (
                     <div
                       key={`${item.productId}-${item.variant.size}`}
-                      className="bg-white rounded-2xl p-4 shadow-sm border border-[#D8CFF7]/40"
+                      className="bg-white rounded-2xl p-4 shadow-sm border border-secondary/10"
                     >
                       <div className="flex gap-4">
                         <div
@@ -165,21 +165,21 @@ export default function CartSheet({ children }: CartSheetProps) {
                         />
 
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-semibold text-[#5D4E8E] truncate">
+                          <h4 className="font-semibold text-secondary truncate">
                             {item.productName}
                           </h4>
-                          <p className="text-sm text-[#8E82AE]">{item.variant.size}</p>
+                          <p className="text-sm text-secondary/60">{item.variant.size}</p>
 
                           <div className="flex items-center justify-between mt-2">
                             <div>
-                              <p className="text-xs text-[#8E82AE]">Harga satuan</p>
-                              <p className="text-sm font-semibold text-[#A088D9]">
+                              <p className="text-xs text-secondary/60">Harga satuan</p>
+                              <p className="text-sm font-semibold text-primary">
                                 Rp {item.variant.price.toLocaleString('id-ID')}
                               </p>
                             </div>
                             <div className="text-right">
-                              <p className="text-xs text-[#8E82AE]">Subtotal</p>
-                              <p className="text-sm font-bold text-[#5D4E8E]">
+                              <p className="text-xs text-secondary/60">Subtotal</p>
+                              <p className="text-sm font-bold text-secondary">
                                 Rp{' '}
                                 {(item.variant.price * item.quantity).toLocaleString('id-ID')}
                               </p>
@@ -189,7 +189,7 @@ export default function CartSheet({ children }: CartSheetProps) {
                       </div>
 
                       {/* JUMLAH + HAPUS */}
-                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-[#D8CFF7]/40">
+                      <div className="flex items-center justify-between mt-4 pt-4 border-t border-secondary/5">
                         <div className="flex items-center gap-2">
                           <Button
                             variant="outline"
@@ -201,12 +201,12 @@ export default function CartSheet({ children }: CartSheetProps) {
                                 item.quantity - 1
                               )
                             }
-                            className="h-8 w-8 rounded-full border-[#C8B6EA] text-[#7D69C3] hover:bg-[#EDE7F6]"
+                            className="h-8 w-8 rounded-full border-secondary/30 text-secondary hover:bg-secondary/10"
                           >
                             <Minus className="w-3 h-3" />
                           </Button>
 
-                          <span className="w-10 text-center font-semibold text-[#5D4E8E]">
+                          <span className="w-10 text-center font-semibold text-secondary">
                             {item.quantity}
                           </span>
 
@@ -220,7 +220,7 @@ export default function CartSheet({ children }: CartSheetProps) {
                                 item.quantity + 1
                               )
                             }
-                            className="h-8 w-8 rounded-full border-[#C8B6EA] text-[#7D69C3] hover:bg-[#EDE7F6]"
+                            className="h-8 w-8 rounded-full border-secondary/30 text-secondary hover:bg-secondary/10"
                           >
                             <Plus className="w-3 h-3" />
                           </Button>
@@ -232,7 +232,7 @@ export default function CartSheet({ children }: CartSheetProps) {
                           onClick={() =>
                             removeFromCart(item.productId, item.variant.size)
                           }
-                          className="text-[#C06A87] hover:text-[#A85A75] hover:bg-[#F8E7EC]"
+                          className="text-primary hover:text-primary-dark hover:bg-primary/10"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -244,20 +244,20 @@ export default function CartSheet({ children }: CartSheetProps) {
             </div>
 
             {/* RINGKASAN BAWAH */}
-            <div className="border-t-2 border-[#D8CFF7]/40 bg-[#F6F2FF] p-6 -mx-6 mt-auto">
+            <div className="border-t border-secondary/10 bg-secondary/5 p-6 -mx-6 mt-auto">
               <div className="space-y-3 mb-4">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[#8E82AE]">Total item</span>
-                  <span className="font-semibold text-[#5D4E8E]">
+                  <span className="text-secondary/60">Total item</span>
+                  <span className="font-semibold text-secondary">
                     {getTotalItems()} item
                   </span>
                 </div>
 
                 <div className="flex items-center justify-between">
-                  <span className="text-lg font-semibold text-[#5D4E8E]">
+                  <span className="text-lg font-semibold text-secondary">
                     Subtotal produk
                   </span>
-                  <span className="text-2xl font-bold text-[#A088D9]">
+                  <span className="text-2xl font-bold text-primary">
                     Rp {getTotalPrice().toLocaleString('id-ID')}
                   </span>
                 </div>
@@ -268,33 +268,33 @@ export default function CartSheet({ children }: CartSheetProps) {
                   if (deliveryInfo?.isValid && deliveryInfo.cost > 0) {
                     const total = getTotalPrice() + deliveryInfo.cost;
                     return (
-                      <div className="mt-2 p-3 bg-white/70 rounded-xl border border-[#D8CFF7]/40 shadow-sm">
+                      <div className="mt-2 p-3 bg-white/50 rounded-xl border border-secondary/10 shadow-sm">
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-[#8E82AE]">Subtotal produk</span>
-                          <span className="text-[#5D4E8E]">
+                          <span className="text-secondary/60">Subtotal produk</span>
+                          <span className="text-secondary">
                             Rp {getTotalPrice().toLocaleString('id-ID')}
                           </span>
                         </div>
 
                         <div className="flex items-center justify-between text-sm">
-                          <span className="text-[#8E82AE]">
+                          <span className="text-secondary/60">
                             Perkiraan ongkir ({deliveryInfo.zone})
                           </span>
-                          <span className="text-[#5D4E8E]">
+                          <span className="text-secondary">
                             Rp {deliveryInfo.cost.toLocaleString('id-ID')}
                           </span>
                         </div>
 
-                        <div className="flex items-center justify-between border-t border-[#D8CFF7]/40 pt-2 mt-2">
-                          <span className="font-semibold text-[#5D4E8E]">
+                        <div className="flex items-center justify-between border-t border-secondary/10 pt-2 mt-2">
+                          <span className="font-semibold text-secondary">
                             Total produk (Ongkir dikonfirmasi via WhatsApp)
                           </span>
-                          <span className="font-bold text-[#A088D9]">
+                          <span className="font-bold text-primary">
                             Rp {getTotalPrice().toLocaleString('id-ID')}
                           </span>
                         </div>
 
-                        <p className="text-xs text-[#8E82AE] mt-1">
+                        <p className="text-xs text-secondary/50 mt-1">
                           *Ongkir final akan dikonfirmasi lagi via WhatsApp.
                         </p>
                       </div>
@@ -306,7 +306,7 @@ export default function CartSheet({ children }: CartSheetProps) {
 
               <Button
                 onClick={scrollToOrderForm}
-                className="w-full bg-gradient-to-r from-[#C9B8EA] to-[#B39AD8] hover:from-[#BFAAE3] hover:to-[#A088D9] text-white shadow-lg rounded-xl py-6 text-lg font-semibold transition-all"
+                className="w-full bg-primary hover:bg-primary/90 text-white shadow-lg rounded-xl py-6 text-lg font-semibold transition-all"
               >
                 Lanjut ke form pemesanan
               </Button>

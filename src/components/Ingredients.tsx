@@ -10,9 +10,9 @@ export default function Ingredients() {
           Quality Ingredients, Honest Recipes
         </span>
 
-        <h2 className="heading-lg mb-4">
+        <h2 className="heading-lg font-montserrat mb-4">
           Real Ingredients You{' '}
-          <span className="text-[#553d8f]">Know and Love</span>
+          <span className="text-primary">Know and Love</span>
         </h2>
 
         <p className="body-base max-w-none mx-auto">
@@ -24,36 +24,17 @@ export default function Ingredients() {
 
       {/* Ingredient Chips */}
       <div className="flex flex-wrap gap-2 md:gap-3 justify-center mb-8">
-        <span className="px-4 py-1.5 bg-[#fde8e8] text-[#b91c1c] rounded-full text-sm font-medium border border-[#fbcfd0] shadow-sm">
-          🧈 Butter
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#fef3c7] text-[#92400e] rounded-full text-sm font-medium border border-[#fde68a] shadow-sm">
-          🥚 Eggs
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#e0f2fe] text-[#0369a1] rounded-full text-sm font-medium border border-[#bae6fd] shadow-sm">
-          🌾 Flour
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#f3e8ff] text-[#6b21a8] rounded-full text-sm font-medium border border-[#e9d5ff] shadow-sm">
-          🍬 Sugar
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#FFEE91] text-[#b45309] rounded-full text-sm font-medium border border-[#fdecc8] shadow-sm">
-          🧀 Cheese
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#E2852E] text-white rounded-full text-sm font-medium border border-[#f8d4ba] shadow-sm">
-          🌿 Cinnamon
-        </span>
-
-        <span className="px-4 py-1.5 bg-[#f4e7d5] text-[#92400e] rounded-full text-sm font-medium border border-[#ecd7b9] shadow-sm">
-          🍯 Brown Sugar
-        </span>
-        <span className="px-4 py-1.5 bg-[#493628] text-white rounded-full text-sm font-medium border border-[#ecd7b9] shadow-sm">
-          🍫 Choco Chips
-        </span>
+        {[
+          "🧈 Butter", "🥚 Eggs", "🌾 Flour", "� Sugar",
+          "🧀 Cheese", "🌿 Cinnamon", "🍯 Brown Sugar", "🍫 Choco Chips"
+        ].map((ingredient, index) => (
+          <span
+            key={index}
+            className="px-4 py-1.5 bg-secondary/5 text-secondary rounded-full text-sm font-medium border border-secondary/10 shadow-sm"
+          >
+            {ingredient}
+          </span>
+        ))}
       </div>
 
       {/* Image */}
@@ -73,7 +54,7 @@ export default function Ingredients() {
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
             <div className="w-12 h-12 bg-secondary rounded-full flex items-center justify-center">
-              <Vegan className="h-6 w-6 text-[#6b21a8]" />
+              <Vegan className="h-6 w-6 text-white" />
             </div>
           </div>
           <div className="flex-1">
@@ -90,8 +71,8 @@ export default function Ingredients() {
         {/* Card 2 */}
         <div className="flex items-start gap-4">
           <div className="flex-shrink-0">
-            <div className="w-12 h-12 bg-accent rounded-full flex items-center justify-center">
-              <Home className="h-6 w-6 text-[#6b21a8]" />
+            <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center">
+              <Home className="h-6 w-6 text-white" />
             </div>
           </div>
           <div className="flex-1">

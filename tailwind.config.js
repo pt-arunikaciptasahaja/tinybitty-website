@@ -18,13 +18,18 @@ module.exports = {
       },
     },
     extend: {
+      fontFamily: {
+        cooper: ['"Cooper BT"', '"Cooper Black"', 'serif'],
+        laila: ['"Laila"', 'serif'],
+        montserrat: ['"Montserrat"', 'sans-serif'],
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        
+
         // Pastel Lilac Primary Colors
         primary: {
           DEFAULT: "hsl(var(--primary))",
@@ -32,7 +37,7 @@ module.exports = {
           light: "hsl(var(--primary-light))",
           dark: "hsl(var(--primary-dark))",
         },
-        
+
         // Secondary Pastel Colors
         secondary: {
           DEFAULT: "hsl(var(--secondary))",
@@ -40,7 +45,7 @@ module.exports = {
           light: "hsl(var(--secondary-light))",
           dark: "hsl(var(--secondary-dark))",
         },
-        
+
         // Accent Pastel Colors
         accent: {
           DEFAULT: "hsl(var(--accent))",
@@ -48,7 +53,7 @@ module.exports = {
           light: "hsl(var(--accent-light))",
           dark: "hsl(var(--accent-dark))",
         },
-        
+
         // System Colors
         destructive: {
           DEFAULT: "hsl(var(--destructive))",

@@ -2,58 +2,137 @@
   "cookies": [
     {
       "id": "choco-almond-crunch",
-      "name": "Choco Almond",
-      "description": "Rich, buttery cookies loaded with premium Australian almonds and melty chocolate chips, finished with a delightful corn flake crunch in every bite.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575760/almondd_v75yxv.png",
+      "name": "Golden Crunch",
+      "description": "A delightful blend of premium sliced almonds, chocolate chips, and crispy cornflakes, baked to perfection with our signature buttery dough for a satisfying golden crunch.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771082868/Gemini_Generated_Image_bnbu1pbnbu1pbnbu_w2t3pm.png",
       "variants": [
-        { "size": "Large 400gr", "price": 220000 },
-        { "size": "Medium 150gr", "price": 85000 },
-        { "size": "Small 100gr", "price": 65000 },
-        { "size": "Mini 30gr", "price": 20000 }
+        {
+          "size": "Large 400gr",
+          "price": 220000
+        },
+        {
+          "size": "Medium 150gr",
+          "price": 85000
+        },
+        {
+          "size": "Small 100gr",
+          "price": 65000
+        },
+        {
+          "size": "Mini 30gr",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Chocolate chips", "Almond", "Corn flakes"],
+      "ingredients": [
+        "Flour",
+        "Eggs",
+        "Australian Butter",
+        "Brown Sugar",
+        "Sliced Almonds",
+        "Choco Chips",
+        "Cornflakes"
+      ],
       "isNew": false
     },
     {
       "id": "heavenly-bites",
       "name": "Heavenly Bites",
-      "description": "Indulgent cookies packed with crunchy chocolate chips, creamy dark cookie crumbles, and choco cereal bits for the ultimate chocolate lover's experience.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575761/heaven_y9sj24.png",
+      "description": "Indulge in a chocolate lover's dream. These rich cookies combine dark cookie crumbles, chocolate chips, and choco cereal for a multi-textured heavenly experience.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771082865/Gemini_Generated_Image_y0oojoy0oojoy0oo_e6mtoi.png",
       "variants": [
-        { "size": "Large 400gr", "price": 220000 },
-        { "size": "Medium 150gr", "price": 85000 },
-        { "size": "Small 100gr", "price": 65000 },
-        { "size": "Mini 30gr", "price": 20000 }
+        {
+          "size": "Large 400gr",
+          "price": 220000
+        },
+        {
+          "size": "Medium 150gr",
+          "price": 85000
+        },
+        {
+          "size": "Small 100gr",
+          "price": 65000
+        },
+        {
+          "size": "Mini 30gr",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Dark crumbs", "Chocolate chips", "Choco cereal"],
+      "ingredients": [
+        "Flour",
+        "Eggs",
+        "Australian Butter",
+        "Brown Sugar",
+        "Dark Crumbs",
+        "Choco Chips",
+        "Choco Cereal"
+      ],
       "isNew": false
     },
     {
       "id": "oatmeal-raisin",
-      "name": "Oatmeal Raisin",
-      "description": "Hearty, chewy cookies made with wholesome oats, sweet golden raisins, and a cozy blend of warm cinnamon for that perfect comfort food feeling.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575769/oatmeal_spzisq.png",
+      "name": "Harvest Haven",
+      "description": "A wholesome retreat in every bite, featuring plump raisins and hearty oats folded into our rich, buttery base for a chewy and comforting harvest treat.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771082861/Gemini_Generated_Image_2zdeqg2zdeqg2zde_vdy8wi.png",
       "variants": [
-        { "size": "Large 400gr", "price": 220000 },
-        { "size": "Medium 150gr", "price": 85000 },
-        { "size": "Small 100gr", "price": 65000 },
-        { "size": "Mini 30gr", "price": 20000 }
+        {
+          "size": "Large 400gr",
+          "price": 220000
+        },
+        {
+          "size": "Medium 150gr",
+          "price": 85000
+        },
+        {
+          "size": "Small 100gr",
+          "price": 65000
+        },
+        {
+          "size": "Mini 30gr",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Flour", "Eggs", "Australian Butter", "Oats", "Raisin",  "Brown Sugar", "Cinnamon powder"],
+      "ingredients": [
+        "Flour",
+        "Eggs",
+        "Australian Butter",
+        "Brown Sugar",
+        "Raisins",
+        "Oats"
+      ],
       "isNew": false
     },
     {
       "id": "cheese-almond",
-      "name": "Cheese Almond",
-      "description": "A delicious harmony of sharp, aged cheddar cheese and buttery roasted almonds in every bite - the perfect sweet and savory treat.",
-      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575763/cheesy_soullc.png",
+      "name": "Desert Crown",
+      "description": "The crown jewel of our collection, featuring a luxurious mix of roasted almonds, wholesome oats, and succulent Medjool dates for a sophisticated sweetness.",
+      "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771082870/Gemini_Generated_Image_t4bd24t4bd24t4bd_hrmu4b.png",
       "variants": [
-        { "size": "Large 400gr", "price": 220000 },
-        { "size": "Medium 150gr", "price": 85000 },
-        { "size": "Small 100gr", "price": 65000 },
-        { "size": "Mini 30gr", "price": 20000 }
+        {
+          "size": "Large 400gr",
+          "price": 220000
+        },
+        {
+          "size": "Medium 150gr",
+          "price": 85000
+        },
+        {
+          "size": "Small 100gr",
+          "price": 65000
+        },
+        {
+          "size": "Mini 30gr",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Flour", "Eggs", "Australian Butter", "Brown Sugar", "Cheddar Cheese", "Almond"],
+      "ingredients": [
+        "Flour",
+        "Eggs",
+        "Australian Butter",
+        "Brown Sugar",
+        "Roast Almonds",
+        "Oats",
+        "Medjool Dates"
+      ],
       "isNew": true
     }
   ],
@@ -64,10 +143,20 @@
       "description": "Luscious, tropical mango goodness bursting with natural sweetness, enhanced with satisfying chewy textures from chia seeds and bouncy nata de coco.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785933/WhatsApp_Image_2025-11-22_at_11.11.10_iwmttv.jpg",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Mango", "Sugar", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Mango",
+        "Sugar",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": false
     },
     {
@@ -76,10 +165,20 @@
       "description": "Vibrant and tangy guava refreshment with a satisfying burst of chewy nata de coco and nutrient-rich chia seeds in every sip.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763785942/WhatsApp_Image_2025-11-22_at_11.20.30_yzhrkw.jpg",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Guava", "Sugar", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Guava",
+        "Sugar",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": false
     },
     {
@@ -88,10 +187,20 @@
       "description": "Bright, refreshing strawberry burst with a playful mix of chewy nata de coco and omega-3 rich chia seeds for the perfect guilt-free indulgence.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763780212/strawberry-delight_y3xczp.jpg",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Strawberry", "Sugar", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Strawberry",
+        "Sugar",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": false
     },
     {
@@ -100,10 +209,20 @@
       "description": "Sweet strawberry perfection with zero guilt - naturally sweetened with Tropicana Slim and loaded with satisfying chewy textures for a truly delightful experience.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786126/WhatsApp_Image_2025-11-22_at_11.35.00_wkjibs.jpg",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Strawberry", "Tropicana sweetener", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Strawberry",
+        "Tropicana sweetener",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": true
     },
     {
@@ -112,10 +231,20 @@
       "description": "Silky smooth tropical escape with the exotic sweetness of soursop, complemented by bouncy nata de coco for a refreshing and satisfying drink.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763806406/yupp-generated-image-210752_1_fhp7lk.png",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Soursop", "Sugar", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Soursop",
+        "Sugar",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": false
     },
     {
@@ -124,10 +253,20 @@
       "description": "Exotic tropical indulgence without the sugar rush - creamy soursop naturally sweetened with Tropicana Slim, dotted with delightful nata de coco pearls.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763806454/yupp-generated-image-757808_1_fqxcuh.png",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Soursop", "Tropicana sweetener", "Water"],
-      "toppings": ["Chia seeds", "Nata de coco"],
+      "ingredients": [
+        "Soursop",
+        "Tropicana sweetener",
+        "Water"
+      ],
+      "toppings": [
+        "Chia seeds",
+        "Nata de coco"
+      ],
       "isNew": true
     },
     {
@@ -136,9 +275,17 @@
       "description": "Indulgent coffee meets creamy avocado richness - a perfectly balanced drink with aromatic coffee, smooth avocado, and just the right amount of sweetness.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763786332/WhatsApp_Image_2025-11-22_at_11.37.48_bj68up.jpg",
       "variants": [
-        { "size": "250ml", "price": 20000 }
+        {
+          "size": "250ml",
+          "price": 20000
+        }
       ],
-      "ingredients": ["Avocado", "Coffee", "Creamer", "Brown sugar"],
+      "ingredients": [
+        "Avocado",
+        "Coffee",
+        "Creamer",
+        "Brown sugar"
+      ],
       "toppings": [],
       "isNew": true
     }
@@ -150,11 +297,30 @@
       "description": "Decadent baked macaroni cups loaded with creamy white and sharp red cheddar, tender smoked beef, juicy chicken, and perfectly seasoned pasta in every bite.",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763575766/sahroni_scbpg6.png",
       "variants": [
-        { "size": "2 pcs", "price": 40000 },
-        { "size": "4 pcs", "price": 80000 },
-        { "size": "9 pcs", "price": 180000 }
+        {
+          "size": "2 pcs",
+          "price": 40000
+        },
+        {
+          "size": "4 pcs",
+          "price": 80000
+        },
+        {
+          "size": "9 pcs",
+          "price": 180000
+        }
       ],
-      "ingredients": ["White Cheddar Cheese", "Red Cheddar Cheese", "Eggs", "Milk", "Smoked beef", "Chicken breast", "Pasta", "Oregano", "Spices"],
+      "ingredients": [
+        "White Cheddar Cheese",
+        "Red Cheddar Cheese",
+        "Eggs",
+        "Milk",
+        "Smoked beef",
+        "Chicken breast",
+        "Pasta",
+        "Oregano",
+        "Spices"
+      ],
       "cupSize": "Cup Ø 8cm • tall 3.5cm",
       "isNew": false
     }
@@ -166,10 +332,24 @@
       "description": "-",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/white_afgdv2.png",
       "variants": [
-        { "size": "Whole sliced loaf", "price": 79000 },
-        { "size": "2-slice pack", "price": 20000 }
+        {
+          "size": "Whole sliced loaf",
+          "price": 79000
+        },
+        {
+          "size": "2-slice pack",
+          "price": 20000
+        }
       ],
-      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt"],
+      "ingredients": [
+        "High-Protein Flour",
+        "Sugar",
+        "Eggs",
+        "Milk",
+        "Butter",
+        "Whipping Cream",
+        "Salt"
+      ],
       "isNew": true
     },
     {
@@ -178,10 +358,24 @@
       "description": "-",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764692911/ChatGPT_Image_Dec_2_2025_11_09_14_PM_1_xr7thn.png",
       "variants": [
-        { "size": "Whole sliced loaf", "price": 89000 },
-        { "size": "2-slice pack", "price": 20000 }
+        {
+          "size": "Whole sliced loaf",
+          "price": 89000
+        },
+        {
+          "size": "2-slice pack",
+          "price": 20000
+        }
       ],
-      "ingredients": ["High-Protein Flour", "Wheat Flour", "Eggs", "Milk", "Margarine", "Coconut Milk", "Salt"],
+      "ingredients": [
+        "High-Protein Flour",
+        "Wheat Flour",
+        "Eggs",
+        "Milk",
+        "Margarine",
+        "Coconut Milk",
+        "Salt"
+      ],
       "isNew": true
     },
     {
@@ -190,10 +384,25 @@
       "description": "-",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/keju_piadcp.png",
       "variants": [
-        { "size": "Whole sliced loaf", "price": 89000 },
-        { "size": "2-slice pack", "price": 20000 }
+        {
+          "size": "Whole sliced loaf",
+          "price": 89000
+        },
+        {
+          "size": "2-slice pack",
+          "price": 20000
+        }
       ],
-      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt", "Cheese"],
+      "ingredients": [
+        "High-Protein Flour",
+        "Sugar",
+        "Eggs",
+        "Milk",
+        "Butter",
+        "Whipping Cream",
+        "Salt",
+        "Cheese"
+      ],
       "isNew": true
     },
     {
@@ -202,10 +411,25 @@
       "description": "-",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764483815/choc_puexcc.png",
       "variants": [
-        { "size": "Whole sliced loaf", "price": 89000 },
-        { "size": "2-slice pack", "price": 20000 }
+        {
+          "size": "Whole sliced loaf",
+          "price": 89000
+        },
+        {
+          "size": "2-slice pack",
+          "price": 20000
+        }
       ],
-      "ingredients": ["High-Protein Flour", "Sugar", "Eggs", "Milk", "Butter", "Whipping Cream", "Salt", "Chocolate"],
+      "ingredients": [
+        "High-Protein Flour",
+        "Sugar",
+        "Eggs",
+        "Milk",
+        "Butter",
+        "Whipping Cream",
+        "Salt",
+        "Chocolate"
+      ],
       "isNew": true
     },
     {
@@ -214,10 +438,25 @@
       "description": "-",
       "image": "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764487211/ChatGPT_Image_Nov_30_2025_02_18_22_PM_1_lemrfv.png",
       "variants": [
-        { "size": "Whole sliced loaf", "price": 89000 },
-        { "size": "2-slice pack", "price": 20000 }
+        {
+          "size": "Whole sliced loaf",
+          "price": 89000
+        },
+        {
+          "size": "2-slice pack",
+          "price": 20000
+        }
       ],
-      "ingredients": ["High-Protein Flour", "Wheat Flour", "Eggs", "Milk", "Olive Oil", "Seeds", "Walnuts", "Salt"],
+      "ingredients": [
+        "High-Protein Flour",
+        "Wheat Flour",
+        "Eggs",
+        "Milk",
+        "Olive Oil",
+        "Seeds",
+        "Walnuts",
+        "Salt"
+      ],
       "isNew": true
     }
   ]

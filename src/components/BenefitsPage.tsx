@@ -5,7 +5,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function BenefitsPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#F5EEE8]">
       <Header />
       <div className="pt-32">
         <div className="container mx-auto px-4">

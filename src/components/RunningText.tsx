@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const scrollToHampersSection = () => {
   const element = document.getElementById('hampers-section');
   if (element) {
-    element.scrollIntoView({ 
+    element.scrollIntoView({
       behavior: 'smooth',
       block: 'start'
     });
@@ -12,43 +12,44 @@ const scrollToHampersSection = () => {
 };
 
 // const upperText = ["COOKIES ✨", "JUICE ✨", "MACARONI SCHOTEL ✨"];
+// Eid/Ramadan themed text
 const upperText = [
-  "HOLIDAY GOODIES 💜", 
-  "SNACKS FOR SNUGGLY DAYS ❄️", 
-  "LIL' TREATS FOR HAPPY MOMENTS ✨",
-  "SWEET TREATS FOR WINTER 🌟",
-  "COZY COOKIE BITES 🍪",
-  "HOLIDAY HAMPER SPECIALS 🎁"
+  "EID MUBARAK ✨",
+  "SWEET TREATS FOR RAMADAN 🌙",
+  "SHARE THE JOY OF EID 🕌",
+  "BITE-SIZED HAPPINESS 🍪",
+  "CELEBRATE WITH TINY BITTY ✨",
+  "RAMADAN SPECIALS 🎁"
 ];
 
 
 // Seasonal text - commented out for seasonal hampers
 /*const bottomText = [
-  " 🍪 Cheese Almond NEW!",
-  " 🍪 Choco Almond",
+  " 🍪 Desert Crown NEW!",
+  " 🍪 Golden Crunch",
   " 🍪 Heavenly Bites",
-  " 🍪 Oatmeal Raisin",
+  " 🍪 Harvest Haven",
 ];*/
 
-// Hampers images from HampersSection product cards
+// Hampers images from HampersSection product cards - Eid/Ramadan Collection
 const bottomImages = [
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693066/yupp-generated-image-497742_zdaako.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-570797_ekp6hg.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-565543_ukqomr.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764743725/yupp-generated-image-664995_1_vgsoen.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693066/yupp-generated-image-497742_zdaako.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-570797_ekp6hg.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-565543_ukqomr.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764743725/yupp-generated-image-664995_1_vgsoen.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693066/yupp-generated-image-497742_zdaako.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-570797_ekp6hg.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764693067/yupp-generated-image-565543_ukqomr.jpg",
-  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1764743725/yupp-generated-image-664995_1_vgsoen.jpg",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png",
+  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png",
 ];
 
 export default function RunningText() {
   return (
-    <div className="overflow-hidden py-3 md:py-6 mb-4 md:mb-6 rounded-xl bg-[#f7f7f7]">
+    <div className="overflow-hidden py-3 md:py-6 mb-4 md:mb-6 rounded-xl bg-background">
       {/* LEFT → RIGHT */}
       <Marquee
         items={upperText}
@@ -62,7 +63,7 @@ export default function RunningText() {
       <Marquee
         items={bottomImages}
         size="md:text-2xl"
-        className="text-white md:text-2xl bg-[#C5B8FF] px-3 rounded-full"
+        className="text-white md:text-2xl bg-accent px-3 rounded-full"
         speed={30}
         direction="left"
         gap="gap-4"
@@ -111,7 +112,7 @@ function Block({ items, size, className, onImageClick }: any) {
             <button
               key={i}
               onClick={onImageClick}
-              className="w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white flex-shrink-0 bg-white p-1 hover:shadow-xl duration-300 focus:outline-none focus:ring-2 focus:ring-[#C5B8FF] focus:ring-offset-2 cursor-pointer"
+              className="w-28 h-28 md:w-36 md:h-36 rounded-2xl overflow-hidden border-2 border-white flex-shrink-0 bg-white p-1 hover:shadow-xl duration-300 focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 cursor-pointer"
               aria-label={`Lihat hamper ${i + 1}`}
             >
               <img
@@ -127,8 +128,8 @@ function Block({ items, size, className, onImageClick }: any) {
         return (
           <span
             key={i}
-            className={`font-extrabold tracking-wider ${size} ${className || "text-[#553D8F]"}`}
-            style={{ fontFamily: "Nunito, sans-serif", fontWeight: 900 }}
+            className={`font-extrabold tracking-wider ${size} ${className || "text-secondary"}`}
+            style={{ fontFamily: "Montserrat, sans-serif", fontWeight: 900 }}
           >
             {item}
           </span>

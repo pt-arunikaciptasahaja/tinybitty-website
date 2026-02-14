@@ -34,12 +34,12 @@ const formatCostRange = (formattedCost: string): string => {
     // Take the first number found and remove dots for thousands separator
     const costStr = costMatch[0].replace(/\./g, '');
     const cost = parseInt(costStr);
-    
+
     // Skip if parsing failed or cost is 0
     if (isNaN(cost) || cost <= 0) {
       return formattedCost;
     }
-    
+
     // Check if cost has the buffer (costs with buffer are >= 11000)
     let baseCost: number;
     if (cost >= 11000) {
@@ -49,7 +49,7 @@ const formatCostRange = (formattedCost: string): string => {
       // For very small costs, add a reasonable buffer for estimation
       baseCost = Math.max(0, Math.floor(cost * 0.8));
     }
-    
+
     // Convert to thousands format for cleaner display
     const formatThousands = (amount: number) => {
       if (amount >= 1000) {
@@ -62,7 +62,7 @@ const formatCostRange = (formattedCost: string): string => {
         maximumFractionDigits: 0
       }).format(amount);
     };
-    
+
     return `${formatThousands(baseCost)} - ${formatThousands(cost)}`;
   }
   return formattedCost;
@@ -125,14 +125,14 @@ export default function OrderForm() {
   const [orderTotal, setOrderTotal] = useState(0);
   const [deliveryInfo, setDeliveryInfo] = useState<DeliveryInfo | null>(null);
   const [isCalculatingDelivery, setIsCalculatingDelivery] = useState(false);
-  
+
   const [clearedFields, setClearedFields] = useState<Set<string>>(new Set());
   const [hasCompletedDeliveryCalculation, setHasCompletedDeliveryCalculation] = useState(false);
   const [hasCalculatedDelivery, setHasCalculatedDelivery] = useState(false);
   const [isDistanceTooFar, setIsDistanceTooFar] = useState(false);
   const [deliveryDistance, setDeliveryDistance] = useState<number | null>(null);
   const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
-  
+
   // Debounced address calculation to prevent API calls on every keystroke
   const calculationTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -158,14 +158,14 @@ export default function OrderForm() {
   // Simple handler for new address search component
   const handleAddressSelect = useCallback((result: DistanceResult) => {
     // console.log('[ORDER FORM] Address selected:', result);
-    
+
     // Store the selected address in form
     form.setValue('address', result.destination.label);
-    
+
     // Store distance for delivery calculations
     // This distance will be used instead of parsing from zone names in delivery calculations
     setDeliveryDistance(result.distanceKm);
-    
+
     // Reset delivery calculation since address changed
     setHasCompletedDeliveryCalculation(false);
     setDeliveryInfo(null);
@@ -173,7 +173,7 @@ export default function OrderForm() {
     setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
     form.setValue('deliveryMethod', undefined);
     form.setValue('paymentMethod', undefined);
-    
+
     // Show success feedback
     toast({
       title: 'Alamat ditemukan!',
@@ -190,10 +190,10 @@ export default function OrderForm() {
   // Handle delivery method change - this is when we trigger ongkir calculation
   const handleDeliveryMethodChange = useCallback((method: string) => {
     form.setValue('deliveryMethod', method as any);
-    
+
     // Log shipping calculator trigger
     // console.log('🚚 [SHIPPING CALCULATOR] Delivery method selected:', method);
-    
+
     // If user selects Paxel, clear the distance too far state
     if (method === 'paxel') {
       setIsDistanceTooFar(false);
@@ -201,14 +201,14 @@ export default function OrderForm() {
       setDeliveryInfo(null); // Clear any existing delivery info
       setHasCompletedDeliveryCalculation(false);
     }
-    
+
     // Force form validation to reset to avoid timing issues
     form.trigger('paymentMethod');
-    
+
     // Trigger delivery calculation only when delivery method is selected (not for Paxel)
     const address = form.getValues('address');
     const detailedAddress = form.getValues('detailedAddress');
-    
+
     if (address && method && method !== 'paxel') {
       // console.log('🚚 [SHIPPING CALCULATOR] Starting calculation for:', { address, method, detailedAddress });
       calculateDeliveryForAddress(address, method, detailedAddress);
@@ -218,13 +218,13 @@ export default function OrderForm() {
   // Separate function for delivery calculation (only triggered on delivery method selection)
   const calculateDeliveryForAddress = useCallback(async (address: string, method: string, detailedAddress?: string) => {
     // console.log('🚚 [SHIPPING CALCULATOR] Cart total:', getTotalPrice());
-    
+
     setIsCalculatingDelivery(true);
     let calculationSuccess = false;
-    
+
     try {
       // console.log('🚚 [SHIPPING CALCULATOR] Attempting primary calculation...');
-      
+
       // FAST PATH: Use direct distance if available (much faster, no API calls)
       if (deliveryDistance && deliveryDistance > 0) {
         const calculation = await calculateDeliveryCostWithDistance(deliveryDistance, method);
@@ -234,9 +234,9 @@ export default function OrderForm() {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
         }).format(calculation.cost);
-        
+
         const estimatedTime = getETA(method);
-        
+
         const info = {
           cost: calculation.cost,
           zone: calculation.zone.name,
@@ -245,7 +245,7 @@ export default function OrderForm() {
           isValid: true
         };
         setDeliveryInfo(info);
-        
+
         // Check if GoSend/Grab delivery is not available due to distance > 40km
         const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
         if (isGoSendGrabMethod && deliveryDistance > 40) {
@@ -253,7 +253,7 @@ export default function OrderForm() {
           setHasCompletedDeliveryCalculation(false);
           setIsDistanceTooFar(true);
 
-          
+
           toast({
             title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
             description: `Jarak pengiriman ~${deliveryDistance.toFixed(1)}km melebihi batas 40km. Gunakan Paxel untuk pengiriman.`,
@@ -264,13 +264,13 @@ export default function OrderForm() {
           calculationSuccess = true;
           setHasCompletedDeliveryCalculation(true);
         }
-        
+
         return;
       }
-      
+
       // SLOW PATH: Fallback to API-based calculation when no direct distance
       const calculation = await calculateShippingCost(address, method, cart);
-      
+
       if (!calculation.isValidAddress) {
 
         const info = {
@@ -285,9 +285,9 @@ export default function OrderForm() {
         calculationSuccess = false;
         return;
       }
-      
+
       // console.log('[SHIPPING CALCULATOR] Primary calculation successful:', calculation);
-      
+
       // Use the distance from address search if available, otherwise extract from zone name
       let distance = deliveryDistance;
       if (!distance) {
@@ -295,10 +295,10 @@ export default function OrderForm() {
         distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
         setDeliveryDistance(distance);
       }
-      
+
       // Check if any GoSend/Grab method is selected and distance > 40km
       const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
-      
+
       // Check if delivery is not available due to distance > 40km
       if (isGoSendGrabMethod && distance > 40) {
         // Remove calculator display and show Paxel alternative
@@ -306,7 +306,7 @@ export default function OrderForm() {
         setHasCompletedDeliveryCalculation(false);
         setIsDistanceTooFar(true);
 
-        
+
         // Show toast notification about Paxel alternative
         toast({
           title: 'Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress',
@@ -321,9 +321,9 @@ export default function OrderForm() {
           minimumFractionDigits: 0,
           maximumFractionDigits: 0
         }).format(calculation.cost);
-        
+
         const estimatedTime = getETA(method);
-        
+
         const info = {
           cost: calculation.cost,
           zone: calculation.zone.name,
@@ -332,12 +332,12 @@ export default function OrderForm() {
           isValid: true
         };
         setDeliveryInfo(info);
-        
+
         // Only clear distance too far state if it's not a GoSend/Grab method for far distance
         if (!isGoSendGrabMethod || distance <= 40) {
           setIsDistanceTooFar(false);
         }
-        
+
         calculationSuccess = true;
         setHasCompletedDeliveryCalculation(true);
         // console.log('[SHIPPING CALCULATOR] Delivery info set:', info);
@@ -346,7 +346,7 @@ export default function OrderForm() {
 
       try {
         // console.log('[SHIPPING CALCULATOR] Attempting fallback calculation...');
-        
+
         // FAST PATH: Use direct distance if available in fallback too
         if (deliveryDistance && deliveryDistance > 0) {
           const fallbackCalculation = await calculateDeliveryCostWithDistance(deliveryDistance, method);
@@ -356,9 +356,9 @@ export default function OrderForm() {
             minimumFractionDigits: 0,
             maximumFractionDigits: 0
           }).format(fallbackCalculation.cost);
-          
+
           const estimatedTime = getETA(method);
-          
+
           const info = {
             cost: fallbackCalculation.cost,
             zone: fallbackCalculation.zone.name,
@@ -367,15 +367,15 @@ export default function OrderForm() {
             isValid: true
           };
           setDeliveryInfo(info);
-          
+
           // Check if GoSend/Grab delivery is not available due to distance > 40km
           const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
           if (isGoSendGrabMethod && deliveryDistance > 40) {
             setDeliveryInfo(null);
             setHasCompletedDeliveryCalculation(false);
             setIsDistanceTooFar(true);
-  
-            
+
+
             toast({
               title: 'Maaf layanan ini tidak tersedia untuk gojek/grab',
               description: `Jarak pengiriman ~${deliveryDistance.toFixed(1)}km melebihi batas 40km. Silakan gunakan Paxel untuk pengiriman.`,
@@ -386,13 +386,13 @@ export default function OrderForm() {
             calculationSuccess = true;
             setHasCompletedDeliveryCalculation(true);
           }
-          
+
           return;
         }
-        
+
         // SLOW PATH: Fallback to the old delivery calculator
         const fallbackCalculation = calculateDeliveryCost(address, method, cart, getTotalPrice());
-        
+
         // Check for distance limit exceeded (for all GoSend/Grab methods) in fallback too
         const isGoSendGrabMethod = method.includes('gosend') || method.includes('grab');
         let distance = deliveryDistance;
@@ -401,7 +401,7 @@ export default function OrderForm() {
           distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
           setDeliveryDistance(distance);
         }
-        
+
         // Check if GoSend/Grab delivery is not available due to distance > 40km
         if (isGoSendGrabMethod && distance > 40) {
           // Remove calculator display and show Paxel alternative
@@ -409,7 +409,7 @@ export default function OrderForm() {
           setHasCompletedDeliveryCalculation(false);
           setIsDistanceTooFar(true);
 
-          
+
           // Show toast notification about Paxel alternative
           toast({
             title: 'Maaf layanan ini tidak tersedia untuk gojek/grab',
@@ -426,12 +426,12 @@ export default function OrderForm() {
             isValid: true
           };
           setDeliveryInfo(info);
-          
+
           // Only clear distance too far state if it's not a GoSend/Grab method for far distance
           if (!isGoSendGrabMethod || distance <= 40) {
             setIsDistanceTooFar(false);
           }
-          
+
           calculationSuccess = true;
           setHasCompletedDeliveryCalculation(true);
           console.log('[SHIPPING CALCULATOR] Fallback calculation successful:', info);
@@ -464,15 +464,15 @@ export default function OrderForm() {
   const generateFullAddress = useCallback(() => {
     const addressField = form.watch('address');
     const detailedAddressField = form.watch('detailedAddress');
-    
+
     // Build address from search-based system
     const parts = [];
-    
+
     // Add main address from search
     if (addressField && addressField.trim()) {
       parts.push(toCamelCase(addressField.trim()));
     }
-    
+
     // Add detailed address (street address, house number, etc.)
     if (detailedAddressField && detailedAddressField.trim()) {
       const normalizedAddress = detailedAddressField
@@ -485,20 +485,20 @@ export default function OrderForm() {
         .trim();
       parts.push(toCamelCase(normalizedAddress));
     }
-    
+
     return parts.join(', ');
   }, [form]);
 
   // Debounced function for delivery calculation
   const debouncedDeliveryCalculation = useCallback(() => {
     // console.log('🔵 [DEBOUNCE] debouncedDeliveryCalculation called');
-    
+
     // Skip calculation if already completed - this prevents the overwrite issue
     if (hasCompletedDeliveryCalculation) {
       // console.log('🟢 [DEBOUNCE] Skipping calculation - already completed');
       return;
     }
-    
+
     // Clear existing timeout
     if (calculationTimeoutRef.current) {
       clearTimeout(calculationTimeoutRef.current);
@@ -507,21 +507,21 @@ export default function OrderForm() {
     // Set new timeout for 2 seconds to debounce API calls
     calculationTimeoutRef.current = setTimeout(() => {
       // console.log('🔵 [DEBOUNCE 1] Timeout fired - checking current state');
-      
+
       // Check again inside timeout - calculation might have completed while waiting
       if (hasCompletedDeliveryCalculation || deliveryInfo?.isValid) {
         // console.log('🟢 [DEBOUNCE] Skipping timeout logic - calculation already completed');
         return;
       }
-      
+
       // console.log('🔵 [DEBOUNCE 2] Timeout fired - starting calculation logic');
       // Use the new address system check (same as step completion logic)
       const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
         (detailedAddress && detailedAddress.trim().length >= 8);
-      
+
       // Generate address for API calls - use the search-based address
       const fullAddress = form.watch('address') || '';
-      
+
       // console.log('🔵 [DEBOUNCE 3] Calculation conditions:', {
       //   isAddressComplete,
       //   deliveryMethod,
@@ -529,7 +529,7 @@ export default function OrderForm() {
       //   addressLength: fullAddress.length,
       //   detailedAddressLength: detailedAddress?.trim().length
       // });
-      
+
       // Only calculate delivery if address is complete, delivery method is selected,
       // and we haven't already calculated delivery for this specific combination
       // Skip calculation for Paxel as it uses external calculator
@@ -538,7 +538,7 @@ export default function OrderForm() {
         const calculateNewDelivery = async () => {
           setIsCalculatingDelivery(true);
           let calculationSuccess = false;
-          
+
           try {
             // FAST PATH: Use direct distance if available (much faster, no API calls)
             if (deliveryDistance && deliveryDistance > 0) {
@@ -549,9 +549,9 @@ export default function OrderForm() {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
               }).format(calculation.cost);
-              
+
               const estimatedTime = getETA(deliveryMethod);
-              
+
               const info = {
                 cost: calculation.cost,
                 zone: calculation.zone.name,
@@ -560,7 +560,7 @@ export default function OrderForm() {
                 isValid: true
               };
               setDeliveryInfo(info);
-              
+
               // Check if GoSend/Grab delivery is not available due to distance > 40km
               const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
               if (isGoSendGrabMethod && deliveryDistance > 40) {
@@ -573,13 +573,13 @@ export default function OrderForm() {
                 calculationSuccess = true;
                 setHasCompletedDeliveryCalculation(true);
               }
-              
+
               return;
             }
-            
+
             // SLOW PATH: Fallback to API-based calculation when no direct distance
             const calculation = await calculateShippingCost(fullAddress, deliveryMethod, cart);
-            
+
             if (!calculation.isValidAddress) {
               const info = {
                 cost: 0,
@@ -593,7 +593,7 @@ export default function OrderForm() {
               calculationSuccess = false;
               return;
             }
-            
+
             // Use the distance from address search if available, otherwise extract from zone name
             let distance = deliveryDistance;
             if (!distance) {
@@ -601,7 +601,7 @@ export default function OrderForm() {
               distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
               setDeliveryDistance(distance);
             }
-            
+
             // Check if GoSend/Grab delivery is not available due to distance > 40km
             const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
             if (isGoSendGrabMethod && distance > 40) {
@@ -617,9 +617,9 @@ export default function OrderForm() {
                 minimumFractionDigits: 0,
                 maximumFractionDigits: 0
               }).format(calculation.cost);
-              
+
               const estimatedTime = getETA(deliveryMethod);
-              
+
               const info = {
                 cost: calculation.cost,
                 zone: calculation.zone.name,
@@ -629,12 +629,12 @@ export default function OrderForm() {
               };
               // console.log('🟢 [CALC] Setting deliveryInfo with successful calculation:', info);
               setDeliveryInfo(info);
-              
+
               // Only clear distance too far state if it's not a GoSend/Grab method for far distance
               if (!isGoSendGrabMethod || distance <= 40) {
                 setIsDistanceTooFar(false);
               }
-              
+
               calculationSuccess = true;
               setHasCompletedDeliveryCalculation(true);
             }
@@ -649,9 +649,9 @@ export default function OrderForm() {
                   minimumFractionDigits: 0,
                   maximumFractionDigits: 0
                 }).format(fallbackCalculation.cost);
-                
+
                 const estimatedTime = getETA(deliveryMethod);
-                
+
                 const info = {
                   cost: fallbackCalculation.cost,
                   zone: fallbackCalculation.zone.name,
@@ -660,7 +660,7 @@ export default function OrderForm() {
                   isValid: true
                 };
                 setDeliveryInfo(info);
-                
+
                 // Check if GoSend/Grab delivery is not available due to distance > 40km
                 const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
                 if (isGoSendGrabMethod && deliveryDistance > 40) {
@@ -673,13 +673,13 @@ export default function OrderForm() {
                   calculationSuccess = true;
                   setHasCompletedDeliveryCalculation(true);
                 }
-                
+
                 return;
               }
-              
+
               // SLOW PATH: Fallback to the old delivery calculator
               const fallbackCalculation = calculateDeliveryCost(fullAddress, deliveryMethod, cart, getTotalPrice());
-              
+
               // Use the distance from address search if available, otherwise extract from zone name
               let distance = deliveryDistance;
               if (!distance) {
@@ -687,7 +687,7 @@ export default function OrderForm() {
                 distance = distanceMatch ? parseFloat(distanceMatch[1]) : 0;
                 setDeliveryDistance(distance);
               }
-              
+
               const isGoSendGrabMethod = deliveryMethod.includes('gosend') || deliveryMethod.includes('grab');
               if (isGoSendGrabMethod && distance > 40) {
                 setDeliveryInfo(null);
@@ -704,12 +704,12 @@ export default function OrderForm() {
                   isValid: true
                 };
                 setDeliveryInfo(info);
-                
+
                 // Only clear distance too far state if it's not a GoSend/Grab method for far distance
                 if (!isGoSendGrabMethod || distance <= 40) {
                   setIsDistanceTooFar(false);
                 }
-                
+
                 calculationSuccess = true;
                 setHasCompletedDeliveryCalculation(true);
               }
@@ -772,13 +772,13 @@ export default function OrderForm() {
     // Only trigger calculation if all fields are complete (using new address system)
     const isAddressComplete = (form.watch('address') && form.watch('address').trim().length >= 8) &&
       (detailedAddress && detailedAddress.trim().length >= 8);
-    
+
     // console.log('🔵 [USEEFFECT] Delivery calculation useEffect triggered', {
     //   isAddressComplete,
     //   deliveryMethod,
     //   hasCompletedDeliveryCalculation
     // });
-    
+
     if (isAddressComplete || deliveryMethod) {
       // console.log('🔵 [USEEFFECT] Calling debouncedDeliveryCalculation');
       debouncedDeliveryCalculation();
@@ -796,9 +796,9 @@ export default function OrderForm() {
   // Function to generate and download PDF invoice
   const handleDownloadInvoice = async () => {
     if (!orderData) return;
-    
+
     setIsGeneratingPDF(true);
-    
+
     try {
       // Map delivery method to proper label
       const getDeliveryMethodLabel = (method: string) => {
@@ -811,15 +811,15 @@ export default function OrderForm() {
           default: return method || 'Not specified';
         }
       };
-      
+
       downloadInvoicePDF(
-        orderData, 
-        cart, 
-        orderTotal, 
+        orderData,
+        cart,
+        orderTotal,
         0, // Exclude ongkir cost since it's estimated and will be confirmed via WhatsApp
         getDeliveryMethodLabel(deliveryMethod || '')
       );
-      
+
       toast({
         title: 'Invoice downloaded!',
         description: 'Invoice has been downloaded to your device',
@@ -838,7 +838,7 @@ export default function OrderForm() {
 
   const handleWhatsAppRedirect = () => {
     if (!orderData) return;
-    
+
     // Track Purchase event for Facebook Pixel before redirect
     const pixelData = {
       content_ids: cart.map(item => item.productId),
@@ -867,23 +867,23 @@ export default function OrderForm() {
     fbPixelTrack('Purchase', pixelData);
 
     // console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
-    
+
     const message = buildWhatsAppMessage(orderData, cart, orderTotal, 0, isDistanceTooFar, deliveryDistance);
-    
+
     sendWhatsAppOrder(message, WHATSAPP_NUMBER);
-    
+
     setShowThankYouModal(false);
     setOrderData(null);
     setOrderTotal(0);
     setDeliveryInfo(null);
     clearCart();
     form.reset();
-    
+
     toast({
       title: 'WhatsApp opened!',
       description: 'Please send the message to complete your order',
     });
-    
+
     setTimeout(() => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
       setTimeout(() => {
@@ -968,21 +968,21 @@ export default function OrderForm() {
   };
 
   const { isValid, errors } = form.formState;
-  
+
   const isStep1Complete = form.watch('name') && form.watch('phone') &&
     form.watch('name').trim() !== '' && form.watch('phone').trim() !== '';
-  
+
   const isAddressComplete = (detailedAddress && detailedAddress.trim().length >= 8);
-  
+
   const isStep2Complete = isAddressComplete;
   const isStep3Complete = deliveryMethod && deliveryMethod.trim() !== '';
   const isStep4Complete = paymentMethod && paymentMethod.trim() !== '';
-  
+
   const currentStep = !isStep1Complete ? 1 :
-                     !isStep2Complete ? 2 :
-                     !isStep3Complete ? 3 :
-                     !isStep4Complete ? 4 : 4;
-  
+    !isStep2Complete ? 2 :
+      !isStep3Complete ? 3 :
+        !isStep4Complete ? 4 : 4;
+
   // Calculate the next step more logically
   const getNextStep = () => {
     if (!isStep1Complete) return 1;
@@ -991,245 +991,241 @@ export default function OrderForm() {
     if (!isStep4Complete) return 4;
     return 4; // All complete
   };
-  
+
   const nextStep = getNextStep();
-  
+
   const stepProgress = (currentStep - 1) / 4 * 100;
 
   return (
-<section id="order" className="mb-12 md:mb-16 py-16 rounded-3xl bg-[#C5B8FF]/20 border">
-  <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-    <Card className="rounded-3xl overflow-hidden w-full md:w-1/2 md:mx-auto">
-      <CardHeader className="bg-[#F6F2FF]">
-        <CardTitle className="text-2xl font-bold text-[#5D4E8E] flex items-center gap-2">
-          <MessageCircle className="w-8 h-8 text-[#BFAAE3]" />
-          Form Pemesanan
-        </CardTitle>
-        <div className="mt-3">
-          <div className="flex items-center justify-between text-sm text-[#8978B4] mb-2">
-            <span>Langkah {currentStep} dari 4</span>
-            <span>
-              {currentStep === 4 && isStep4Complete ? 'Form selesai!' : 'Lengkapi dulu ya!'}
-            </span>
-          </div>
-          <div className="w-full bg-[#D8CFF7]/20 rounded-full h-2">
-            <div
-              className="bg-[#BFAAE3] h-2 rounded-full transition-all duration-300"
-              style={{ width: `${stepProgress + (currentStep === 4 ? 25 : 0)}%` }}
-            ></div>
-          </div>
-        </div>
-        <CardDescription className="text-[#8978B4]">
-          {currentStep === 1 && 'Mulai dengan mengisi nama dan nomor WhatsApp kamu'}
-          {currentStep === 2 && 'Lengkapi alamat pengiriman kamu'}
-          {currentStep === 3 && 'Cek ongkir dan pilih kurir pengiriman'}
-          {currentStep === 4 && 'Data kamu sudah lengkap, yuk lanjut order sekarang!'}
-        </CardDescription>
-      </CardHeader>
-
-      <CardContent className="p-6 md:p-8">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            {/* Step 1: Data Kontak */}
-            <div
-              className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-                currentStep === 1
-                  ? 'bg-[#F6F2FF] border-[#D8CFF7]'
-                  : isStep1Complete
-                  ? 'bg-green-50 border-green-200'
-                  : 'bg-[#F6F2FF] border-[#D8CFF7]/40'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
-                    isStep1Complete
-                      ? 'bg-green-500 text-white'
-                      : currentStep === 1
-                      ? 'bg-[#BFAAE3] text-white'
-                      : 'bg-gray-300 text-gray-600'
-                  }`}
-                >
-                  1
-                </div>
-                <h3 className="font-semibold text-[#5D4E8E]">Data Kontak</h3>
-                {isStep1Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+    <section id="order" className="mb-12 md:mb-16 py-16 rounded-3xl bg-muted/20 border">
+      <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
+        <Card className="rounded-3xl overflow-hidden w-full md:w-1/2 md:mx-auto">
+          <CardHeader className="bg-muted/10">
+            <CardTitle className="text-2xl font-bold text-secondary flex items-center gap-2">
+              <MessageCircle className="w-8 h-8 text-muted" />
+              Form Pemesanan
+            </CardTitle>
+            <div className="mt-3">
+              <div className="flex items-center justify-between text-sm text-secondary/70 mb-2">
+                <span>Langkah {currentStep} dari 4</span>
+                <span>
+                  {currentStep === 4 && isStep4Complete ? 'Form selesai!' : 'Lengkapi dulu ya!'}
+                </span>
               </div>
-
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className='mb-6'>
-                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-                    <UserRoundPen className="w-4 h-4" />
-                      Nama</FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="Ketik nama lengkap"
-                        {...field}
-                        className="rounded-xl text-[#5D4E8E] border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="phone"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-                    <Smartphone className="w-4 h-4" />
-                      Nomor WhatsApp
-                    </FormLabel>
-                    <FormControl>
-                      <Input
-                        placeholder="08123456789"
-                        inputMode="numeric"
-                        pattern="[0-9]*"
-                        maxLength={15}
-                        className="rounded-xl text-[#5D4E8E] border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
-                        value={field.value}
-                        onChange={(e) => {
-                          const onlyDigits = e.target.value.replace(/\D/g, '');
-                          field.onChange(onlyDigits);
-                        }}
-                        onBlur={field.onBlur}
-                        name={field.name}
-                        ref={field.ref}
-                      />
-                    </FormControl>
-                    <p className="text-xs text-[#8978B4] mt-1">
-                      Hanya nomor Indonesia (0 atau 62 di depan), tanpa spasi atau simbol.
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="w-full bg-muted/20 rounded-full h-2">
+                <div
+                  className="bg-muted h-2 rounded-full transition-all duration-300"
+                  style={{ width: `${stepProgress + (currentStep === 4 ? 25 : 0)}%` }}
+                ></div>
+              </div>
             </div>
+            <CardDescription className="text-secondary/70">
+              {currentStep === 1 && 'Mulai dengan mengisi nama dan nomor WhatsApp kamu'}
+              {currentStep === 2 && 'Lengkapi alamat pengiriman kamu'}
+              {currentStep === 3 && 'Cek ongkir dan pilih kurir pengiriman'}
+              {currentStep === 4 && 'Data kamu sudah lengkap, yuk lanjut order sekarang!'}
+            </CardDescription>
+          </CardHeader>
 
-            {/* Step 2: Alamat Pengiriman */}
-            <div
-              className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-                currentStep === 2
-                  ? 'bg-[#F6F2FF] border-[#D8CFF7]'
-                  : isStep2Complete
-                  ? 'bg-green-50 border-green-200'
-                  : !isStep1Complete
-                  ? 'bg-gray-50 border-gray-200'
-                  : 'bg-[#F6F2FF] border-[#D8CFF7]/40'
-              }`}
-            >
-              <div className="flex items-center gap-2 mb-3">
+          <CardContent className="p-6 md:p-8">
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+                {/* Step 1: Data Kontak */}
                 <div
-                  className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
-                    isStep2Complete
-                      ? 'bg-green-500 text-white'
-                      : currentStep === 2
-                      ? 'bg-[#BFAAE3] text-white'
-                      : !isStep1Complete
-                      ? 'bg-gray-300 text-gray-500'
-                      : 'bg-[#D8CFF7] text-[#5D4E8E]'
-                  }`}
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${currentStep === 1
+                    ? 'bg-muted/5 border-muted'
+                    : isStep1Complete
+                      ? 'bg-green-50 border-green-200'
+                      : 'bg-muted/5 border-muted/40'
+                    }`}
                 >
-                  2
-                </div>
-                <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
-                  {/* <MapPin className="w-4 h-4" /> */}
-                  Alamat Lengkap
-                </h3>
-                {isStep2Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-              </div>
-
-              {/* New Address Search Component */}
-              <FormField
-                control={form.control}
-                name="address"
-                render={({ field }) => (
-                  <FormItem className="mb-6">
-                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      Alamat Pengantaran
-                    </FormLabel>
-                    <div className="relative">
-                      <FormControl>
-                        <AddressSearchInput
-                          onSelect={(result) => {
-                            console.log("result: ", result)
-                            // Store the selected address in form
-                            form.setValue('address', result.destination.label);
-                            
-                            // Store distance for delivery calculations
-                            setDeliveryDistance(result.distanceKm);
-                            
-                            // Reset delivery calculation since address changed
-                            setHasCompletedDeliveryCalculation(false);
-                            setDeliveryInfo(null);
-                            setIsDistanceTooFar(false);
-                            setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
-                            form.setValue('deliveryMethod', undefined);
-                            form.setValue('paymentMethod', undefined);
-                            
-                            // Show success feedback
-                            toast({
-                              title: 'Alamat ditemukan!',
-                              description: `${result.destination.label}`,
-                              variant: 'default',
-                            });
-                          }}
-                          disabled={!isStep1Complete}
-                          className="w-full"
-                        />
-                      </FormControl>
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${isStep1Complete
+                        ? 'bg-green-500 text-white'
+                        : currentStep === 1
+                          ? 'bg-muted text-white'
+                          : 'bg-gray-300 text-gray-600'
+                        }`}
+                    >
+                      1
                     </div>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <h3 className="font-semibold text-secondary">Data Kontak</h3>
+                    {isStep1Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                  </div>
 
-              {/* Detail Alamat (Mandatory) */}
-              <FormField
-                control={form.control}
-                name="detailedAddress"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-                      <MapPinHouse className="w-4 h-4" />
-                      Detail Alamat (Wajib)
-                      <span className="text-red-500">*</span>
-                    </FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Contoh: Blok ABC No. 123"
-                        {...field}
-                        disabled={!isStep1Complete}
-                        className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white min-h-[80px] placeholder:text-gray-400"
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
-                          form.setValue('deliveryMethod', undefined);
-                          form.setValue('paymentMethod', undefined);
-                          setHasCompletedDeliveryCalculation(false);
-                          setDeliveryInfo(null);
-                          setIsDistanceTooFar(false);
-                          setDeliveryDistance(null);
-                        }}
-                      />
-                    </FormControl>
-                    <p className="text-xs text-[#8978B4] flex items-center gap-1">
-                      <Lightbulb className="w-3 h-3" />
-                      Detail alamat diperlukan untuk akurasi pengiriman (nomor rumah, RT/RW, lantai, dll)
-                    </p>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItem className='mb-6'>
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <UserRoundPen className="w-4 h-4" />
+                          Nama</FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="Ketik nama lengkap"
+                            {...field}
+                            className="rounded-xl text-secondary border-muted/40 focus:border-muted bg-white placeholder:text-gray-400"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
 
-              {/* Detailed Address Input */}
-              {/* <FormField
+                  <FormField
+                    control={form.control}
+                    name="phone"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <Smartphone className="w-4 h-4" />
+                          Nomor WhatsApp
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            placeholder="08123456789"
+                            inputMode="numeric"
+                            pattern="[0-9]*"
+                            maxLength={15}
+                            className="rounded-xl text-secondary border-muted/40 focus:border-muted bg-white placeholder:text-gray-400"
+                            value={field.value}
+                            onChange={(e) => {
+                              const onlyDigits = e.target.value.replace(/\D/g, '');
+                              field.onChange(onlyDigits);
+                            }}
+                            onBlur={field.onBlur}
+                            name={field.name}
+                            ref={field.ref}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-secondary/70 mt-1">
+                          Hanya nomor Indonesia (0 atau 62 di depan), tanpa spasi atau simbol.
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+
+                {/* Step 2: Alamat Pengiriman */}
+                <div
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${currentStep === 2
+                    ? 'bg-muted/5 border-muted'
+                    : isStep2Complete
+                      ? 'bg-green-50 border-green-200'
+                      : !isStep1Complete
+                        ? 'bg-gray-50 border-gray-200'
+                        : 'bg-muted/5 border-muted/40'
+                    }`}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${isStep2Complete
+                        ? 'bg-green-500 text-white'
+                        : currentStep === 2
+                          ? 'bg-muted text-white'
+                          : !isStep1Complete
+                            ? 'bg-gray-300 text-gray-500'
+                            : 'bg-muted/50 text-secondary'
+                        }`}
+                    >
+                      2
+                    </div>
+                    <h3 className="font-semibold text-secondary flex items-center gap-2">
+                      {/* <MapPin className="w-4 h-4" /> */}
+                      Alamat Lengkap
+                    </h3>
+                    {isStep2Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                  </div>
+
+                  {/* New Address Search Component */}
+                  <FormField
+                    control={form.control}
+                    name="address"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          Alamat Pengantaran
+                        </FormLabel>
+                        <div className="relative">
+                          <FormControl>
+                            <AddressSearchInput
+                              onSelect={(result) => {
+                                console.log("result: ", result)
+                                // Store the selected address in form
+                                form.setValue('address', result.destination.label);
+
+                                // Store distance for delivery calculations
+                                setDeliveryDistance(result.distanceKm);
+
+                                // Reset delivery calculation since address changed
+                                setHasCompletedDeliveryCalculation(false);
+                                setDeliveryInfo(null);
+                                setIsDistanceTooFar(false);
+                                setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+                                form.setValue('deliveryMethod', undefined);
+                                form.setValue('paymentMethod', undefined);
+
+                                // Show success feedback
+                                toast({
+                                  title: 'Alamat ditemukan!',
+                                  description: `${result.destination.label}`,
+                                  variant: 'default',
+                                });
+                              }}
+                              disabled={!isStep1Complete}
+                              className="w-full"
+                            />
+                          </FormControl>
+                        </div>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Detail Alamat (Mandatory) */}
+                  <FormField
+                    control={form.control}
+                    name="detailedAddress"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <MapPinHouse className="w-4 h-4" />
+                          Detail Alamat (Wajib)
+                          <span className="text-red-500">*</span>
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Contoh: Blok ABC No. 123"
+                            {...field}
+                            disabled={!isStep1Complete}
+                            className="rounded-xl border-muted/40 focus:border-muted bg-white min-h-[80px] placeholder:text-gray-400"
+                            onChange={(e) => {
+                              field.onChange(e);
+                              setClearedFields(new Set(['deliveryMethod', 'paymentMethod']));
+                              form.setValue('deliveryMethod', undefined);
+                              form.setValue('paymentMethod', undefined);
+                              setHasCompletedDeliveryCalculation(false);
+                              setDeliveryInfo(null);
+                              setIsDistanceTooFar(false);
+                              setDeliveryDistance(null);
+                            }}
+                          />
+                        </FormControl>
+                        <p className="text-xs text-secondary/70 flex items-center gap-1">
+                          <Lightbulb className="w-3 h-3" />
+                          Detail alamat diperlukan untuk akurasi pengiriman (nomor rumah, RT/RW, lantai, dll)
+                        </p>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Detailed Address Input */}
+                  {/* <FormField
                 control={form.control}
                 name="detailedAddress"
                 render={({ field }) => (
@@ -1270,99 +1266,95 @@ export default function OrderForm() {
                   </FormItem>
                 )}
               /> */}
-            </div>
+                </div>
 
-{/* Step 3: Cek Ongkir / Kurir */}
-<div
-  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-    currentStep === 3
-      ? 'bg-[#F6F2FF] border-[#D8CFF7]'
-      : isStep3Complete
-      ? 'bg-green-50 border-green-200'
-      : !isStep2Complete
-      ? 'bg-gray-50 border-gray-200'
-      : 'bg-[#F6F2FF] border-[#D8CFF7]/40'
-  }`}
->
-  <div className="flex items-center gap-2 mb-3">
-    <div
-      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
-        isStep3Complete
-          ? 'bg-green-500 text-white'
-          : currentStep === 3
-          ? 'bg-[#BFAAE3] text-white'
-          : !isStep2Complete
-          ? 'bg-gray-300 text-gray-500'
-          : 'bg-[#D8CFF7] text-[#5D4E8E]'
-      }`}
-    >
-      3
-    </div>
-    <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
-      {/* <Motorbike className="w-4 h-4" /> */}
-      Cek Ongkir
-    </h3>
-    {isStep3Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-  </div>
+                {/* Step 3: Cek Ongkir / Kurir */}
+                <div
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${currentStep === 3
+                    ? 'bg-muted/5 border-muted'
+                    : isStep3Complete
+                      ? 'bg-green-50 border-green-200'
+                      : !isStep2Complete
+                        ? 'bg-gray-50 border-gray-200'
+                        : 'bg-muted/5 border-muted/40'
+                    }`}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${isStep3Complete
+                        ? 'bg-green-500 text-white'
+                        : currentStep === 3
+                          ? 'bg-muted text-white'
+                          : !isStep2Complete
+                            ? 'bg-gray-300 text-gray-500'
+                            : 'bg-muted/50 text-secondary'
+                        }`}
+                    >
+                      3
+                    </div>
+                    <h3 className="font-semibold text-secondary flex items-center gap-2">
+                      {/* <Motorbike className="w-4 h-4" /> */}
+                      Cek Ongkir
+                    </h3>
+                    {isStep3Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
+                  </div>
 
-  <FormField
-    control={form.control}
-    name="deliveryMethod"
-    render={({ field }) => (
-      <FormItem>
-        
-        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-        <Motorbike className="w-4 h-4" />
-          Pilih Kurir / Metode Pengiriman
-        </FormLabel>
-        <Select
-          value={field.value || ''}
-          onValueChange={(value) => {
-            field.onChange(value);
-            // Trigger ongkir calculation when delivery method is selected
-            handleDeliveryMethodChange(value);
-            setClearedFields((prev) => {
-              const updated = new Set(prev);
-              updated.delete('deliveryMethod');
-              return updated;
-            });
-          }}
-          disabled={!isStep2Complete || isCalculatingDelivery}
-        >
-          <FormControl>
-            <SelectTrigger
-              className={`rounded-xl border-[#D8CFF7]/40 bg-white ${
-                !isStep2Complete ? 'bg-gray-100 cursor-not-allowed' : ''
-              } ${
-                clearedFields.has('deliveryMethod')
-                  ? 'border-amber-300 bg-amber-50'
-                  : ''
-              }`}
-            >
-              <SelectValue
-                placeholder={
-                  !isStep2Complete
-                    ? 'Lengkapi alamat dulu'
-                    : 'Pilih kurir / metode pengiriman'
-                }
-              />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            <SelectItem value="gosend">GoSend Instant</SelectItem>
-            <SelectItem value="gosendsameday">GoSend SameDay</SelectItem>
-            <SelectItem value="grab">GrabExpress Instant</SelectItem>
-            <SelectItem value="grabsameday">GrabExpress SameDay</SelectItem>
-            <SelectItem value="paxel">Paxel</SelectItem>
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
+                  <FormField
+                    control={form.control}
+                    name="deliveryMethod"
+                    render={({ field }) => (
+                      <FormItem>
 
-  {/* WhatsApp Confirmation Notice */}
-  {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mt-3">
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <Motorbike className="w-4 h-4" />
+                          Pilih Kurir / Metode Pengiriman
+                        </FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            // Trigger ongkir calculation when delivery method is selected
+                            handleDeliveryMethodChange(value);
+                            setClearedFields((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete('deliveryMethod');
+                              return updated;
+                            });
+                          }}
+                          disabled={!isStep2Complete || isCalculatingDelivery}
+                        >
+                          <FormControl>
+                            <SelectTrigger
+                              className={`rounded-xl border-muted/40 bg-white ${!isStep2Complete ? 'bg-gray-100 cursor-not-allowed' : ''
+                                } ${clearedFields.has('deliveryMethod')
+                                  ? 'border-amber-300 bg-amber-50'
+                                  : ''
+                                }`}
+                            >
+                              <SelectValue
+                                placeholder={
+                                  !isStep2Complete
+                                    ? 'Lengkapi alamat dulu'
+                                    : 'Pilih kurir / metode pengiriman'
+                                }
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="gosend">GoSend Instant</SelectItem>
+                            <SelectItem value="gosendsameday">GoSend SameDay</SelectItem>
+                            <SelectItem value="grab">GrabExpress Instant</SelectItem>
+                            <SelectItem value="grabsameday">GrabExpress SameDay</SelectItem>
+                            <SelectItem value="paxel">Paxel</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* WhatsApp Confirmation Notice */}
+                  {/* <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mt-3">
     <div className="flex items-center gap-2 text-blue-700">
       <MessageCircle className="w-4 h-4" />
       <span className="text-sm font-medium">💬 ONGKIR AKAN DIKONFIRMASI VIA WHATSAPP</span>
@@ -1371,491 +1363,501 @@ export default function OrderForm() {
       Biaya pengiriman akan dikonfirmasi melalui WhatsApp setelah order diterima.
     </p>
   </div> */}
-</div>
+                </div>
 
-{/* Ongkir Display - Hide when distance is too far for GoSend/Grab OR when Paxel is selected */}
-{(deliveryInfo || isCalculatingDelivery || deliveryMethod) && !isDistanceTooFar && deliveryMethod !== 'paxel' && (
-  <Card
-    className={`border-2 shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${
-      deliveryInfo?.isValid
-        ? 'bg-gradient-to-br from-[#F6F2FF] to-[#F0E8FF] border-[#BFAAE3] shadow-[#BFAAE3]/20'
-        : 'bg-red-50 border-red-200'
-    }`}
-  >
-    <CardContent className="p-6">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
-          <div className="p-2 bg-[#BFAAE3] rounded-lg">
-            <Motorbike className="w-5 h-5 text-white" />
-          </div>
-          <span className="flex-1 text-sm">Kalkulator Ongkir</span>
-          {isCalculatingDelivery && (
-            <div className="hidden md:flex items-center gap-2 text-sm text-[#8978B4] bg-[#BFAAE3]/10 px-3 py-1 rounded-full">
-              <div className="w-4 h-4 border-2 border-[#BFAAE3]/30 border-t-[#BFAAE3] rounded-full animate-spin"></div>
-              Menghitung ongkir...
-            </div>
-          )}
-        </div>
+                {/* Ongkir Display - Hide when distance is too far for GoSend/Grab OR when Paxel is selected */}
+                {(deliveryInfo || isCalculatingDelivery || deliveryMethod) && !isDistanceTooFar && deliveryMethod !== 'paxel' && (
+                  <Card
+                    className={`border-2 shadow-lg transform hover:scale-[1.02] transition-all duration-300 ${deliveryInfo?.isValid
+                      ? 'bg-gradient-to-br from-muted/5 to-muted/10 border-muted shadow-muted/20'
+                      : 'bg-red-50 border-red-200'
+                      }`}
+                  >
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-secondary font-bold text-lg bg-white/50 rounded-xl p-3 border border-muted/20">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <Motorbike className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="flex-1 text-sm">Kalkulator Ongkir</span>
+                          {isCalculatingDelivery && (
+                            <div className="hidden md:flex items-center gap-2 text-sm text-secondary/70 bg-muted/10 px-3 py-1 rounded-full">
+                              <div className="w-4 h-4 border-2 border-muted/30 border-t-muted rounded-full animate-spin"></div>
+                              Menghitung ongkir...
+                            </div>
+                          )}
+                        </div>
 
-        {isCalculatingDelivery && (
-          <div className="md:hidden mt-2 w-full flex items-center justify-center gap-2 text-sm text-[#8978B4] bg-[#BFAAE3]/10 px-3 py-1 rounded-full">
-            <div className="w-4 h-4 border-2 border-[#BFAAE3]/30 border-t-[#BFAAE3] rounded-full animate-spin"></div>
-            Menghitung ongkir...
-          </div>
-        )}
+                        {isCalculatingDelivery && (
+                          <div className="md:hidden mt-2 w-full flex items-center justify-center gap-2 text-sm text-secondary/70 bg-muted/10 px-3 py-1 rounded-full">
+                            <div className="w-4 h-4 border-2 border-muted/30 border-t-muted rounded-full animate-spin"></div>
+                            Menghitung ongkir...
+                          </div>
+                        )}
 
-        {!isCalculatingDelivery && deliveryInfo && !deliveryInfo.isValid ? (
-          <div className="text-red-600 text-sm">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4" />
-              <span>{deliveryInfo.validationError}</span>
-            </div>
-          </div>
-        ) : !isCalculatingDelivery && deliveryInfo ? (
-          <>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="bg-white/60 rounded-xl p-4 border border-[#BFAAE3]/20 hover:bg-white/80 transition-all duration-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#BFAAE3]/10 rounded-lg">
-                    <MapPin className="w-5 h-5 text-[#BFAAE3]" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#5D4E8E] text-sm">
-                      Estimasi Jarak
+                        {!isCalculatingDelivery && deliveryInfo && !deliveryInfo.isValid ? (
+                          <div className="text-red-600 text-sm">
+                            <div className="flex items-center gap-2">
+                              <AlertCircle className="w-4 h-4" />
+                              <span>{deliveryInfo.validationError}</span>
+                            </div>
+                          </div>
+                        ) : !isCalculatingDelivery && deliveryInfo ? (
+                          <>
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                              <div className="bg-white/60 rounded-xl p-4 border border-muted/20 hover:bg-white/80 transition-all duration-200">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-muted/10 rounded-lg">
+                                    <MapPin className="w-5 h-5 text-muted" />
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-secondary text-sm">
+                                      Estimasi Jarak
+                                    </div>
+                                    <div className="text-secondary/70 font-medium">
+                                      {`${deliveryInfo.zone}`}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="bg-white/60 rounded-xl p-4 border border-muted/20 hover:bg-white/80 transition-all duration-200">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-muted/10 rounded-lg">
+                                    <Timer className="w-5 h-5 text-muted" />
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-secondary text-sm">
+                                      Estimasi Waktu Pengiriman
+                                    </div>
+                                    <div className="text-secondary/70 font-medium">
+                                      {deliveryInfo.time}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <div className="bg-gradient-to-br from-muted to-secondary/50 rounded-xl p-4 border border-muted hover:shadow-lg transition-all duration-200">
+                                <div className="flex items-center gap-3">
+                                  <div className="p-2 bg-white/20 rounded-lg">
+                                    <Motorbike className="w-5 h-5 text-white" />
+                                  </div>
+                                  <div>
+                                    <div className="font-bold text-white text-sm">
+                                      Perkiraan Ongkir
+                                    </div>
+                                    <div className="text-white font-bold text-lg">
+                                      {formatCostRange(deliveryInfo.formattedCost)}
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+
+                            {/* Note: ongkir masih perkiraan */}
+                            <p className="text-xs md:text-sm text-secondary/70 bg-white/60 rounded-lg px-3 py-2 border border-muted/20">
+                              💡 <strong>Rentang perkiraan ongkir:</strong> {formatCostRange(deliveryInfo.formattedCost)} (harga final mengikuti aplikasi kurir)
+                            </p>
+                          </>
+                        ) : isCalculatingDelivery ? (
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
+                                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
+                                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-20"></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
+                                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
+                                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-16"></div>
+                                </div>
+                              </div>
+                            </div>
+                            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
+                              <div className="flex items-center gap-3">
+                                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
+                                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
+                                </div>
+                                <div className="flex-1">
+                                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
+                                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-24"></div>
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        ) : null}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Paxel Display - Show when Paxel is selected */}
+                {deliveryMethod === 'paxel' && (
+                  <Card className="border-2 shadow-lg bg-gradient-to-br from-secondary/5 to-secondary/10 border-muted shadow-muted/20">
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-secondary font-bold text-lg bg-white/50 rounded-xl p-3 border border-muted/20">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <ExternalLink className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="flex-1 text-sm">Cek Ongkir via Paxel</span>
+                        </div>
+
+                        <div className="text-center">
+                          <p className="text-[#8978B4] mb-4">Klik tombol di bawah untuk cek ongkir pengiriman Paxel</p>
+                          <Button
+                            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
+                            className="relative w-full bg-foreground text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 overflow-hidden group hover:shadow-primary/20 transition-all duration-300"
+                          >
+                            <div className="relative z-10 flex items-center justify-center gap-2">
+                              <ExternalLink className="w-4 h-4" />
+                              Cek Ongkir Paxel
+                            </div>
+                            <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Paxel Alternative - Show when distance > 40km */}
+                {isDistanceTooFar && deliveryDistance && deliveryDistance > 40 && (
+                  <Card className="border-2 shadow-lg bg-gradient-to-br from-secondary/5 to-secondary/10 border-muted shadow-muted/20">
+                    <CardContent className="p-6">
+                      <div className="space-y-4">
+                        <div className="flex items-center gap-3 text-secondary font-bold text-lg bg-white/50 rounded-xl p-3 border border-muted/20">
+                          <div className="p-2 bg-muted rounded-lg">
+                            <AlertCircle className="w-5 h-5 text-white" />
+                          </div>
+                          <span className="flex-1 text-sm">Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress</span>
+                        </div>
+
+                        <div className="text-center">
+                          {/* <p className="text-[#8978B4] mb-4">Untuk jarak {deliveryDistance.toFixed(1)} km, sebaiknya gunakan Paxel</p> */}
+                          <Button
+                            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
+                            className="relative w-full bg-foreground text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 overflow-hidden group hover:shadow-primary/20 transition-all duration-300"
+                          >
+                            <div className="relative z-10 flex items-center justify-center gap-2">
+                              <ExternalLink className="w-4 h-4" />
+                              Cek Ongkir Paxel
+                            </div>
+                            <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Step 4: Metode Pembayaran */}
+                <div
+                  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${paymentMethod
+                    ? 'bg-green-50 border-green-200'
+                    : currentStep === 4
+                      ? 'bg-[#F6F2FF] border-[#D8CFF7]'
+                      : isStep4Complete
+                        ? 'bg-green-50 border-green-200'
+                        : !isStep3Complete
+                          ? 'bg-gray-50 border-gray-200'
+                          : 'bg-[#F6F2FF] border-[#D8CFF7]/40'
+                    }`}
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <div
+                      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${isStep4Complete
+                        ? 'bg-green-500 text-white'
+                        : currentStep === 4
+                          ? 'bg-muted text-white'
+                          : !isStep3Complete
+                            ? 'bg-gray-300 text-gray-500'
+                            : 'bg-muted/50 text-secondary'
+                        }`}
+                    >
+                      4
                     </div>
-                    <div className="text-[#8978B4] font-medium">
-                      {`${deliveryInfo.zone}`}
-                    </div>
+                    <h3 className="font-semibold text-secondary flex items-center gap-2">
+                      {/* <CreditCard className="w-4 h-4" /> */}
+                      Metode Pembayaran
+                    </h3>
+                    {isStep4Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
                   </div>
+
+                  <FormField
+                    control={form.control}
+                    name="paymentMethod"
+                    render={({ field }) => (
+                      <FormItem className="mb-6">
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <WalletCards className="w-4 h-4" />
+                          Pilih Metode Pembayaran
+                        </FormLabel>
+                        <Select
+                          value={field.value || ''}
+                          onValueChange={(value) => {
+                            field.onChange(value);
+                            setClearedFields((prev) => {
+                              const updated = new Set(prev);
+                              updated.delete('paymentMethod');
+                              return updated;
+                            });
+                          }}
+                          disabled={!isStep3Complete}
+                        >
+                          <FormControl>
+                            <SelectTrigger
+                              className={`rounded-xl border-muted/40 bg-white ${!isStep3Complete ? 'bg-gray-100 cursor-not-allowed' : ''
+                                } ${clearedFields.has('paymentMethod')
+                                  ? 'border-amber-300 bg-amber-50'
+                                  : ''
+                                }`}
+                            >
+                              <SelectValue
+                                placeholder={
+                                  !isStep3Complete
+                                    ? 'Cek ongkir & pilih kurir dulu'
+                                    : 'Pilih metode pembayaran'
+                                }
+                              />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="transfer">Transfer Bank</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  {/* Catatan (Opsional) */}
+                  <FormField
+                    control={form.control}
+                    name="notes"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel className="text-secondary flex items-center gap-2">
+                          <NotebookPen className="w-4 h-4" />
+                          Catatan Tambahan (Opsional)
+                        </FormLabel>
+                        <FormControl>
+                          <Textarea
+                            placeholder="Ada instruksi khusus? Tulis di sini"
+                            {...field}
+                            className="rounded-xl border-muted/40 focus:border-primary bg-white placeholder:text-gray-400"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
                 </div>
-              </div>
 
-              <div className="bg-white/60 rounded-xl p-4 border border-[#BFAAE3]/20 hover:bg-white/80 transition-all duration-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-[#BFAAE3]/10 rounded-lg">
-                    <Timer className="w-5 h-5 text-[#BFAAE3]" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-[#5D4E8E] text-sm">
-                      Estimasi Waktu Pengiriman
-                    </div>
-                    <div className="text-[#8978B4] font-medium">
-                      {deliveryInfo.time}
-                    </div>
-                  </div>
-                </div>
-              </div>
+                {/* Ringkasan Pesanan */}
+                {cart.length > 0 && (
+                  <Card className={`border-muted/40 ${deliveryInfo?.isValid ? 'bg-secondary/5' : 'bg-amber-50 border-amber-200'
+                    }`}>
+                    <CardContent className="p-4">
+                      <div className="space-y-2">
+                        <div className="font-semibold text-secondary mb-3">Ringkasan Pesanan</div>
 
-              <div className="bg-gradient-to-br from-[#BFAAE3] to-[#9D85D0] rounded-xl p-4 border border-[#BFAAE3] hover:shadow-lg transition-all duration-200">
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white/20 rounded-lg">
-                    <Motorbike className="w-5 h-5 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-white text-sm">
-                      Perkiraan Ongkir
-                    </div>
-                    <div className="text-white font-bold text-lg">
-                      {formatCostRange(deliveryInfo.formattedCost)}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-secondary/70">Subtotal Produk</span>
+                          <span className="text-secondary font-medium">
+                            Rp {getTotalPrice().toLocaleString('id-ID')}
+                          </span>
+                        </div>
 
-            {/* Note: ongkir masih perkiraan */}
-            <p className="text-xs md:text-sm text-[#8978B4] bg-white/60 rounded-lg px-3 py-2 border border-[#BFAAE3]/20">
-              💡 <strong>Rentang perkiraan ongkir:</strong> {formatCostRange(deliveryInfo.formattedCost)} (harga final mengikuti aplikasi kurir)
-            </p>
-          </>
-        ) : isCalculatingDelivery ? (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
-                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
-                </div>
-                <div className="flex-1">
-                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-20"></div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
-                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
-                </div>
-                <div className="flex-1">
-                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-16"></div>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white/40 rounded-xl p-4 border border-[#BFAAE3]/10">
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-[#BFAAE3]/20 rounded-lg animate-pulse">
-                  <div className="w-5 h-5 bg-[#BFAAE3]/30 rounded"></div>
-                </div>
-                <div className="flex-1">
-                  <div className="h-3 bg-[#BFAAE3]/20 rounded animate-pulse mb-2"></div>
-                  <div className="h-4 bg-[#BFAAE3]/10 rounded animate-pulse w-24"></div>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : null}
-      </div>
-    </CardContent>
-  </Card>
-)}
-
-{/* Paxel Display - Show when Paxel is selected */}
-{deliveryMethod === 'paxel' && (
-  <Card className="border-2 shadow-lg bg-gradient-to-br from-[#F6F2FF] to-[#F0E8FF] border-[#BFAAE3] shadow-[#BFAAE3]/20">
-    <CardContent className="p-6">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
-          <div className="p-2 bg-[#BFAAE3] rounded-lg">
-            <ExternalLink className="w-5 h-5 text-white" />
-          </div>
-          <span className="flex-1 text-sm">Cek Ongkir via Paxel</span>
-        </div>
-
-        <div className="text-center">
-          <p className="text-[#8978B4] mb-4">Klik tombol di bawah untuk cek ongkir pengiriman Paxel</p>
-          <Button
-            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
-            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Cek Ongkir Paxel
-          </Button>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)}
-
-{/* Paxel Alternative - Show when distance > 40km */}
-{isDistanceTooFar && deliveryDistance && deliveryDistance > 40 && (
-  <Card className="border-2 shadow-lg bg-gradient-to-br from-[#F6F2FF] to-[#F0E8FF] border-[#BFAAE3] shadow-[#BFAAE3]/20">
-    <CardContent className="p-6">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-[#5D4E8E] font-bold text-lg bg-white/50 rounded-xl p-3 border border-[#BFAAE3]/20">
-          <div className="p-2 bg-[#BFAAE3] rounded-lg">
-            <AlertCircle className="w-5 h-5 text-white" />
-          </div>
-          <span className="flex-1 text-sm">Maaf layanan ini tidak tersedia untuk GoSend/GrabExpress</span>
-        </div>
-
-        <div className="text-center">
-          {/* <p className="text-[#8978B4] mb-4">Untuk jarak {deliveryDistance.toFixed(1)} km, sebaiknya gunakan Paxel</p> */}
-          <Button
-            onClick={() => window.open('https://paxel.co/id/check-rates', '_blank')}
-            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
-          >
-            <ExternalLink className="w-4 h-4" />
-            Cek Ongkir Paxel
-          </Button>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-)}
-
-{/* Step 4: Metode Pembayaran */}
-<div
-  className={`p-4 rounded-2xl border-2 transition-all duration-300 ${
-    paymentMethod
-      ? 'bg-green-50 border-green-200'
-      : currentStep === 4
-      ? 'bg-[#F6F2FF] border-[#D8CFF7]'
-      : isStep4Complete
-      ? 'bg-green-50 border-green-200'
-      : !isStep3Complete
-      ? 'bg-gray-50 border-gray-200'
-      : 'bg-[#F6F2FF] border-[#D8CFF7]/40'
-  }`}
->
-  <div className="flex items-center gap-2 mb-3">
-    <div
-      className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold ${
-        isStep4Complete
-          ? 'bg-green-500 text-white'
-          : currentStep === 4
-          ? 'bg-[#BFAAE3] text-white'
-          : !isStep3Complete
-          ? 'bg-gray-300 text-gray-500'
-          : 'bg-[#D8CFF7] text-[#5D4E8E]'
-      }`}
-    >
-      4
-    </div>
-    <h3 className="font-semibold text-[#5D4E8E] flex items-center gap-2">
-      {/* <CreditCard className="w-4 h-4" /> */}
-      Metode Pembayaran
-    </h3>
-    {isStep4Complete && <CheckCircle2 className="w-4 h-4 text-green-500" />}
-  </div>
-
-  <FormField
-    control={form.control}
-    name="paymentMethod"
-    render={({ field }) => (
-      <FormItem className="mb-6">
-        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-        <WalletCards className="w-4 h-4" />
-          Pilih Metode Pembayaran
-        </FormLabel>
-        <Select
-          value={field.value || ''}
-          onValueChange={(value) => {
-            field.onChange(value);
-            setClearedFields((prev) => {
-              const updated = new Set(prev);
-              updated.delete('paymentMethod');
-              return updated;
-            });
-          }}
-          disabled={!isStep3Complete}
-        >
-          <FormControl>
-            <SelectTrigger
-              className={`rounded-xl border-[#D8CFF7]/40 bg-white ${
-                !isStep3Complete ? 'bg-gray-100 cursor-not-allowed' : ''
-              } ${
-                clearedFields.has('paymentMethod')
-                  ? 'border-amber-300 bg-amber-50'
-                  : ''
-              }`}
-            >
-              <SelectValue
-                placeholder={
-                  !isStep3Complete
-                    ? 'Cek ongkir & pilih kurir dulu'
-                    : 'Pilih metode pembayaran'
-                }
-              />
-            </SelectTrigger>
-          </FormControl>
-          <SelectContent>
-            <SelectItem value="transfer">Transfer Bank</SelectItem>
-          </SelectContent>
-        </Select>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-
-  {/* Catatan (Opsional) */}
-  <FormField
-    control={form.control}
-    name="notes"
-    render={({ field }) => (
-      <FormItem>
-        <FormLabel className="text-[#5D4E8E] flex items-center gap-2">
-        <NotebookPen className="w-4 h-4" />
-          Catatan Tambahan (Opsional)
-        </FormLabel>
-        <FormControl>
-          <Textarea
-            placeholder="Ada instruksi khusus? Tulis di sini"
-            {...field}
-            className="rounded-xl border-[#D8CFF7]/40 focus:border-[#BFAAE3] bg-white placeholder:text-gray-400"
-          />
-        </FormControl>
-        <FormMessage />
-      </FormItem>
-    )}
-  />
-</div>
-
-{/* Ringkasan Pesanan */}
-{cart.length > 0 && (
-  <Card className={`border-[#D8CFF7]/40 ${
-    deliveryInfo?.isValid ? 'bg-[#F6F2FF]' : 'bg-amber-50 border-amber-200'
-  }`}>
-    <CardContent className="p-4">
-      <div className="space-y-2">
-        <div className="font-semibold text-[#5D4E8E] mb-3">Ringkasan Pesanan</div>
-
-        <div className="flex justify-between text-sm">
-          <span className="text-[#8978B4]">Subtotal Produk</span>
-          <span className="text-[#5D4E8E] font-medium">
-            Rp {getTotalPrice().toLocaleString('id-ID')}
-          </span>
-        </div>
-
-        {deliveryInfo?.isValid ? (
-          <div className="flex justify-between text-sm">
-            <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-            <span className="font-medium text-[#5D4E8E]">
-              {formatCostRange(deliveryInfo.formattedCost)}
-            </span>
-          </div>
-        ) : deliveryMethod === 'paxel' ? (
-          <div className="flex justify-between text-sm">
-            {/* <span className="text-[#8978B4]">Perkiraan Ongkir</span>
+                        {deliveryInfo?.isValid ? (
+                          <div className="flex justify-between text-sm">
+                            <span className="text-secondary/70">Perkiraan Ongkir</span>
+                            <span className="font-medium text-secondary">
+                              {formatCostRange(deliveryInfo.formattedCost)}
+                            </span>
+                          </div>
+                        ) : deliveryMethod === 'paxel' ? (
+                          <div className="flex justify-between text-sm">
+                            {/* <span className="text-[#8978B4]">Perkiraan Ongkir</span>
             <span className="font-medium text-[#5D4E8E]">
               Tidak tersedia
             </span> */}
-          </div>
-        ) : ""}
-      </div>
-    </CardContent>
-  </Card>
-)}
+                          </div>
+                        ) : ""}
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
 
-{/* Ringkasan Validasi */}
-{Object.keys(errors).length > 0 && cart.length > 0 && (
-  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
-    <div className="flex items-center gap-2 text-red-700 font-semibold mb-3">
-      <AlertCircle className="w-5 h-5" />
-      <span>Ada data yang perlu dilengkapi dulu:</span>
-    </div>
-    <div className="space-y-2 text-sm text-red-600">
-      {(() => {
-        // console.log('🔴 [VALIDATION ERROR] Validation errors detected:', {
-        //   errors,
-        //   errorKeys: Object.keys(errors),
-        //   isAddressComplete,
-        //   deliveryMethod,
-        //   paymentMethod,
-        //   formValues: {
-        //     name: form.watch('name'),
-        //     phone: form.watch('phone'),
-        //     address: form.watch('address'),
-        //     detailedAddress: form.watch('detailedAddress'),
-        //     deliveryMethod: form.watch('deliveryMethod'),
-        //     paymentMethod: form.watch('paymentMethod')
-        //   }
-        // });
-        return null;
-      })()}
-      {errors.name && <div>• Nama lengkap</div>}
-      {errors.phone && <div>• Nomor WhatsApp</div>}
-      {(!detailedAddress || detailedAddress.trim().length < 8) && <div>• Alamat lengkap (detail alamat)</div>}
-      {!deliveryMethod && <div>• Cek ongkir & pilih kurir</div>}
-      {!paymentMethod && <div>• Metode pembayaran</div>}
-    </div>
-  </div>
-)}
+                {/* Ringkasan Validasi */}
+                {Object.keys(errors).length > 0 && cart.length > 0 && (
+                  <div className="bg-red-50 border-2 border-red-200 rounded-xl p-4">
+                    <div className="flex items-center gap-2 text-red-700 font-semibold mb-3">
+                      <AlertCircle className="w-5 h-5" />
+                      <span>Ada data yang perlu dilengkapi dulu:</span>
+                    </div>
+                    <div className="space-y-2 text-sm text-red-600">
+                      {(() => {
+                        // console.log('🔴 [VALIDATION ERROR] Validation errors detected:', {
+                        //   errors,
+                        //   errorKeys: Object.keys(errors),
+                        //   isAddressComplete,
+                        //   deliveryMethod,
+                        //   paymentMethod,
+                        //   formValues: {
+                        //     name: form.watch('name'),
+                        //     phone: form.watch('phone'),
+                        //     address: form.watch('address'),
+                        //     detailedAddress: form.watch('detailedAddress'),
+                        //     deliveryMethod: form.watch('deliveryMethod'),
+                        //     paymentMethod: form.watch('paymentMethod')
+                        //   }
+                        // });
+                        return null;
+                      })()}
+                      {errors.name && <div>• Nama lengkap</div>}
+                      {errors.phone && <div>• Nomor WhatsApp</div>}
+                      {(!detailedAddress || detailedAddress.trim().length < 8) && <div>• Alamat lengkap (detail alamat)</div>}
+                      {!deliveryMethod && <div>• Cek ongkir & pilih kurir</div>}
+                      {!paymentMethod && <div>• Metode pembayaran</div>}
+                    </div>
+                  </div>
+                )}
 
-{cart.length === 0 && (
-  <div className="text-xs text-red-500 flex items-center gap-2">
-    <AlertCircle className="w-4 h-4 flex-shrink-0" />
-    <span>Belum ada produk di keranjang. Yuk pilih menu favoritmu dulu!</span>
-    <button
-      onClick={scrollToProducts}
-      className="ml-auto flex items-center gap-1 bg-[#BFAAE3] hover:bg-[#9D85D0] text-white px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 flex-shrink-0"
-    >
-      <ShoppingBag className="w-3 h-3" />
-      Lihat Menu
-    </button>
-  </div>
-)}
+                {cart.length === 0 && (
+                  <div className="text-xs text-red-500 flex items-center gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                    <span>Belum ada produk di keranjang. Yuk pilih menu favoritmu dulu!</span>
+                    <button
+                      onClick={scrollToProducts}
+                      className="ml-auto flex items-center gap-1 bg-primary hover:bg-primary/90 text-white px-3 py-1 rounded-full text-xs font-medium transition-colors duration-200 flex-shrink-0"
+                    >
+                      <ShoppingBag className="w-3 h-3" />
+                      Lihat Menu
+                    </button>
+                  </div>
+                )}
 
-<Button
-  type="submit"
-  disabled={!isStep4Complete || cart.length === 0}
-  className={`w-full transition-all duration-300 rounded-full py-6 text-lg font-semibold flex items-center justify-center gap-2 ${
-    isStep4Complete && cart.length > 0
-      ? 'bg-[#BFAAE3] hover:bg-[#9D85D0] text-white shadow-lg hover:shadow-xl text-md'
-      : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-  }`}
->
-  <MessageCircle className="w-5 h-5" />
-  {isStep4Complete && cart.length > 0
-    ? 'Checkout via WhatsApp! 🚀'
-    : `Lanjut ke Langkah ${nextStep}`}
-</Button>
+                <Button
+                  type="submit"
+                  disabled={!isStep4Complete || cart.length === 0}
+                  className={`relative w-full transition-all duration-300 rounded-full py-6 text-lg font-semibold flex items-center justify-center gap-2 overflow-hidden group ${isStep4Complete && cart.length > 0
+                    ? 'bg-foreground text-white shadow-lg hover:shadow-primary/20'
+                    : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-2">
+                    <MessageCircle className="w-5 h-5" />
+                    {isStep4Complete && cart.length > 0
+                      ? 'Checkout via WhatsApp! 🚀'
+                      : `Lanjut ke Langkah ${nextStep}`}
+                  </div>
+                  {isStep4Complete && cart.length > 0 && (
+                    <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                  )}
+                </Button>
 
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
-  </div>
-
-{/* Thank You Modal - Updated with Manual WhatsApp Button */}
-<Dialog open={showThankYouModal} onOpenChange={() => {}}>
-  <DialogContent className="sm:max-w-lg bg-white border-2 border-[#D8CFF7]/40 rounded-3xl shadow-2xl p-0 overflow-hidden">
-    <div className="bg-[#F6F2FF] border-b-2 border-[#D8CFF7]/40 px-6 py-6 text-center">
-      <div className="flex justify-center mb-3">
-        <div className="w-12 h-12 bg-[#BFAAE3] rounded-full flex items-center justify-center shadow-lg">
-          <PackageCheck className="w-8 h-8 text-white" />
-        </div>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
       </div>
 
-      <DialogTitle className="text-xl font-bold text-[#5D4E8E] mb-2">
-        Terima kasih, {toCamelCase(customerName)}!
-      </DialogTitle>
+      {/* Thank You Modal - Updated with Manual WhatsApp Button */}
+      <Dialog open={showThankYouModal} onOpenChange={() => { }}>
+        <DialogContent className="sm:max-w-lg bg-white border-2 border-muted/40 rounded-3xl shadow-2xl p-0 overflow-hidden">
+          <div className="bg-secondary/5 border-b-2 border-muted/40 px-6 py-6 text-center">
+            <div className="flex justify-center mb-3">
+              <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center shadow-lg">
+                <PackageCheck className="w-8 h-8 text-white" />
+              </div>
+            </div>
 
-      <DialogDescription className="text-[#8978B4] text-sm">
-        Data pesanan kamu sudah kami terima.
-      </DialogDescription>
-    </div>
+            <DialogTitle className="text-xl font-bold text-secondary mb-2">
+              Terima kasih, {toCamelCase(customerName)}!
+            </DialogTitle>
 
-    <div className="px-6 py-6">
-      <div className="text-center mb-6">
-        <p className="text-[#5D4E8E] text-sm leading-relaxed mb-4">
-          Tim Tiny Bitty akan menghubungi kamu melalui WhatsApp untuk konfirmasi pesanan,
-          alamat, dan detail pengiriman agar pesananmu bisa segera diproses.
-        </p>
-
-        {/* Manual WhatsApp Button */}
-        <div className="bg-[#F6F2FF] rounded-2xl p-4 mb-4">
-          <div className="flex items-center justify-center gap-2 mb-2">
-            {/* <MessagesSquare className="w-5 h-5 text-[#5D4E8E]" /> */}
-            <p className="text-[#5D4E8E] font-semibold text-base">
-              Lanjut konfirmasi via WhatsApp
-            </p>
+            <DialogDescription className="text-secondary/70 text-sm">
+              Data pesanan kamu sudah kami terima.
+            </DialogDescription>
           </div>
 
-          <Button
-            onClick={handleWhatsAppRedirect}
-            className="w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2"
-          >
-            <MessagesSquare className="w-5 h-5" />
-            Buka WhatsApp
-          </Button>
+          <div className="px-6 py-6">
+            <div className="text-center mb-6">
+              <p className="text-[#5D4E8E] text-sm leading-relaxed mb-4">
+                Tim Tiny Bitty akan menghubungi kamu melalui WhatsApp untuk konfirmasi pesanan,
+                alamat, dan detail pengiriman agar pesananmu bisa segera diproses.
+              </p>
 
-          <Button
-            onClick={handleDownloadInvoice}
-            disabled={isGeneratingPDF}
-            className="w-full bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2"
-          >
-            <FileText className="w-5 h-5" />
-            {isGeneratingPDF ? 'Generating...' : 'Download Invoice'}
-          </Button>
+              {/* Manual WhatsApp Button */}
+              <div className="bg-[#F6F2FF] rounded-2xl p-4 mb-4">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  {/* <MessagesSquare className="w-5 h-5 text-[#5D4E8E]" /> */}
+                  <p className="text-[#5D4E8E] font-semibold text-base">
+                    Lanjut konfirmasi via WhatsApp
+                  </p>
+                </div>
 
-          <p className="text-[#8978B4] text-xs">
-            Klik tombol WhatsApp untuk konfirmasi pesanan, dan download invoice untuk menyimpan ke perangkat kamu.
-          </p>
-        </div>
+                <Button
+                  onClick={handleWhatsAppRedirect}
+                  className="relative w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2 overflow-hidden group shadow-lg hover:shadow-[#25D366]/20 transition-all duration-300"
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-2">
+                    <MessagesSquare className="w-5 h-5" />
+                    Buka WhatsApp
+                  </div>
+                  <span className="absolute inset-0 z-0 bg-white/20 scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                </Button>
 
-        {/* <p className="text-[#8978B4] text-xs">
+                <Button
+                  onClick={handleDownloadInvoice}
+                  disabled={isGeneratingPDF}
+                  className="relative w-full bg-foreground text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2 overflow-hidden group shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                >
+                  <div className="relative z-10 flex items-center justify-center gap-2">
+                    <FileText className="w-5 h-5" />
+                    {isGeneratingPDF ? 'Generating...' : 'Download Invoice'}
+                  </div>
+                  <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                </Button>
+
+                <p className="text-[#8978B4] text-xs">
+                  Klik tombol WhatsApp untuk konfirmasi pesanan, dan download invoice untuk menyimpan ke perangkat kamu.
+                </p>
+              </div>
+
+              {/* <p className="text-[#8978B4] text-xs">
           Terima kasih sudah memilih Tiny Bitty.
         </p> */}
-      </div>
+            </div>
 
-      <div className="flex justify-center bg-[#F6F2FF] rounded-2xl">
-        <div className="w-[340px] h-[200px] flex items-center max-auto">
-          <Lottie
-            animationData={remixAnimation}
-            loop={true}
-          />
-        </div>
-      </div>
-    </div>
-  </DialogContent>
-</Dialog>
+            <div className="flex justify-center bg-[#F6F2FF] rounded-2xl">
+              <div className="w-[340px] h-[200px] flex items-center max-auto">
+                <Lottie
+                  animationData={remixAnimation}
+                  loop={true}
+                />
+              </div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
 
-{/* Order Confirmation Modal */}
-<Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-  <DialogContent
-    className="
+      {/* Order Confirmation Modal */}
+      <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+        <DialogContent
+          className="
       sm:max-w-2xl
       bg-white
       border-2 border-[#D8CFF7]/40
@@ -1866,131 +1868,130 @@ export default function OrderForm() {
       max-h-[80vh]
       flex flex-col
     "
-  >
-    <div className="bg-[#F6F2FF] border-b-2 border-[#D8CFF7]/40 px-6 py-6 flex-shrink-0">
-      <DialogHeader>
-        <DialogTitle className="text-2xl font-bold text-[#5D4E8E] flex items-center gap-2">
-          <ClipboardCheck className="w-8 h-8 text-[#BFAAE3]" />
-          Cek Ulang Pesanan Kamu
-        </DialogTitle>
-        <DialogDescription className="text-[#8978B4]">
-          Tolong cek lagi detail pesanan di bawah ini sebelum dikirim via WhatsApp 😊
-        </DialogDescription>
-      </DialogHeader>
-    </div>
-
-    <div className="px-6 py-6 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#F6F2FF] [&::-webkit-scrollbar-thumb]:bg-[#D8CFF7] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-[#BFAAE3]">
-      {orderData && (
-        <div className="space-y-4">
-          {/* Customer Details */}
-          <div className="bg-[#F6F2FF] rounded-2xl p-4">
-            <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
-              <UserCheck className="w-5 h-5 text-[#BFAAE3]" />
-              Data Pemesan
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
-              <div>
-                <span className="text-[#8978B4]">Nama:</span>
-                <div className="font-medium text-[#5D4E8E]">{toCamelCase(orderData.name)}</div>
-              </div>
-              <div>
-                <span className="text-[#8978B4]">Nomor WhatsApp:</span>
-                <div className="font-medium text-[#5D4E8E]">{orderData.phone}</div>
-              </div>
-              <div className="md:col-span-2">
-                <span className="text-[#8978B4]">Alamat Lengkap:</span>
-                <div className="font-medium text-[#5D4E8E]">{generateFullAddress()}</div>
-              </div>
-              <div>
-                <span className="text-[#8978B4]">Kurir / Ongkir:</span>
-                <div className="font-medium text-[#5D4E8E]">
-                  {/* Force Paxel display when distance > 40km and GoSend/Grab unavailable */}
-                  {isDistanceTooFar && deliveryDistance && deliveryDistance > 40 ? 'Paxel' : (
-                    <>
-                      {deliveryMethod === 'gosend' && 'GoSend Instant'}
-                      {deliveryMethod === 'gosendsameday' && 'GoSend Same Day'}
-                      {deliveryMethod === 'grab' && 'GrabExpress Instant'}
-                      {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
-                      {deliveryMethod === 'paxel' && 'Paxel'}
-                      {!deliveryMethod && 'Belum dipilih'}
-                    </>
-                  )}
-                </div>
-              </div>
-              <div>
-                <span className="text-[#8978B4]">Metode Pembayaran:</span>
-                <div className="font-medium text-[#5D4E8E]">Transfer Bank</div>
-              </div>
-            </div>
+        >
+          <div className="bg-secondary/5 border-b-2 border-muted/40 px-6 py-6 flex-shrink-0">
+            <DialogHeader>
+              <DialogTitle className="text-2xl font-bold text-secondary flex items-center gap-2">
+                <ClipboardCheck className="w-8 h-8 text-primary" />
+                Cek Ulang Pesanan Kamu
+              </DialogTitle>
+              <DialogDescription className="text-secondary/70">
+                Tolong cek lagi detail pesanan di bawah ini sebelum dikirim via WhatsApp 😊
+              </DialogDescription>
+            </DialogHeader>
           </div>
 
-          {/* Order Items */}
-          <div className="bg-white rounded-2xl border-2 border-[#D8CFF7]/40 p-4">
-            <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
-              <ShoppingBag className="w-5 h-5 text-[#BFAAE3]" />
-              Produk Dipesan ({cart.length} item)
-            </h3>
-            <div className="space-y-3">
-              {cart.map((item) => (
-                <div
-                  key={`${item.productId}-${item.variant.size}`}
-                  className="flex items-center gap-3 p-3 bg-[#F6F2FF] rounded-xl"
-                >
-                  <div
-                    className="w-12 h-12 bg-cover bg-center bg-no-repeat rounded-xl flex-shrink-0"
-                    style={{ backgroundImage: `url(${item.image})` }}
-                  />
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-medium text-[#5D4E8E] text-sm truncate">
-                      {item.productName}
-                    </h4>
-                    <p className="text-xs text-[#8978B4]">{item.variant.size}</p>
-                    <p className="text-xs text-[#BFAAE3] font-medium">
-                      {item.quantity}x Rp {item.variant.price.toLocaleString('id-ID')}
-                    </p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-sm font-semibold text-[#5D4E8E]">
-                      Rp {(item.variant.price * item.quantity).toLocaleString('id-ID')}
-                    </p>
+          <div className="px-6 py-6 overflow-y-auto flex-1 [&::-webkit-scrollbar]:w-2 [&::-webkit-scrollbar-track]:bg-[#F6F2FF] [&::-webkit-scrollbar-thumb]:bg-[#D8CFF7] [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb:hover]:bg-[#BFAAE3]">
+            {orderData && (
+              <div className="space-y-4">
+                {/* Customer Details */}
+                <div className="bg-secondary/5 rounded-2xl p-4">
+                  <h3 className="font-semibold text-secondary mb-3 flex items-center gap-2">
+                    <UserCheck className="w-5 h-5 text-primary" />
+                    Data Pemesan
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm">
+                    <div>
+                      <span className="text-secondary/70">Nama:</span>
+                      <div className="font-medium text-secondary">{toCamelCase(orderData.name)}</div>
+                    </div>
+                    <div>
+                      <span className="text-secondary/70">Nomor WhatsApp:</span>
+                      <div className="font-medium text-secondary">{orderData.phone}</div>
+                    </div>
+                    <div className="md:col-span-2">
+                      <span className="text-secondary/70">Alamat Lengkap:</span>
+                      <div className="font-medium text-secondary">{generateFullAddress()}</div>
+                    </div>
+                    <div>
+                      <span className="text-[#8978B4]">Kurir / Ongkir:</span>
+                      <div className="font-medium text-[#5D4E8E]">
+                        {/* Force Paxel display when distance > 40km and GoSend/Grab unavailable */}
+                        {isDistanceTooFar && deliveryDistance && deliveryDistance > 40 ? 'Paxel' : (
+                          <>
+                            {deliveryMethod === 'gosend' && 'GoSend Instant'}
+                            {deliveryMethod === 'gosendsameday' && 'GoSend Same Day'}
+                            {deliveryMethod === 'grab' && 'GrabExpress Instant'}
+                            {deliveryMethod === 'grabsameday' && 'GrabExpress Same Day'}
+                            {deliveryMethod === 'paxel' && 'Paxel'}
+                            {!deliveryMethod && 'Belum dipilih'}
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div>
+                      <span className="text-[#8978B4]">Metode Pembayaran:</span>
+                      <div className="font-medium text-[#5D4E8E]">Transfer Bank</div>
+                    </div>
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
 
-          {/* Order Total */}
-          <div className={`rounded-2xl p-4 ${
-            deliveryInfo?.isValid ? 'bg-[#F6F2FF]' : 'bg-amber-50 border-2 border-amber-200'
-          }`}>
-            <h3 className="font-semibold text-[#5D4E8E] mb-3 flex items-center gap-2">
-            <ReceiptText className="w-5 h-5 text-[#BFAAE3]" />
-              Ringkasan Pembayaran</h3>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
-                <span className="text-[#8978B4]">Subtotal Produk</span>
-                <span className="text-[#5D4E8E]">
-                  Rp {getTotalPrice().toLocaleString('id-ID')}
-                </span>
-              </div>
-              {deliveryInfo?.isValid ? (
-                <>
-                  <div className="flex justify-between text-sm">
-                    <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-                    <span className="text-[#5D4E8E]">
-                      {formatCostRange(deliveryInfo.formattedCost)}
-                    </span>
+                {/* Order Items */}
+                <div className="bg-white rounded-2xl border-2 border-muted/40 p-4">
+                  <h3 className="font-semibold text-secondary mb-3 flex items-center gap-2">
+                    <ShoppingBag className="w-5 h-5 text-primary" />
+                    Produk Dipesan ({cart.length} item)
+                  </h3>
+                  <div className="space-y-3">
+                    {cart.map((item) => (
+                      <div
+                        key={`${item.productId}-${item.variant.size}`}
+                        className="flex items-center gap-3 p-3 bg-secondary/5 rounded-xl"
+                      >
+                        <div
+                          className="w-12 h-12 bg-cover bg-center bg-no-repeat rounded-xl flex-shrink-0"
+                          style={{ backgroundImage: `url(${item.image})` }}
+                        />
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-secondary text-sm truncate">
+                            {item.productName}
+                          </h4>
+                          <p className="text-xs text-secondary/70">{item.variant.size}</p>
+                          <p className="text-xs text-primary font-medium">
+                            {item.quantity}x Rp {item.variant.price.toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                        <div className="text-right">
+                          <p className="text-sm font-semibold text-secondary">
+                            Rp {(item.variant.price * item.quantity).toLocaleString('id-ID')}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                </>
-              ) : (
-                <div className="flex justify-between text-sm">
-                  <span className="text-[#8978B4]">Perkiraan Ongkir</span>
-                  <span className="text-[#5D4E8E]">
-                    Konfirmasi via WhatsApp
-                  </span>
                 </div>
-              )}
-              {/* <div className="border-t border-[#D8CFF7]/40 pt-2">
+
+                {/* Order Total */}
+                <div className={`rounded-2xl p-4 ${deliveryInfo?.isValid ? 'bg-secondary/5' : 'bg-amber-50 border-2 border-amber-200'
+                  }`}>
+                  <h3 className="font-semibold text-secondary mb-3 flex items-center gap-2">
+                    <ReceiptText className="w-5 h-5 text-primary" />
+                    Ringkasan Pembayaran</h3>
+                  <div className="space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-secondary/70">Subtotal Produk</span>
+                      <span className="text-secondary">
+                        Rp {getTotalPrice().toLocaleString('id-ID')}
+                      </span>
+                    </div>
+                    {deliveryInfo?.isValid ? (
+                      <>
+                        <div className="flex justify-between text-sm">
+                          <span className="text-secondary/70">Perkiraan Ongkir</span>
+                          <span className="text-secondary">
+                            {formatCostRange(deliveryInfo.formattedCost)}
+                          </span>
+                        </div>
+                      </>
+                    ) : (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-secondary/70">Perkiraan Ongkir</span>
+                        <span className="text-secondary">
+                          Konfirmasi via WhatsApp
+                        </span>
+                      </div>
+                    )}
+                    {/* <div className="border-t border-[#D8CFF7]/40 pt-2">
                 <div className="flex justify-between font-bold text-lg">
                   <span className="text-[#5D4E8E]">Total Produk (Ongkir akan dikonfirmasi via WhatsApp)</span>
                   <span className="text-[#BFAAE3]">
@@ -1998,41 +1999,44 @@ export default function OrderForm() {
                   </span>
                 </div>
               </div> */}
-            </div>
-          </div>
+                  </div>
+                </div>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 pt-4">
-            <Button
-              onClick={handleEditOrder}
-              variant="outline"
-              className="flex-1 border-2 border-[#D8CFF7]/40 text-[#5D4E8E] hover:bg-[#F6F2FF] py-3 rounded-xl font-medium"
-            >
-              Edit Pesanan
-            </Button>
-            <Button
-              onClick={handleConfirmOrder}
-              className="flex-1 bg-[#BFAAE3] hover:bg-[#9D85D0] text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2"
-            >
-              <CircleCheckBig className="w-5 h-5" />
-              Konfirmasi
-            </Button>
-          </div>
+                {/* Action Buttons */}
+                <div className="flex gap-3 pt-4">
+                  <Button
+                    onClick={handleEditOrder}
+                    variant="outline"
+                    className="flex-1 border-2 border-muted/40 text-secondary hover:bg-secondary/5 py-3 rounded-xl font-medium"
+                  >
+                    Edit Pesanan
+                  </Button>
+                  <Button
+                    onClick={handleConfirmOrder}
+                    className="relative flex-1 bg-foreground text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 overflow-hidden group shadow-lg hover:shadow-primary/20 transition-all duration-300"
+                  >
+                    <div className="relative z-10 flex items-center justify-center gap-2">
+                      <CircleCheckBig className="w-5 h-5" />
+                      Konfirmasi
+                    </div>
+                    <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+                  </Button>
+                </div>
 
-          {orderData.notes && (
-            <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4">
-              <h4 className="font-medium text-[#5D4E8E] mb-2 flex items-center gap-2">
-                <FileText className="w-4 h-4" />
-                Catatan Tambahan
-              </h4>
-              <p className="text-sm text-[#8978B4]">{orderData.notes}</p>
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  </DialogContent>
-</Dialog>
+                {orderData.notes && (
+                  <div className="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-4">
+                    <h4 className="font-medium text-secondary mb-2 flex items-center gap-2">
+                      <FileText className="w-4 h-4" />
+                      Catatan Tambahan
+                    </h4>
+                    <p className="text-sm text-secondary/70">{orderData.notes}</p>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
     </section>
   );

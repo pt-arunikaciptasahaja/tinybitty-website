@@ -106,7 +106,7 @@ export default function PromoBanner() {
                         }
                       }}
                     />
-                    
+
                     {/* Mobile Image */}
                     <img
                       src={banner.mobileImage}
@@ -121,7 +121,7 @@ export default function PromoBanner() {
                         }
                       }}
                     />
-                    
+
                     {/* Optional overlay for clickable banners */}
                     {banner.link && (
                       <a
@@ -134,16 +134,16 @@ export default function PromoBanner() {
                 </CarouselItem>
               ))}
             </CarouselContent>
-            
+
             {/* Show navigation buttons only if there are multiple banners */}
             {banners.length > 1 && (
               <>
-                <CarouselPrevious className="left-2 bg-[#fff] hover:bg-[#f7f7f7] border-[#fff] shadow-sm hidden md:flex" />
-                <CarouselNext className="right-2 bg-[#fff] hover:bg-[#f7f7f7] border-[#fff] shadow-sm hidden md:flex" />
+                <CarouselPrevious className="left-2 bg-[#fff] hover:bg-background border-[#fff] shadow-sm hidden md:flex" />
+                <CarouselNext className="right-2 bg-[#fff] hover:bg-background border-[#fff] shadow-sm hidden md:flex" />
               </>
             )}
           </Carousel>
-          
+
           {/* Dots indicator for multiple banners */}
           {banners.length > 1 && (
             <div className="flex justify-center mt-4 space-x-2">
@@ -154,11 +154,10 @@ export default function PromoBanner() {
                     setCurrentBanner(index);
                     api?.scrollTo(index);
                   }}
-                  className={`rounded-full transition-all duration-500 ${
-                    index === currentBanner 
-                      ? 'bg-[#553d8f] w-8 h-2 shadow-sm' 
-                      : 'bg-purple-100 hover:bg-purple-200 w-2 h-2 hover:w-6'
-                  }`}
+                  className={`rounded-full transition-all duration-500 ${index === currentBanner
+                    ? 'bg-secondary w-8 h-2 shadow-sm'
+                    : 'bg-muted/30 hover:bg-muted/50 w-2 h-2 hover:w-6'
+                    }`}
                   aria-label={`Go to banner ${index + 1}`}
                 />
               ))}

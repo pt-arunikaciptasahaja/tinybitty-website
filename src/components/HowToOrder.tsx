@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { ShoppingBasket, FileText, Motorbike, Smartphone, Lightbulb, CircleQuestionMark, UserRoundPen } from 'lucide-react';
+import { motion } from 'framer-motion';
 
 export default function HowToOrder() {
     const steps = [
@@ -32,16 +33,16 @@ export default function HowToOrder() {
     return (
         <section
             id="how-to-order"
-            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-[#C5B8FF]/20 border"
+            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-secondary/5 border border-secondary/10"
         >
             <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-                <Card className="rounded-3xl overflow-hidden">
-                    <CardHeader className="bg-gradient-to-r from-purple-50 to-[#553d8f]/10">
-                        <CardTitle className="text-2xl font-bold text-[#553d8f] flex items-center justify-center gap-2">
-                        <CircleQuestionMark className="w-5 h-5 text-[#553d8f]" />
+                <Card className="rounded-3xl overflow-hidden border-none shadow-xl">
+                    <CardHeader className="bg-gradient-to-r from-background to-secondary/10">
+                        <CardTitle className="text-2xl font-bold text-secondary flex items-center justify-center gap-2">
+                            <CircleQuestionMark className="w-5 h-5 text-primary" />
                             How to Order
                         </CardTitle>
-                        <CardDescription className="text-[#553d8f]/80 text-center">
+                        <CardDescription className="text-secondary/70 text-center">
                             Empat langkah mudah buat menikmati menu Tiny Bitty di rumah. ✨
                         </CardDescription>
                     </CardHeader>
@@ -51,12 +52,12 @@ export default function HowToOrder() {
                             {steps.map((step) => (
                                 <div
                                     key={step.id}
-                                    className="group relative flex flex-col items-center rounded-2xl bg-white/80 border border-purple-200/50 px-4 py-5 md:px-5 md:py-6 shadow-sm hover:-translate-y-1 hover:shadow-[0_14px_35px_rgba(147,51,234,0.25)] transition-all duration-200 backdrop-blur-sm"
+                                    className="group relative flex flex-col items-center rounded-2xl bg-white/80 border border-secondary/10 px-4 py-5 md:px-5 md:py-6 shadow-sm hover:-translate-y-1 hover:shadow-primary/20 transition-all duration-200 backdrop-blur-sm"
                                 >
                                     {/* Number pill */}
                                     <div className="absolute text-center top-1">
-                                        <div className="inline-flex items-center gap-1 rounded-full bg-[#553d8f] px-3 py-1 text-[11px] font-semibold text-white">
-                                            <span className="w-4 h-4 flex items-center justify-center rounded-full bg-white text-[#553d8f] text-[10px] font-bold">
+                                        <div className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-[11px] font-semibold text-white">
+                                            <span className="w-4 h-4 flex items-center justify-center rounded-full bg-white text-secondary text-[10px] font-bold">
                                                 {step.id}
                                             </span>
                                             <span>Langkah {step.id}</span>
@@ -64,15 +65,15 @@ export default function HowToOrder() {
                                     </div>
 
                                     {/* Icon */}
-                                    <div className="mt-6 mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#553d8f] shadow-lg shadow-[#553d8f]/25">
+                                    <div className="mt-6 mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25">
                                         <step.icon className="h-8 w-8 text-white" />
                                     </div>
 
                                     {/* Text */}
-                                    <h3 className="mb-2 text-sm md:text-base font-semibold text-[#553d8f] text-center">
+                                    <h3 className="mb-2 text-sm md:text-base font-semibold text-secondary text-center">
                                         {step.title}
                                     </h3>
-                                    <p className="text-xs md:text-sm text-[#553d8f]/80 text-center leading-relaxed">
+                                    <p className="text-xs md:text-sm text-secondary/70 text-center leading-relaxed">
                                         {step.desc}
                                     </p>
                                 </div>
@@ -80,24 +81,32 @@ export default function HowToOrder() {
                         </div>
 
                         {/* Tip / helper */}
-                        <div className="mt-8 rounded-2xl border border-purple-200/60 bg-white/60 backdrop-blur-sm px-4 py-4 md:px-5 md:py-4">
-                            <div className="flex flex-col items-center gap-2 text-center text-[#553d8f]/80 md:flex-row md:justify-center">
-                            <Lightbulb className="w-5 h-5 text-[#553d8f]/60" />
+                        <div className="mt-8 rounded-2xl border border-secondary/10 bg-white/60 backdrop-blur-sm px-4 py-4 md:px-5 md:py-4">
+                            <div className="flex flex-col items-center gap-2 text-center text-secondary/70 md:flex-row md:justify-center">
+                                <Lightbulb className="w-5 h-5 text-primary" />
                                 <p className="text-xs md:text-sm font-medium">
-                                    Isi data selengkap & sejelas mungkin ya — supaya konfirmasi & pengiriman bisa diproses lebih cepat. 
+                                    Isi data selengkap & sejelas mungkin ya — supaya konfirmasi & pengiriman bisa diproses lebih cepat.
                                     ✨
                                 </p>
                             </div>
                         </div>
                         {/* CTA */}
-                        <div className="mt-10 flex justify-center">
+                        <motion.div
+                            className="mt-10 flex justify-center"
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.8, duration: 0.6 }}
+                        >
                             <a
                                 href="#products"
-                                className="inline-flex items-center justify-center rounded-full px-7 py-3 text-sm md:text-base font-semibold bg-[#553d8f] hover:bg-[#4a337a] text-white shadow-[0_10px_30px_rgba(85,61,143,0.25)] transition-all duration-200"
+                                className="relative rounded-full px-10 py-4 text-sm md:text-base font-bold tracking-wide uppercase transition-all duration-300 overflow-hidden group bg-foreground text-white shadow-lg hover:shadow-primary/20 flex items-center justify-center"
                             >
-                                Mulai Order
+                                <span className="relative z-10 block pointer-events-none">
+                                    Mulai Order
+                                </span>
+                                <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
                             </a>
-                        </div>
+                        </motion.div>
                     </CardContent>
                 </Card>
             </div>

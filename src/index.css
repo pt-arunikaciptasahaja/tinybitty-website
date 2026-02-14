@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Chelsea+Market&family=Chicle&family=Inter:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&family=Knewave&family=Patrick+Hand+SC&family=Bebas+Neue&family=Oswald:wght@400;500;600;700&family=Rubik+Moonrocks&display=swap&family=Poiret+One&display=swap&family=Delius&display=swap&family=Modak&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Laila:wght@600;700&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -13,10 +13,13 @@
   /* Hide scrollbar on desktop to prevent layout shift */
   @media (min-width: 768px) {
     html {
-      scrollbar-width: none; /* Firefox */
+      scrollbar-width: none;
+      /* Firefox */
     }
+
     html::-webkit-scrollbar {
-      display: none; /* Chrome, Safari and Opera */
+      display: none;
+      /* Chrome, Safari and Opera */
     }
   }
 
@@ -54,43 +57,49 @@
       padding: 0 0rem;
     }
   }
-  
+
   :root {
-    /* Pastel Lilac Design System */
-    --background: 60 20% 97%;
-    --foreground: 247 38% 15%;
-    --card: 245 17% 99%;
-    --card-foreground: 247 38% 15%;
-    --popover: 245 17% 99%;
-    --popover-foreground: 247 38% 15%;
+    /* Tiny Bitty Design System */
 
-    /* Primary Lilac Colors */
-    --primary: 253 35% 27%;
-    --primary-foreground: 253 35% 97%;
-    --primary-light: 253 35% 40%;
-    --primary-dark: 253 35% 20%;
+    /* Pink (Primary) */
+    --primary: 7 74% 79%;
+    /* #F1ABA2 - HSL approx 7 74% 79% */
+    --primary-foreground: 166 26% 45%;
 
-    /* Secondary Pastel Colors */
-    --secondary: 344 67% 87%;
-    --secondary-foreground: 253 35% 27%;
-    --secondary-light: 344 67% 92%;
-    --secondary-dark: 344 67% 82%;
+    /* Dark Green (Secondary) */
+    --secondary: 166 26% 45%;
+    /* #559083 - HSL approx 166 26% 45% */
+    --secondary-foreground: 0 0% 100%;
 
-    --accent: 184 67% 85%;
-    --accent-foreground: 253 35% 27%;
-    --accent-light: 184 67% 92%;
-    --accent-dark: 184 67% 82%;
+    /* Soft Pink (Accent) */
+    --accent: 7 74% 79%;
+    /* #F2ABA3 - HSL approx 7 74% 79% */
+    --accent-foreground: 166 26% 45%;
+    /* Dark Green text on soft pink */
 
-    /* Supporting Colors */
-    --muted: 42 20% 95%;
-    --muted-foreground: 253 35% 40%;
+    /* Soft Green (Muted) */
+    --muted: 87 46% 70%;
+    /* #B6D88C - HSL approx 87 46% 70% */
+    --muted-foreground: 166 26% 45%;
+    /* Dark Green text on soft green */
+
+    --background: 28 38% 94%;
+    /* #F5EEE8 */
+    --foreground: 166 26% 45%;
+    /* Dark Green as default text */
+
+    --card: 0 0% 100%;
+    --card-foreground: 166 26% 45%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 166 26% 45%;
+
     --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 253 35% 97%;
+    --destructive-foreground: 0 0% 98%;
 
-    /* System Colors */
-    --border: 253 35% 85%;
-    --input: 253 35% 95%;
-    --ring: 253 35% 40%;
+    --border: 166 26% 45%;
+    --input: 166 26% 45%;
+    --ring: 353 59% 66%;
     --radius: 0.75rem;
 
     /* Page Layout Variables */
@@ -99,18 +108,19 @@
     --page-wrapper-padding-md: 2rem;
     --page-wrapper-padding-lg: 3rem;
     --page-wrapper-padding-xl: 4rem;
-    
+
     /* Content Spacing */
     --content-spacing: 2rem;
     --content-spacing-lg: 3rem;
     --content-spacing-xl: 4rem;
-    
+
     /* Mobile Header */
     --mobile-header-height: 138px;
     --mobile-header-height-2: 4.7rem;
   }
 
   .dark {
+    /* Dark mode could just invert or stay same for pastel brand */
     --background: 222.2 84% 4.9%;
     --foreground: 210 40% 98%;
 
@@ -120,10 +130,10 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 210 40% 98%;
+    --primary: 353 59% 66%;
     --primary-foreground: 222.2 47.4% 11.2%;
 
-    --secondary: 217.2 32.6% 17.5%;
+    --secondary: 166 26% 45%;
     --secondary-foreground: 210 40% 98%;
 
     --muted: 217.2 32.6% 17.5%;
@@ -145,48 +155,49 @@
   * {
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', sans-serif;
+    font-family: 'Montserrat', sans-serif;
   }
-  
+
   /* Typography Hierarchy */
   .heading-xl {
-    @apply bebas-neue-regular text-4xl md:text-6xl lg:text-7xl text-primary leading-tight tracking-wide;
+    @apply font-cooper text-4xl md:text-6xl lg:text-7xl text-primary leading-tight tracking-wide;
   }
-  
+
   .heading-lg {
-    @apply bebas-neue-regular text-3xl md:text-5xl lg:text-6xl text-primary leading-tight tracking-wide;
+    @apply font-cooper text-3xl md:text-5xl lg:text-6xl text-primary leading-tight tracking-wide;
   }
-  
+
   .heading-md {
-    @apply bebas-neue-regular text-2xl md:text-4xl lg:text-5xl text-primary leading-tight;
+    @apply font-cooper text-2xl md:text-4xl lg:text-5xl text-primary leading-tight;
   }
-  
+
   .heading-sm {
-    @apply bebas-neue-regular text-xl md:text-2xl lg:text-3xl text-primary leading-tight;
+    @apply font-cooper text-xl md:text-2xl lg:text-3xl text-primary leading-tight;
   }
-  
+
   .body-lg {
     @apply text-lg md:text-xl text-muted-foreground leading-relaxed;
   }
-  
+
   .body-base {
     @apply text-base text-muted-foreground leading-relaxed;
   }
-  
+
   .body-sm {
     @apply text-sm text-muted-foreground leading-relaxed;
   }
-  
+
   .badge {
     @apply inline-block px-3 py-1.5 rounded-full text-sm font-medium;
   }
-  
+
   .badge-primary {
     @apply bg-primary/10 text-primary border border-primary/20;
   }
-  
+
   .badge-secondary {
     @apply bg-secondary/20 text-primary border border-secondary/30;
   }
@@ -197,115 +208,100 @@
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl font-medium transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none;
   }
-  
+
   .btn-primary {
     @apply btn bg-primary text-primary-foreground hover:bg-primary-light shadow-lg hover:shadow-xl;
   }
-  
+
   .btn-secondary {
     @apply btn bg-secondary text-secondary-foreground hover:bg-secondary-light border border-secondary;
   }
-  
+
   .btn-outline {
     @apply btn bg-transparent text-primary border-2 border-primary hover:bg-primary hover:text-primary-foreground;
   }
-  
+
   .btn-ghost {
     @apply btn bg-transparent text-primary hover:bg-primary/10;
   }
-  
+
   /* Button Sizes */
   .btn-sm {
     @apply px-4 py-2 text-sm;
   }
-  
+
   .btn-base {
     @apply px-6 py-2.5 text-sm;
   }
-  
+
   .btn-lg {
     @apply px-8 py-3 text-base;
   }
-  
+
   .btn-xl {
     @apply px-10 py-4 text-lg;
   }
-  
+
   /* Page Wrapper System */
   .page-wrapper {
     @apply min-h-screen;
   }
-  
+
   .page-content {
     @apply px-4 md:px-8 lg:px-12 xl:px-16;
   }
-  
+
   .container-standard {
     @apply container mx-auto;
   }
-  
+
   .content-section {
     @apply py-12 md:py-16 lg:py-20;
   }
-  
+
   .content-spacing {
     @apply space-y-8 md:space-y-12 lg:space-y-16;
   }
-  
+
   .card-standard {
     @apply bg-card rounded-2xl shadow-lg border border-border p-6 md:p-6;
   }
-  
+
   .card-elevated {
     @apply card-standard shadow-xl hover:shadow-2xl transition-shadow duration-300;
   }
 }
 
 @layer utilities {
-  .font-handwritten {
-    font-family: 'Caveat', cursive;
+  .font-cooper {
+    font-family: 'Cooper BT', 'Cooper Black', serif;
+    font-weight: 700;
   }
-  .chelsea-market-regular {
-    font-family: "Chelsea Market", system-ui;
-    font-weight: 400;
+
+  .font-laila {
+    font-family: 'Laila', sans-serif;
+  }
+
+  .font-montserrat {
+    font-family: 'Montserrat', sans-serif;
+  }
+
+  .font-montserrat-heading {
+    font-family: "Montserrat", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 800;
+    /* Bold weight for headings */
     font-style: normal;
   }
-  .knewave-regular {
-    font-family: "Knewave", system-ui;
-    font-weight: 400;
-    font-style: normal;
+
+  /* 3D Animation Utilities */
+  .perspective-1000 {
+    perspective: 1000px;
   }
-  .patrick-hand-sc-regular {
-    font-family: "Patrick Hand SC", cursive;
-    font-weight: 400;
-    font-style: normal;
+
+  .transform-style-3d {
+    transform-style: preserve-3d;
   }
-  .bebas-neue-regular {
-    font-family: "Bebas Neue", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  .rubik-moonrocks-regular {
-    font-family: "Rubik Moonrocks", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  .poiret-one-regular {
-    font-family: "Poiret One", sans-serif;
-    font-weight: 400;
-    font-style: normal;
-  }
-  .delius-regular {
-    font-family: "Delius", cursive;
-    font-weight: 400;
-    font-style: normal;
-  }
-  .modak-regular {
-    font-family: "Modak", system-ui;
-    font-weight: 400;
-    font-style: normal;
-  }
-  
 }
 
 /* Header navigation hover effect */
@@ -321,7 +317,7 @@
   height: 2px;
   bottom: -2px;
   left: 50%;
-  background-color: #553d8f;
+  background-color: hsl(var(--primary));
   transition: all 0.3s ease;
   transform: translateX(-50%);
 }
@@ -331,7 +327,7 @@
 }
 
 .nav-link-hover:hover {
-  color: #553d8f;
+  color: hsl(var(--primary));
 }
 
 /* Running text ticker */
@@ -355,8 +351,17 @@
 
 /* Enhanced star animation for running text */
 @keyframes sparkle {
-  0%, 100% { transform: rotate(0deg) scale(1); opacity: 1; }
-  50% { transform: rotate(180deg) scale(1.2); opacity: 0.8; }
+
+  0%,
+  100% {
+    transform: rotate(0deg) scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: rotate(180deg) scale(1.2);
+    opacity: 0.8;
+  }
 }
 
 .star-animation {
@@ -491,26 +496,32 @@ html {
     transform: translateY(-100px) rotate(0deg) scale(1);
     opacity: 0.9;
   }
+
   15% {
     transform: translateY(15vh) rotate(45deg) scale(1.05);
     opacity: 1;
   }
+
   30% {
     transform: translateY(30vh) rotate(90deg) scale(0.98);
     opacity: 0.95;
   }
+
   50% {
     transform: translateY(50vh) rotate(180deg) scale(1.02);
     opacity: 0.9;
   }
+
   70% {
     transform: translateY(70vh) rotate(270deg) scale(0.95);
     opacity: 0.8;
   }
+
   85% {
     transform: translateY(85vh) rotate(360deg) scale(1.01);
     opacity: 0.6;
   }
+
   100% {
     transform: translateY(110vh) rotate(420deg) scale(0.9);
     opacity: 0;
@@ -558,8 +569,15 @@ html {
 }
 
 @keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-6px); }
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
 }
 
 /* Snow animation */
@@ -568,6 +586,7 @@ html {
     transform: translateY(-100vh) rotate(0deg);
     opacity: 1;
   }
+
   100% {
     transform: translateY(100vh) rotate(360deg);
     opacity: 0;
@@ -577,6 +596,17 @@ html {
 .animate-snowfall {
   animation: snowfall linear infinite;
   will-change: transform;
-  animation-duration: 12s; /* Slower default duration */
+  animation-duration: 12s;
+  /* Slower default duration */
 }
 
+/* Floating Cookie Animations */
+.noise-bg {
+  background-color: #f7f3f0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.05'/%3E%3C/svg%3E");
+}
+
+.cookie-glow {
+  filter: drop-shadow(0 0 15px rgba(255, 160, 122, 0.4));
+  transform: scale(1.05);
+}

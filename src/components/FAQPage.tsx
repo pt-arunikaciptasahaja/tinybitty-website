@@ -6,7 +6,7 @@ import { HelpCircle } from 'lucide-react';
 
 export default function FAQPage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f7f7' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F5EEE8' }}>
       <Header />
 
       <main className="content-section md:!pt-[6rem]" style={{ paddingTop: 'var(--mobile-header-height-2)' }}>
@@ -16,11 +16,11 @@ export default function FAQPage() {
             <HelpCircle className="h-4 w-4" />
             Frequently Asked Questions
           </span>
-          
-          <h1 className="heading-xl mb-6">
+
+          <h1 className="heading-xl font-montserrat mb-6">
             Got Questions?
           </h1>
-          
+
           <p className="body-lg mx-auto">
             Find answers to the most common questions about our products, ordering, delivery, and more.
           </p>

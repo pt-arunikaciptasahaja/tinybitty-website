@@ -46,7 +46,7 @@ export default function Home() {
       icon: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763576128/cookies-icon_rhytdc.png"
     },
     {
-      title: "Tiny Juice", 
+      title: "Tiny Juice",
       description: "Jus alami tanpa pengawet, diolah dari buah segar berkualitas—cocok diminum kapan pun kamu butuh penyegar yang alami.",
       products: sortedJuice,
       icon: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/curut_kqs4g5.png"
@@ -67,13 +67,13 @@ export default function Home() {
   ];
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#f5f7f7' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#F5EEE8' }}>
       <Header />
-      {/* <Hero /> */}
-      <PromoBanner />
-      
+      <Hero />
+      {/* <PromoBanner /> */}
+
       <RunningText />
-      
+
       <main>
         <ProductSection categories={categories} />
       </main>

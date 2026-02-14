@@ -5,8 +5,8 @@ export default function FAQ() {
   const [openItems, setOpenItems] = useState<number[]>([]);
 
   const toggleItem = (index: number) => {
-    setOpenItems(prev => 
-      prev.includes(index) 
+    setOpenItems(prev =>
+      prev.includes(index)
         ? prev.filter(i => i !== index)
         : [...prev, index]
     );
@@ -253,7 +253,7 @@ export default function FAQ() {
       ]
     }
   ];
-  
+
 
   return (
     <div className="card-standard">
@@ -261,18 +261,18 @@ export default function FAQ() {
       <div className="space-y-6">
         {faqCategories.map((category, categoryIndex) => (
           <div key={categoryIndex} className="card-elevated">
-            <div className="bg-[#ebeafd] from-secondary/10 to-accent/10 px-6 py-4 border-b border-border rounded-t-lg">
-              <h3 className="text-xl font-bold text-primary flex items-center gap-3">
+            <div className="bg-secondary from-secondary/10 to-accent/10 px-6 py-4 border-b border-border rounded-t-lg">
+              <h3 className="text-xl font-bold text-secondary-foreground flex items-center gap-3">
                 {category.icon}
                 {category.title}
               </h3>
             </div>
-            
+
             <div className="divide-y divide-border">
               {category.questions.map((item, questionIndex) => {
                 const globalIndex = categoryIndex * 100 + questionIndex;
                 const isOpen = openItems.includes(globalIndex);
-                
+
                 return (
                   <div key={questionIndex}>
                     <button
@@ -286,10 +286,9 @@ export default function FAQ() {
                         <ChevronDown className="w-5 h-5 text-primary flex-shrink-0" />
                       )}
                     </button>
-                    
-                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                      isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
-                    }`}>
+
+                    <div className={`overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                      }`}>
                       <div className="px-6 pb-4">
                         <p className="text-muted-foreground leading-relaxed">{item.answer}</p>
                       </div>
@@ -303,25 +302,30 @@ export default function FAQ() {
       </div>
 
       {/* Contact CTA */}
-      <div className="card-elevated mt-6 md:mt-8 text-center">
+      <div className="card-elevated mt-6 md:mt-8 text-center bg-secondary/5">
         <div className="mb-6">
-          <MessageCircleQuestionMark className="w-16 h-16 text-[#553d8f] mx-auto mb-4" />
+          <MessageCircleQuestionMark className="w-16 h-16 text-secondary mx-auto mb-4" />
         </div>
-        <h3 className="text-2xl font-bold text-primary mb-4">
-          Still Have <span className="text-[#553d8f]">Questions?</span>
+        <h3 className="text-2xl font-bold text-secondary mb-4">
+          Still Have <span className="text-primary">Questions?</span>
         </h3>
-        <p className="body-base mb-8 mx-auto">
+        <p className="body-base mb-8 mx-auto text-secondary/80">
           Can't find the answer you're looking for? We're here to help!
         </p>
-        <a
-          href="https://wa.me/6281112010160"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="inline-flex items-center gap-2 bg-[#553d8f] hover:bg-[#553d8f]/90 text-primary-foreground px-4 py-2 text-sm md:px-6 md:py-3 md:text-base rounded-full font-semibold transition-colors duration-200 shadow-lg hover:shadow-xl"
-        >
-          <Smartphone className="w-4 h-4 md:w-5 md:h-5" />
-          Chat with us on WhatsApp
-        </a>
+        <div className="flex justify-center">
+          <a
+            href="https://wa.me/6281112010160"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="relative inline-flex items-center gap-2 bg-secondary text-secondary-foreground px-6 py-3 rounded-full font-semibold transition-all duration-300 shadow-lg hover:shadow-primary/20 overflow-hidden group"
+          >
+            <div className="relative z-10 flex items-center gap-2">
+              <Smartphone className="w-4 h-4 md:w-5 md:h-5" />
+              Chat with us on WhatsApp
+            </div>
+            <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+          </a>
+        </div>
       </div>
     </div>
   );

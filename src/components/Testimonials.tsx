@@ -47,12 +47,12 @@ const customTestimonials: CustomTestimonial[] = [
     avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764689287/WhatsApp_Image_2025-12-02_at_22.26.08_ftryfk.jpg'
   },
   {
-    id: '2', 
+    id: '2',
     name: 'Fajar Tri S',
     handle: '@kapten_kawan',
     text: "Cookiesnya enak parah sih… crunchy di luar, lembut di dalem. Dimakan sambil nyetem gitar langsung auto-ludes 😭🔥 Rasanya tuh kayak chord yang pas—nggak perlu mikir, tinggal nikmatin.",
     rating: 5,
-    product: 'Choco Almond',
+    product: 'Golden Crunch',
     avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687494/1688027213818_r7plzv.jpg'
   },
   {
@@ -74,10 +74,10 @@ const instagramTestimonials: InstagramTestimonial[] = [
     caption: 'A little sneak peek of today’s bake 🍪✨',
     likes: 234,
     comments: 18,
-    instagramUrl: 'https://www.instagram.com/reel/CrncO0-NH_f/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
+    instagramUrl: 'https://www.instagram.com/reel/DUQLi1kEQ3g/?utm_source=ig_web_copy_link&igsh=MzRlODBiNWFlZA=='
   },
   {
-    id: 'ig2', 
+    id: 'ig2',
     accountHandle: '@tiny.bitty',
     imageUrl: 'https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=400&h=400&fit=crop',
     caption: 'Fresh Tokyo Crumb bread perfect for breakfast! 🥖☀️',
@@ -87,7 +87,7 @@ const instagramTestimonials: InstagramTestimonial[] = [
   },
   {
     id: 'ig3',
-    accountHandle: '@tiny.bitty', 
+    accountHandle: '@tiny.bitty',
     imageUrl: 'https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=400&h=400&fit=crop',
     caption: 'Healthy juice options for your daily nutrition! 🥤💚',
     likes: 156,
@@ -223,9 +223,9 @@ const InstagramEmbed = ({ url, caption, className = '' }: InstagramEmbedProps) =
           }
         `}
       </style>
-      <blockquote 
-        className="instagram-media bg-white border-0 rounded-lg shadow-lg w-full max-w-full mx-auto" 
-        data-instgrm-captioned 
+      <blockquote
+        className="instagram-media bg-white border-0 rounded-lg shadow-lg w-full max-w-full mx-auto"
+        data-instgrm-captioned
         data-instgrm-permalink={url}
         data-instgrm-version="14"
         style={{
@@ -239,12 +239,12 @@ const InstagramEmbed = ({ url, caption, className = '' }: InstagramEmbedProps) =
         }}
       >
         <div className="p-2 sm:p-4">
-          <a 
-            href={url} 
-            className="block bg-white text-center no-underline w-full" 
-            style={{ 
-              lineHeight: '0', 
-              padding: '0', 
+          <a
+            href={url}
+            className="block bg-white text-center no-underline w-full"
+            style={{
+              lineHeight: '0',
+              padding: '0',
               textDecoration: 'none',
               fontSize: '10px',
               maxWidth: '100%',
@@ -269,13 +269,13 @@ const CustomTestimonialCard = ({ testimonial }: { testimonial: CustomTestimonial
     <Card className="h-full hover:shadow-lg transition-shadow duration-300">
       <CardContent className="p-6 md:p-8">
         <div className="flex items-start space-x-4 mb-4 md:mb-6">
-          <Avatar className="h-12 w-12">
+          <Avatar className="h-12 w-12 border-2 border-primary/20">
             <AvatarImage src={testimonial.avatar} alt={testimonial.name} />
-            <AvatarFallback>{testimonial.name.charAt(0)}</AvatarFallback>
+            <AvatarFallback className="bg-primary/10 text-primary">{testimonial.name.charAt(0)}</AvatarFallback>
           </Avatar>
           <div className="flex-1">
-            <h4 className="font-semibold text-[#553d8f] text-lg md:text-xl">{testimonial.name}</h4>
-            <p className="text-sm text-[#553d8f]/80">{testimonial.handle}</p>
+            <h4 className="font-semibold text-primary text-lg md:text-xl">{testimonial.name}</h4>
+            <p className="text-sm text-secondary/70">{testimonial.handle}</p>
           </div>
           {/* Rating stars - hidden on mobile, visible on desktop */}
           <div className="hidden md:flex space-x-1">
@@ -284,13 +284,13 @@ const CustomTestimonialCard = ({ testimonial }: { testimonial: CustomTestimonial
             ))}
           </div>
         </div>
-        
-        <blockquote className="text-[#553d8f]/90 mb-4">
+
+        <blockquote className="text-secondary/90 mb-4 italic">
           "{testimonial.text}"
         </blockquote>
-        
+
         <div className="flex items-center justify-center mb-3">
-          <Badge className="text-xs bg-[#C5B8FF] text-white">
+          <Badge className="text-xs bg-secondary text-white hover:bg-secondary/90">
             {testimonial.product}
           </Badge>
           {testimonial.isVideo && (
@@ -316,8 +316,8 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
     return (
       <div className="w-full h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 rounded-lg bg-white">
         <div className="flex-1 w-full p-1 sm:p-2 md:p-4">
-          <InstagramEmbed 
-            url={instagram.instagramUrl} 
+          <InstagramEmbed
+            url={instagram.instagramUrl}
             caption={instagram.caption}
             className="w-full h-full max-w-full"
           />
@@ -328,21 +328,21 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
 
   // Fallback to the custom card design for placeholder data
   return (
-    <Card className="w-full h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 rounded-lg">
+    <Card className="w-full h-full flex flex-col overflow-hidden hover:shadow-lg transition-shadow duration-300 rounded-lg border-secondary/10">
       {/* Header with account handle and Instagram icon */}
       <div className="relative bg-white p-2 sm:p-3 md:p-4 border-b flex-shrink-0">
         <div className="flex items-center justify-between">
-          <span className="font-semibold text-[#553d8f] text-xs sm:text-sm md:text-base">{instagram.accountHandle}</span>
-          <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-pink-500" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+          <span className="font-semibold text-primary text-xs sm:text-sm md:text-base">{instagram.accountHandle}</span>
+          <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 text-primary" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
           </svg>
         </div>
       </div>
 
       {/* Post Image */}
       <div className="aspect-square overflow-hidden flex-shrink-0">
-        <img 
-          src={instagram.imageUrl} 
+        <img
+          src={instagram.imageUrl}
           alt="Instagram post"
           className="w-full h-full object-cover"
         />
@@ -358,7 +358,7 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
               </svg>
               <span className="text-xs font-medium">{instagram.likes}</span>
             </button>
-            
+
             <button className="flex items-center space-x-1 text-gray-700 hover:text-blue-500 transition-colors">
               <svg className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
@@ -373,10 +373,10 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
             </button>
           </div>
         </div>
-        
+
         <div className="flex-1 flex items-end">
-          <p className="text-xs text-[#553d8f]/90 leading-relaxed">
-            <span className="font-semibold text-[#553d8f]">{instagram.accountHandle}</span> {instagram.caption}
+          <p className="text-xs text-secondary/90 leading-relaxed">
+            <span className="font-semibold text-primary">{instagram.accountHandle}</span> {instagram.caption}
           </p>
         </div>
       </div>
@@ -387,17 +387,17 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
 export default function Testimonials({ className = '' }: TestimonialsProps) {
   return (
     <section id="testimonials"
-    className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-[#C5B8FF]/20 border">
+      className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-secondary/5 border border-secondary/10">
       <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
-        <Card className="rounded-3xl overflow-hidden">
+        <Card className="rounded-3xl overflow-hidden border-none shadow-xl">
           <CardContent className="w-full max-w-none p-3 md:p-4 lg:p-6">
             {/* Section Header */}
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-[#553d8f] mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-primary mb-4">
                 Be Part of the Cookie Crush.
               </h2>
-              <p className="text-lg text-[#553d8f]/80 max-w-4xl mx-auto">
-              Thousands of fans, millions of bites—see how Tiny Bitty lovers celebrate the flavor.
+              <p className="text-lg text-secondary/70 max-w-4xl mx-auto">
+                Thousands of fans, millions of bites—see how Tiny Bitty lovers celebrate the flavor.
               </p>
             </div>
 
@@ -427,16 +427,19 @@ export default function Testimonials({ className = '' }: TestimonialsProps) {
               {/* <p className="text-[#553d8f]/80 mb-4">
                 Follow us on Instagram for more delicious updates!
               </p> */}
-              <a 
-                href="https://www.instagram.com/tiny.bitty" 
-                target="_blank" 
+              <a
+                href="https://www.instagram.com/tiny.bitty"
+                target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center px-6 py-3 bg-[#553d8f] hover:bg-[#4a337a] text-white font-semibold rounded-full transition-colors duration-300"
+                className="relative inline-flex items-center px-8 py-3 bg-foreground text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-primary/20 overflow-hidden group"
               >
-                <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.40s-.644-1.44-1.439-1.44z"/>
-                </svg>
-                Follow @tiny.bitty
+                <div className="relative z-10 flex items-center">
+                  <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z" />
+                  </svg>
+                  Follow @tiny.bitty
+                </div>
+                <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
               </a>
             </div>
           </CardContent>
