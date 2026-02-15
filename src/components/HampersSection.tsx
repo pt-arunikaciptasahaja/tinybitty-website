@@ -37,9 +37,19 @@ const seasonalHampers = [
       'A simple, wholesome treat made with Medjool dates, oats, and sliced almonds. Naturally sweet, lightly crunchy, and perfectly comforting in every bite. Beautifully packed and ideal for gifting or enjoying anytime.',
     price: 90000,
     image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png',
+    images: [
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771161737/ChatGPT_Image_Feb_8_2026_07_47_22_PM_s3tqf3.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741397/IMG_9066_b1xkzv.jpg'
+    ],
     rating: 5.0,
     sales: '89+',
     seasonal: 'Eid Collection',
+    whatsIncluded: [
+      '1 cookie jar',
+      '2 Greeting cards',
+      'Gift box'
+    ],
     // isNew: true
   },
   {
@@ -49,9 +59,20 @@ const seasonalHampers = [
       'A charming cookie hamper filled with our signature wholesome cookies, beautifully presented for gifting. Comes with two greeting cards, a decorative ribbon, and an elegant gift box—perfect for celebrations, special moments, or a thoughtful surprise.',
     price: 195000,
     image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
+    images: [
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771162612/ChatGPT_Image_Feb_8_2026_08_08_11_PM_vbvevz.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163442/ChatGPT_Image_Feb_15_2026_08_50_18_PM_pnawg9.png'
+    ],
     rating: 4.9,
     sales: '156+',
     seasonal: 'Eid Collection',
+    whatsIncluded: [
+      '2 cookie jars',
+      '2 greeting cards',
+      'Decorative ribbon',
+      'Gift box'
+    ],
     // isNew: true
   },
   {
@@ -61,22 +82,45 @@ const seasonalHampers = [
       'A thoughtfully curated cookie hamper, beautifully presented and ready to gift. This set includes our signature cookies, two greeting cards, a decorative ribbon, an elegant gift box, and a premium paper bag for a polished finishing touch.',
     price: 375000,
     image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png',
+    images: [
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163753/ChatGPT_Image_Feb_8_2026_06_51_51_PM_x2dqrt.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/a_-90/f_png/v1770741362/IMG_9053_x2asbo.jpg',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741410/IMG_9078_frorxs.jpg'
+    ],
     rating: 4.8,
     sales: '67+',
     seasonal: 'Eid Collection',
+    whatsIncluded: [
+      '3 cookie jars',
+      '2 greeting cards',
+      'Decorative ribbon',
+      'Gift box',
+      'Premium paper bag'
+    ],
     // isNew: true
   },
   {
     id: 'eid-juice-1',
-    name: 'Ramadan & Eid Juice Bag',
+    name: 'Eid Juice Hamper',
     description:
-      'Paket jus segar dingin yang siap nemenin buka puasa sampai silaturahmi Lebaran. Datang dalam insulated flap bag lucu dengan 2 ice pack biar tetap seger. Pilih ukuran Large (7 jus) atau Small (3 jus) — dua-duanya sudah termasuk kartu ucapan Idulfitri 🧃✨',
+      'A refreshing cold juice package perfect for breaking fast through Eid celebrations. Comes in a cute packaging bag with 2 ice packs to keep everything fresh. Choose Large (7 juices) or Small (3 juices) — both include 2 Eid greeting cards 🧃✨',
     price_large: 170000,
     price_small: 90000,
     image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png',
+    images: [
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164594/yupp-generated-image-657758_1_g8qooi_dfvzdq.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164684/sg-11134201-22100-3gvh6ej7a5iv2a_e3xqqx.webp'
+    ],
     rating: 4.9,
     sales: '78+',
     seasonal: 'Eid Collection',
+    whatsIncluded: [
+      'Refreshing juices (3 or 7 based on size)',
+      'Packaging bag',
+      '2 ice packs',
+      '2 Greeting cards'
+    ],
     // isNew: true
   }
 ];
@@ -330,36 +374,20 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
             Rp {currentPrice?.toLocaleString('id-ID')}
           </div>
 
-          {/* What's included preview */}
-          <div className="space-y-1">
+          {/* What's included preview - flex-1 to fill space */}
+          <div className="space-y-1 flex-1">
             <div className="flex items-center gap-1">
               <span className="text-xs font-semibold text-foreground/80">What's Included:</span>
             </div>
             <ul className="text-xs text-foreground/70 space-y-0.5">
-              {isJuiceHamper ? (
-                <>
-                  <li>• {selectedSize === 'small' ? '3' : '7'} refreshing juices</li>
-                  <li>• Insulated flap bag</li>
-                  <li>• 2 ice packs</li>
-                  <li>• Greeting card</li>
-                </>
-              ) : (
-                <>
-                  <li>• Cookie jars per variant</li>
-                  <li>• 2 Greeting cards</li>
-                  <li>• Special packaging</li>
-                </>
-              )}
+              {hamper.whatsIncluded?.map((item, idx) => (
+                <li key={idx}>• {item}</li>
+              ))}
             </ul>
           </div>
 
-          {/* Spacer to match height - cookie hampers have 3 items, juice has 4 */}
-          {!isJuiceHamper && (
-            <div className="h-6"></div>
-          )}
-
           {/* Size section - Consistent height for all hampers */}
-          <div className={`w-full h-10 md:h-10 flex items-center mb-1 ${!isJuiceHamper ? 'mt-3' : ''}`}>
+          <div className="w-full h-10 md:h-10 flex items-center mb-1">
             {isJuiceHamper ? (
               /* Dropdown for multi-size products (juice hampers) */
               <Select
@@ -575,14 +603,30 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
             <div className="p-5 w-full box-border">
               <div className="space-y-4 w-full max-w-full">
 
-                {/* Product Image */}
-                <div className="flex">
-                  <div className="w-full h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden border border-gray-200 mb-4">
-                    <div
-                      className="w-full h-full bg-cover bg-center bg-no-repeat"
-                      style={{ backgroundImage: `url(${hamper.image})` }}
-                    />
-                  </div>
+                {/* Product Image Carousel */}
+                <div className="flex w-full mb-4">
+                  <Carousel
+                    opts={{
+                      align: "center",
+                      loop: true,
+                    }}
+                    className="w-full"
+                  >
+                    <CarouselContent>
+                      {(hamper.images || [hamper.image]).map((img, idx) => (
+                        <CarouselItem key={idx}>
+                          <div className="w-full h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden border border-gray-200">
+                            <div
+                              className="w-full h-full bg-cover bg-center bg-no-repeat"
+                              style={{ backgroundImage: `url(${img})` }}
+                            />
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <CarouselPrevious className="left-2 h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/90 backdrop-blur-sm border-none shadow-lg text-secondary hover:bg-secondary hover:text-white transition-all duration-300" />
+                    <CarouselNext className="right-2 h-8 w-8 md:h-10 md:w-10 rounded-full bg-white/90 backdrop-blur-sm border-none shadow-lg text-secondary hover:bg-secondary hover:text-white transition-all duration-300" />
+                  </Carousel>
                 </div>
 
                 {/* Product Details */}
@@ -648,20 +692,9 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                   <div className="space-y-2">
                     <h3 className="text-sm font-semibold text-foreground">What's Included</h3>
                     <ul className="text-sm text-foreground/75 space-y-1">
-                      {isJuiceHamper ? (
-                        <>
-                          <li>• {selectedSize === 'small' ? '3' : '7'} refreshing juices</li>
-                          <li>• Insulated flap bag</li>
-                          <li>• 2 ice packs</li>
-                          <li>• Greeting card</li>
-                        </>
-                      ) : (
-                        <>
-                          <li>• Cookie jars per variant</li>
-                          <li>• Greeting card</li>
-                          <li>• Special packaging</li>
-                        </>
-                      )}
+                      {hamper.whatsIncluded?.map((item, idx) => (
+                        <li key={idx}>• {item}</li>
+                      ))}
                     </ul>
                   </div>
                 </div>
@@ -677,7 +710,7 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
 export default function HampersSection() {
   return (
     <section id="hampers-section" className="mb-6 md:mb-8 relative font-montserrat">
-      <div className="border border-secondary/20 rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden bg-secondary/5">
+      <div className="border border-secondary/20 rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden" style={{ backgroundColor: '#FBF0D0' }}>
         {/* <div className="hidden md:block">
           <CookieFallingAnimation />
         </div> */}
@@ -699,7 +732,7 @@ export default function HampersSection() {
             <div className="hidden lg:col-span-4 lg:block">
               <div className="aspect-square rounded-2xl overflow-hidden">
                 <img
-                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068105/ramadan_theme_p7aqqh.png"
+                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FAF0D1/f_png/v1771164854/Gemini_Generated_Image_dk03yydk03yydk03_xr2ajp.png"
                   alt="Tiny Bitty Hampers Collection"
                   className="w-full h-full object-cover"
                 />
