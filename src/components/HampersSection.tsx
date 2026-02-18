@@ -100,23 +100,23 @@ const seasonalHampers = [
     // isNew: true
   },
   {
-    id: 'eid-juice-1',
-    name: 'Eid Juice Hamper',
+    id: 'eid-d',
+    name: 'Eid Hampers D',
     description:
-      'A refreshing cold juice package perfect for breaking fast through Eid celebrations. Comes in a cute packaging bag with 2 ice packs to keep everything fresh. Choose Large (7 juices) or Small (3 juices) — both include 2 Eid greeting cards 🧃✨',
+      'Customizable Eid hampers that you can fill with either three or five tiny juices, or two 100-gram pouches of cookies. Perfect for gifting, sharing, or treating yourself during Eid celebrations.',
     price_large: 170000,
     price_small: 90000,
-    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png',
+    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771417485/Gemini_Generated_Image_wy61y7wy61y7wy61_nbjspy.png',
     images: [
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068507/Gemini_Generated_Image_927n25927n25927n_lxafuv.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164594/yupp-generated-image-657758_1_g8qooi_dfvzdq.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771417485/Gemini_Generated_Image_wy61y7wy61y7wy61_nbjspy.png',
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771418738/yupp-generated-image-855171_gjo9aa.png',
       'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164684/sg-11134201-22100-3gvh6ej7a5iv2a_e3xqqx.webp'
     ],
     rating: 4.9,
     sales: '78+',
     seasonal: 'Eid Collection',
     whatsIncluded: [
-      'Refreshing juices (3 or 7 based on size)',
+      'Choice of: 3 or 5 tiny juices OR 2x 100g cookie pouches',
       'Packaging bag',
       '2 ice packs',
       '2 Greeting cards'
@@ -126,7 +126,9 @@ const seasonalHampers = [
 ];
 
 function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
-  const [selectedSize, setSelectedSize] = useState<'small' | 'large'>('small');
+  const [selectedSize, setSelectedSize] = useState<
+    'pouch' | 'three-juices' | 'five-juices'
+  >('pouch');
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [quantities, setQuantities] = useState<Record<string, number>>({});
   const [isAdding, setIsAdding] = useState(false);
@@ -134,9 +136,13 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
   const { addToCart, updateQuantity, cart } = useCart();
   const { toast } = useToast();
 
-  const isJuiceHamper = hamper.price_large && hamper.price_small;
+  const isJuiceHamper = hamper.id === 'eid-d';
   const currentPrice = isJuiceHamper
-    ? (selectedSize === 'small' ? hamper.price_small : hamper.price_large)
+    ? selectedSize === 'pouch'
+      ? 65000
+      : selectedSize === 'three-juices'
+        ? 85000
+        : 125000
     : hamper.price;
   const quantity = quantities[selectedSize] || 0;
   const hasItemInCart = quantity > 0;
@@ -393,7 +399,7 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
               <Select
                 value={selectedSize}
                 onValueChange={(value) => {
-                  setSelectedSize(value as 'small' | 'large');
+                  setSelectedSize(value as 'pouch' | 'three-juices' | 'five-juices');
                 }}
               >
                 <SelectTrigger
@@ -437,7 +443,7 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                   "
                 >
                   <SelectItem
-                    value="small"
+                    value="pouch"
                     className="
                       text-sm
                       py-2 px-3
@@ -456,18 +462,21 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold bg-[#f0f9ff] text-[#0369a1]">
-                        S
+                        P
                       </div>
                       <div className="flex flex-col leading-tight">
                         <span className="text-sm font-semibold text-foreground">
-                          3 juices
+                          2x 30gr pouches
+                        </span>
+                        <span className="text-xs text-foreground/70">
+                          Rp 65.000
                         </span>
                       </div>
                     </div>
                   </SelectItem>
 
                   <SelectItem
-                    value="large"
+                    value="three-juices"
                     className="
                       text-sm
                       py-2 px-3
@@ -486,11 +495,47 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                   >
                     <div className="flex items-center gap-3">
                       <div className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold bg-[#fef9c3] text-[#854d0e]">
-                        L
+                        J3
                       </div>
                       <div className="flex flex-col leading-tight">
                         <span className="text-sm font-semibold text-foreground">
-                          7 juices
+                          3 juices
+                        </span>
+                        <span className="text-xs text-foreground/70">
+                          Rp 85.000
+                        </span>
+                      </div>
+                    </div>
+                  </SelectItem>
+
+                  <SelectItem
+                    value="five-juices"
+                    className="
+                      text-sm
+                      py-2 px-3
+                      rounded-xl
+                      bg-white
+                      data-[state=checked]:bg-muted
+                      data-[state=checked]:text-secondary
+                      data-[highlighted]:bg-muted/10
+                      data-[highlighted]:text-secondary
+                      cursor-pointer
+                      focus:bg-muted/10
+                      focus:text-secondary
+                      hover:bg-muted/10
+                      hover:text-secondary
+                    "
+                  >
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center justify-center w-8 h-8 rounded-full text-xs font-semibold bg-[#dcfce7] text-[#166534]">
+                        J5
+                      </div>
+                      <div className="flex flex-col leading-tight">
+                        <span className="text-sm font-semibold text-foreground">
+                          5 juices
+                        </span>
+                        <span className="text-xs text-foreground/70">
+                          Rp 125.000
                         </span>
                       </div>
                     </div>
@@ -644,9 +689,10 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                   {/* Price */}
                   <div className="text-xl font-bold text-secondary">
                     {isJuiceHamper ? (
-                      <div className="space-y-1">
-                        <div className="text-sm text-secondary/70">Small: Rp {hamper.price_small?.toLocaleString('id-ID')}</div>
-                        <div className="text-sm text-secondary/70">Large: Rp {hamper.price_large?.toLocaleString('id-ID')}</div>
+                      <div className="space-y-1 text-sm text-secondary/70">
+                        <div>2x 30gr pouches: Rp 65.000</div>
+                        <div>3 juices: Rp 85.000</div>
+                        <div>5 juices: Rp 125.000</div>
                       </div>
                     ) : (
                       <span>Rp {hamper.price?.toLocaleString('id-ID')}</span>
@@ -667,14 +713,19 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                       <h3 className="text-sm font-semibold text-foreground">Size Options</h3>
                       <div className="space-y-2">
                         <div className="p-3 rounded-lg bg-[#f0f9ff] border border-[#e0f2fe]">
-                          <div className="font-semibold text-[#0369a1]">Small (3 juices)</div>
-                          <div className="text-sm text-secondary/70">Perfect for 1-2 people, includes greeting card</div>
-                          <div className="font-semibold text-[#0369a1]">Rp {hamper.price_small?.toLocaleString('id-ID')}</div>
+                          <div className="font-semibold text-[#0369a1]">2x 30gr pouches</div>
+                          <div className="text-sm text-secondary/70">Perfect as a light treat or add-on gift</div>
+                          <div className="font-semibold text-[#0369a1]">Rp 65.000</div>
                         </div>
                         <div className="p-3 rounded-lg bg-[#fef9c3] border border-[#fef08a]">
-                          <div className="font-semibold text-[#854d0e]">Large (7 juices)</div>
-                          <div className="text-sm text-secondary/70">Ideal for sharing, includes greeting card</div>
-                          <div className="font-semibold text-[#854d0e]">Rp {hamper.price_large?.toLocaleString('id-ID')}</div>
+                          <div className="font-semibold text-[#854d0e]">3 juices</div>
+                          <div className="text-sm text-secondary/70">Great for sharing or a more generous gift</div>
+                          <div className="font-semibold text-[#854d0e]">Rp 85.000</div>
+                        </div>
+                        <div className="p-3 rounded-lg bg-[#dcfce7] border border-[#bbf7d0]">
+                          <div className="font-semibold text-[#166534]">5 juices</div>
+                          <div className="text-sm text-secondary/70">Best for sharing with loved ones</div>
+                          <div className="font-semibold text-[#166534]">Rp 125.000</div>
                         </div>
                       </div>
                     </div>
