@@ -1794,16 +1794,16 @@ export default function OrderForm() {
 
           <div className="px-6 py-6">
             <div className="text-center mb-6">
-              <p className="text-[#5D4E8E] text-sm leading-relaxed mb-4">
+              <p className="text-secondary text-sm leading-relaxed mb-4">
                 Tim Tiny Bitty akan menghubungi kamu melalui WhatsApp untuk konfirmasi pesanan,
                 alamat, dan detail pengiriman agar pesananmu bisa segera diproses.
               </p>
 
               {/* Manual WhatsApp Button */}
-              <div className="bg-[#F6F2FF] rounded-2xl p-4 mb-4">
+              <div className="bg-muted/10 rounded-2xl p-4 mb-4">
                 <div className="flex items-center justify-center gap-2 mb-2">
-                  {/* <MessagesSquare className="w-5 h-5 text-[#5D4E8E]" /> */}
-                  <p className="text-[#5D4E8E] font-semibold text-base">
+                  {/* <MessagesSquare className="w-5 h-5 text-secondary" /> */}
+                  <p className="text-secondary font-semibold text-base">
                     Lanjut konfirmasi via WhatsApp
                   </p>
                 </div>
@@ -1831,7 +1831,7 @@ export default function OrderForm() {
                   <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
                 </Button>
 
-                <p className="text-[#8978B4] text-xs">
+                <p className="text-secondary/70 text-xs">
                   Klik tombol WhatsApp untuk konfirmasi pesanan, dan download invoice untuk menyimpan ke perangkat kamu.
                 </p>
               </div>
@@ -1841,11 +1841,12 @@ export default function OrderForm() {
         </p> */}
             </div>
 
-            <div className="flex justify-center bg-[#F6F2FF] rounded-2xl">
+            <div className="flex justify-center bg-muted/10 rounded-2xl">
               <div className="w-[340px] h-[200px] flex items-center max-auto">
                 <Lottie
                   animationData={remixAnimation}
                   loop={true}
+                  style={{ filter: 'hue-rotate(-95deg) saturate(1.4) brightness(1.25)' }}
                 />
               </div>
             </div>
