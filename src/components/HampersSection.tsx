@@ -27,6 +27,7 @@ import { useToast } from '@/components/ui/use-toast';
 import { Plus, Minus, Check, Star } from 'lucide-react';
 import { fbPixelTrack } from '@/lib/fbpixel';
 import CookieFallingAnimation from './CookieFallingAnimation';
+import { cldThumb } from '@/lib/cdn';
 
 // Seasonal hamper data with Eid theme
 const seasonalHampers = [
@@ -36,11 +37,23 @@ const seasonalHampers = [
     description:
       'A simple, wholesome treat made with Medjool dates, oats, and sliced almonds. Naturally sweet, lightly crunchy, and perfectly comforting in every bite. Beautifully packed and ideal for gifting or enjoying anytime.',
     price: 90000,
-    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png',
-    images: [
+    image: cldThumb(
       'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771161737/ChatGPT_Image_Feb_8_2026_07_47_22_PM_s3tqf3.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741397/IMG_9066_b1xkzv.jpg'
+      { width: 600, quality: 'auto:eco' },
+    ),
+    images: [
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771068682/ChatGPT_Image_Feb_14_2026_06_30_55_PM_ouyqsr.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771161737/ChatGPT_Image_Feb_8_2026_07_47_22_PM_s3tqf3.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741397/IMG_9066_b1xkzv.jpg',
+        { width: 900, quality: 'auto' },
+      ),
     ],
     rating: 5.0,
     sales: '89+',
@@ -58,11 +71,23 @@ const seasonalHampers = [
     description:
       'A charming cookie hamper filled with our signature wholesome cookies, beautifully presented for gifting. Comes with two greeting cards, a decorative ribbon, and an elegant gift box—perfect for celebrations, special moments, or a thoughtful surprise.',
     price: 195000,
-    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
+    image: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
+      { width: 600, quality: 'auto:eco' },
+    ),
     images: [
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771162612/ChatGPT_Image_Feb_8_2026_08_08_11_PM_vbvevz.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163442/ChatGPT_Image_Feb_15_2026_08_50_18_PM_pnawg9.png'
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771162612/ChatGPT_Image_Feb_8_2026_08_08_11_PM_vbvevz.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770745549/Gemini_Generated_Image_ulp3txulp3txulp3_nxct9q.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163442/ChatGPT_Image_Feb_15_2026_08_50_18_PM_pnawg9.png',
+        { width: 900, quality: 'auto' },
+      ),
     ],
     rating: 4.9,
     sales: '156+',
@@ -81,11 +106,23 @@ const seasonalHampers = [
     description:
       'A thoughtfully curated cookie hamper, beautifully presented and ready to gift. This set includes our signature cookies, two greeting cards, a decorative ribbon, an elegant gift box, and a premium paper bag for a polished finishing touch.',
     price: 375000,
-    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png',
+    image: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770746119/Gemini_Generated_Image_wl95zjwl95zjwl95_jgqfln.png',
+      { width: 600, quality: 'auto:eco' },
+    ),
     images: [
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163753/ChatGPT_Image_Feb_8_2026_06_51_51_PM_x2dqrt.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/a_-90/f_png/v1770741362/IMG_9053_x2asbo.jpg',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741410/IMG_9078_frorxs.jpg'
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/b_rgb:FFFFFF/v1771163753/ChatGPT_Image_Feb_8_2026_06_51_51_PM_x2dqrt.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/a_-90/f_png/v1770741362/IMG_9053_x2asbo.jpg',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FFFFFF/f_png/v1770741410/IMG_9078_frorxs.jpg',
+        { width: 900, quality: 'auto' },
+      ),
     ],
     rating: 4.8,
     sales: '67+',
@@ -106,11 +143,23 @@ const seasonalHampers = [
       'Customizable Eid hampers that you can fill with either three or five tiny juices, or two 100-gram pouches of cookies. Perfect for gifting, sharing, or treating yourself during Eid celebrations.',
     price_large: 170000,
     price_small: 90000,
-    image: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771417485/Gemini_Generated_Image_wy61y7wy61y7wy61_nbjspy.png',
-    images: [
+    image: cldThumb(
       'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771417485/Gemini_Generated_Image_wy61y7wy61y7wy61_nbjspy.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771418738/yupp-generated-image-855171_gjo9aa.png',
-      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164684/sg-11134201-22100-3gvh6ej7a5iv2a_e3xqqx.webp'
+      { width: 600, quality: 'auto:eco' },
+    ),
+    images: [
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771417485/Gemini_Generated_Image_wy61y7wy61y7wy61_nbjspy.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771418738/yupp-generated-image-855171_gjo9aa.png',
+        { width: 900, quality: 'auto' },
+      ),
+      cldThumb(
+        'https://res.cloudinary.com/dodmwwp1w/image/upload/v1771164684/sg-11134201-22100-3gvh6ej7a5iv2a_e3xqqx.webp',
+        { width: 900, quality: 'auto' },
+      ),
     ],
     rating: 4.9,
     sales: '78+',
@@ -344,10 +393,15 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
       >
         {/* TOP: image section - Fixed consistent size */}
         <div className="relative mb-3 md:mb-4 group flex-shrink-0">
-          <div
-            className="w-full h-48 md:h-56 rounded-2xl bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url(${hamper.image})` }}
-          />
+          <div className="w-full h-48 md:h-56 rounded-2xl overflow-hidden">
+            <img
+              src={hamper.image}
+              alt={hamper.name}
+              className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
           <div className="absolute top-2 right-2">
             <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-primary/10 text-primary border border-primary/20 shadow-md backdrop-blur-sm">
               {hamper.seasonal}
@@ -661,9 +715,12 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
                       {(hamper.images || [hamper.image]).map((img, idx) => (
                         <CarouselItem key={idx}>
                           <div className="w-full h-64 md:h-80 lg:h-96 rounded-2xl overflow-hidden border border-gray-200">
-                            <div
-                              className="w-full h-full bg-cover bg-center bg-no-repeat"
-                              style={{ backgroundImage: `url(${img})` }}
+                            <img
+                              src={img}
+                              alt={hamper.name}
+                              className="w-full h-full object-cover"
+                              loading="lazy"
+                              decoding="async"
                             />
                           </div>
                         </CarouselItem>
@@ -783,9 +840,14 @@ export default function HampersSection() {
             <div className="hidden lg:col-span-4 lg:block">
               <div className="aspect-square rounded-2xl overflow-hidden">
                 <img
-                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FAF0D1/f_png/v1771164854/Gemini_Generated_Image_dk03yydk03yydk03_xr2ajp.png"
+                  src={cldThumb(
+                    "https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FAF0D1/f_png/v1771164854/Gemini_Generated_Image_dk03yydk03yydk03_xr2ajp.png",
+                    { width: 700, quality: "auto:eco" },
+                  )}
                   alt="Tiny Bitty Hampers Collection"
                   className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
                 />
               </div>
             </div>

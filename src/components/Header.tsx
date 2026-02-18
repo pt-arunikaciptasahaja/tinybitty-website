@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge';
 import { useCart } from '@/contexts/CartContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
+import { cldThumb } from '@/lib/cdn';
 
 export default function Header() {
   const { getTotalItems } = useCart();
@@ -66,9 +67,14 @@ export default function Header() {
                 className="relative"
               >
                 <img
-                  src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1770742943/New_Logo_Tiny_Bitty_20260130_104635_0001_dsaafx_e_background_removal_f_png_cyeeux.png"
+                  src={cldThumb(
+                    "https://res.cloudinary.com/dodmwwp1w/image/upload/v1770742943/New_Logo_Tiny_Bitty_20260130_104635_0001_dsaafx_e_background_removal_f_png_cyeeux.png",
+                    { width: 320, quality: "auto:eco" },
+                  )}
                   alt="Tiny Bitty - Freshly Baked Happiness"
                   className="h-12 md:h-16 lg:h-24 w-auto object-contain transition-all duration-300 group-hover:drop-shadow-[0_0_15px_rgba(241,171,162,0.6)]"
+                  loading="lazy"
+                  decoding="async"
                 />
               </motion.div>
             </Link>

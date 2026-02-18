@@ -23,6 +23,7 @@ import remixAnimation from '@/data/Remix of assssa.json';
 import AddressSearchInput from './AddressSearchInput';
 import { DistanceResult } from '@/lib/nominatimClient';
 import { MessageCircle, CheckCircle2, Motorbike, MapPin, MapPinHouse, Timer, AlertCircle, ShoppingBag, Search, CreditCard, FileText, Lightbulb, CircleCheckBig, ClipboardCheck, PackageCheck, MessageSquareText, MessagesSquare, ExternalLink, UserCheck, ReceiptText, UserRoundPen, Smartphone, WalletCards, NotebookPen } from 'lucide-react';
+import { cldThumb } from '@/lib/cdn';
 
 const WHATSAPP_NUMBER = import.meta.env.VITE_WHATSAPP_NUMBER || '6281112010160';
 
@@ -1939,10 +1940,15 @@ export default function OrderForm() {
                         key={`${item.productId}-${item.variant.size}`}
                         className="flex items-center gap-3 p-3 bg-secondary/5 rounded-xl"
                       >
-                        <div
-                          className="w-12 h-12 bg-cover bg-center bg-no-repeat rounded-xl flex-shrink-0"
-                          style={{ backgroundImage: `url(${item.image})` }}
-                        />
+                        <div className="w-12 h-12 rounded-xl flex-shrink-0 overflow-hidden bg-muted/10">
+                          <img
+                            src={cldThumb(item.image, { width: 160, quality: 'auto:eco' })}
+                            alt={item.productName}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-secondary text-sm truncate">
                             {item.productName}

@@ -1,4 +1,5 @@
 import { Sparkles, Leaf, Home, ThumbsUp, Vegan } from 'lucide-react';
+import { cldThumb } from '@/lib/cdn';
 
 export default function Ingredients() {
   return (
@@ -41,9 +42,14 @@ export default function Ingredients() {
       <div className="mb-8">
         <div className="rounded-2xl overflow-hidden border border-border shadow-sm mx-auto max-w-none">
           <img
-            src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787771/yupp-generated-image-830030_1_hmsris.png"
+            src={cldThumb(
+              "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763787771/yupp-generated-image-830030_1_hmsris.png",
+              { width: 800, quality: "auto:eco" },
+            )}
             alt="Tiny Bitty baking ingredients"
             className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
           />
         </div>
       </div>

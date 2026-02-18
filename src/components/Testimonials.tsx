@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { cldThumb } from '@/lib/cdn';
 
 interface InstagramEmbedProps {
   url: string;
@@ -44,7 +45,10 @@ const customTestimonials: CustomTestimonial[] = [
     text: "Cookiesnya enak banget… rasanya comforting gitu loh 😭✨ Abis lari pagi cici bawa ke kantor, buka laptop bentar doang, eh udah abis aja. Cici manja approved! 🤌💼💖",
     rating: 5,
     product: 'Heavenly Bites',
-    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764689287/WhatsApp_Image_2025-12-02_at_22.26.08_ftryfk.jpg'
+    avatar: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764689287/WhatsApp_Image_2025-12-02_at_22.26.08_ftryfk.jpg',
+      { width: 96, quality: 'auto:eco' },
+    ),
   },
   {
     id: '2',
@@ -53,7 +57,10 @@ const customTestimonials: CustomTestimonial[] = [
     text: "Cookiesnya enak parah sih… crunchy di luar, lembut di dalem. Dimakan sambil nyetem gitar langsung auto-ludes 😭🔥 Rasanya tuh kayak chord yang pas—nggak perlu mikir, tinggal nikmatin.",
     rating: 5,
     product: 'Golden Crunch',
-    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687494/1688027213818_r7plzv.jpg'
+    avatar: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687494/1688027213818_r7plzv.jpg',
+      { width: 96, quality: 'auto:eco' },
+    ),
   },
   {
     id: '3',
@@ -62,7 +69,10 @@ const customTestimonials: CustomTestimonial[] = [
     text: 'Juice-nya seger banget, mau dijadiin pre-run boost atau recovery abis lari juga masuk banget. Bikin badan auto-ready buat ngegas pace 5 🤙',
     rating: 5,
     product: 'Strawberry Juice',
-    avatar: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687574/1718872032695_aea6ym.jpg'
+    avatar: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764687574/1718872032695_aea6ym.jpg',
+      { width: 96, quality: 'auto:eco' },
+    ),
   }
 ];
 
@@ -70,7 +80,10 @@ const instagramTestimonials: InstagramTestimonial[] = [
   {
     id: 'ig1',
     accountHandle: '@tiny.bitty',
-    imageUrl: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764574412/Screenshot_2025-12-01_at_14.29.42_dqukxx.png',
+    imageUrl: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764574412/Screenshot_2025-12-01_at_14.29.42_dqukxx.png',
+      { width: 480, quality: 'auto:eco' },
+    ),
     caption: 'A little sneak peek of today’s bake 🍪✨',
     likes: 234,
     comments: 18,

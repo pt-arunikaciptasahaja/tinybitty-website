@@ -20,6 +20,7 @@ import { Plus, Minus, Check, Star } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/components/ui/use-toast';
 import { fbPixelTrack } from '@/lib/fbpixel';
+import { cldThumb } from '@/lib/cdn';
 
 interface ProductCardProps {
   product: Product;
@@ -396,10 +397,15 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
     >
       {/* TOP: image section */}
       <div className="relative mb-2 md:mb-4 group">
-        <div
-          className="w-full h-40 md:aspect-square rounded-2xl bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: `url(${product.image})` }}
-        />
+        <div className="w-full h-40 md:aspect-square rounded-2xl overflow-hidden bg-muted/10">
+          <img
+            src={cldThumb(product.image, { width: 600, quality: 'auto:eco' })}
+            alt={product.name}
+            className="w-full h-full object-cover"
+            loading="lazy"
+            decoding="async"
+          />
+        </div>
         {product.isNew && (
           <Badge className="absolute top-2 right-2 bg-accent text-secondary text-[10px] px-2 py-0.5 shadow-md">
             NEW

@@ -6,6 +6,7 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from '@/components/ui/carousel';
+import { cldThumb } from '@/lib/cdn';
 
 interface Banner {
   id: string;
@@ -24,14 +25,26 @@ const banners: Banner[] = [
   // },
   {
     id: 'promo-2',
-    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
-    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
+    desktopImage: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
+      { width: 1280, quality: 'auto' },
+    ),
+    mobileImage: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764499893/Freshly_poured._Freshly_baked._Freshly_made._1_khmp3h.png',
+      { width: 640, quality: 'auto' },
+    ),
     alt: 'Special Offer Banner'
   },
   {
     id: 'promo-3',
-    desktopImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
-    mobileImage: 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
+    desktopImage: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
+      { width: 1280, quality: 'auto' },
+    ),
+    mobileImage: cldThumb(
+      'https://res.cloudinary.com/dodmwwp1w/image/upload/v1764346942/yupp-generated-image-657758_1_g8qooi.png',
+      { width: 640, quality: 'auto' },
+    ),
     alt: 'New Collection Banner'
   },
   // {

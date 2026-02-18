@@ -1,6 +1,7 @@
 import Header from './Header';
 import Footer from './Footer';
 import { Toaster } from '@/components/ui/toaster';
+import { cldThumb } from '@/lib/cdn';
 import {
   Home,
   Sprout,
@@ -153,9 +154,14 @@ export default function OurStoryPage() {
               <div className="text-center">
                 <div className="mx-auto mb-4">
                   <img
-                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker2_fzyyfq.jpg"
+                    src={cldThumb(
+                      "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker2_fzyyfq.jpg",
+                      { width: 120, quality: "auto:eco" },
+                    )}
                     alt="Artisanal"
                     className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Artisanal Craftsmanship</h4>
@@ -165,9 +171,14 @@ export default function OurStoryPage() {
               <div className="text-center">
                 <div className="mx-auto mb-4">
                   <img
-                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker1_bgdbvs.jpg"
+                    src={cldThumb(
+                      "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker1_bgdbvs.jpg",
+                      { width: 120, quality: "auto:eco" },
+                    )}
                     alt="Premium"
                     className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Premium Ingredients</h4>
@@ -177,9 +188,14 @@ export default function OurStoryPage() {
               <div className="text-center">
                 <div className="mx-auto mb-4">
                   <img
-                    src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker3_q0kfsb.jpg"
+                    src={cldThumb(
+                      "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771089201/sticker3_q0kfsb.jpg",
+                      { width: 120, quality: "auto:eco" },
+                    )}
                     alt="Delivery"
                     className="w-16 h-16 md:w-20 md:h-20 rounded-full mx-auto border-2 border-secondary/20 shadow-sm"
+                    loading="lazy"
+                    decoding="async"
                   />
                 </div>
                 <h4 className="font-bold text-secondary mb-2">Thoughtful Delivery</h4>

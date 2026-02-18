@@ -10,6 +10,7 @@ import OrderForm from './OrderForm';
 import Footer from './Footer';
 import productsData from '@/data/products.json';
 import { Toaster } from '@/components/ui/toaster';
+import { cldThumb } from '@/lib/cdn';
 
 export default function Home() {
   // Sort products to show items with isNew badge first
@@ -43,19 +44,28 @@ export default function Home() {
       title: "Cookies",
       description: "Kue kering lezat yang crunchy, ideal untuk cemilan harian atau sebagai hampers istimewa.",
       products: sortedCookies,
-      icon: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763576128/cookies-icon_rhytdc.png"
+      icon: cldThumb(
+        "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763576128/cookies-icon_rhytdc.png",
+        { width: 96, quality: "auto:eco" },
+      ),
     },
     {
       title: "Tiny Juice",
       description: "Jus alami tanpa pengawet, diolah dari buah segar berkualitas—cocok diminum kapan pun kamu butuh penyegar yang alami.",
       products: sortedJuice,
-      icon: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/curut_kqs4g5.png"
+      icon: cldThumb(
+        "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/curut_kqs4g5.png",
+        { width: 96, quality: "auto:eco" },
+      ),
     },
     {
       title: "Macaroni Schotel",
       description: "Macaroni panggang dengan saus keju gurih dan super creamy—sempurna untuk makan siang, makan malam, atau sekadar craving sesuatu yang enak.",
       products: sortedMacaroni,
-      icon: "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/mac-icon_kuyjid.png"
+      icon: cldThumb(
+        "https://res.cloudinary.com/dodmwwp1w/image/upload/v1763574654/mac-icon_kuyjid.png",
+        { width: 96, quality: "auto:eco" },
+      ),
     },
     {
       title: "Tokyo Crumb",

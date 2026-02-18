@@ -12,6 +12,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingCart, Plus, Minus, Trash2 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cldThumb } from '@/lib/cdn';
 import { useToast } from '@/components/ui/use-toast';
 
 interface CartSheetProps {
@@ -159,10 +160,15 @@ export default function CartSheet({ children }: CartSheetProps) {
                       className="bg-white rounded-2xl p-4 shadow-sm border border-secondary/10"
                     >
                       <div className="flex gap-4">
-                        <div
-                          className="w-20 h-20 rounded-xl bg-cover bg-center shadow-sm"
-                          style={{ backgroundImage: `url(${item.image})` }}
-                        />
+                        <div className="w-20 h-20 rounded-xl overflow-hidden shadow-sm bg-muted/10">
+                          <img
+                            src={cldThumb(item.image, { width: 200, quality: 'auto:eco' })}
+                            alt={item.productName}
+                            className="w-full h-full object-cover"
+                            loading="lazy"
+                            decoding="async"
+                          />
+                        </div>
 
                         <div className="flex-1 min-w-0">
                           <h4 className="font-semibold text-secondary truncate">

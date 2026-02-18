@@ -115,6 +115,8 @@ const FloatingCookie = ({
                                         alt={name}
                                         className="w-full h-full object-contain drop-shadow-2xl"
                                         draggable={false}
+                                        loading="lazy"
+                                        decoding="async"
                                     />
                                 </motion.div>
                             </div>

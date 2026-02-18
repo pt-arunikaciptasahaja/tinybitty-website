@@ -1,4 +1,5 @@
 import { Instagram, MessageCircle, Heart, Clock, MapPin, Phone, Mail, Star } from 'lucide-react';
+import { cldThumb } from '@/lib/cdn';
 
 export default function Footer() {
   return (
@@ -17,9 +18,14 @@ export default function Footer() {
           <div className="text-center lg:text-left">
             <div className="flex items-center justify-center lg:justify-start gap-3 mb-4">
               <img
-                src="https://res.cloudinary.com/dodmwwp1w/image/upload/v1771073687/ddf_t3dojo.png"
+                src={cldThumb(
+                  "https://res.cloudinary.com/dodmwwp1w/image/upload/v1771073687/ddf_t3dojo.png",
+                  { width: 320, quality: "auto:eco" },
+                )}
                 alt="Tiny Bitty - Freshly Baked Happiness"
                 className="h-14 w-auto object-contain"
+                loading="lazy"
+                decoding="async"
               />
               <div className="flex items-center gap-2">
                 <span className="text-lg text-secondary delius-regular">Tiny Bitty</span>
