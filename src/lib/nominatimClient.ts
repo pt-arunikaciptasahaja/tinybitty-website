@@ -74,7 +74,7 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
     });
 
     const searchUrl = `${NOMINATIM_BASE_URL}?${searchParams}`;
-    
+
     // console.log(`[NOMINATIM] Making API request to: ${searchUrl}`);
 
     // Create abort controller for timeout
@@ -83,7 +83,7 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
 
     const response = await fetch(searchUrl, {
       headers: {
-        // 'User-Agent': 'tinybitty-location-search/1.0 (contact: your-email@example.com)',
+        'User-Agent': 'TinyBitty-Website-Invoice/1.0 (contact: tinybitty.tb@gmail.com)',
         'Accept-Language': 'id,en',
       },
       signal: controller.signal
@@ -123,12 +123,12 @@ export async function searchLocations(query: string): Promise<GeocodingResult[]>
 
   } catch (error) {
     console.error('[NOMINATIM] Search failed:', error);
-    
+
     // Handle specific error types
     if (error instanceof TypeError && error.message.includes('Failed to fetch')) {
       console.warn('[NOMINATIM] Network error - this might be a temporary connectivity issue');
     }
-    
+
     // Return empty array on error - caller will handle gracefully
     return [];
   }
@@ -141,7 +141,7 @@ function buildLocationLabel(address: any): string | null {
   if (!address) return null;
 
   const parts: string[] = [];
-  
+
   // Add primary location (road, place, etc.)
   if (address.road || address.house_number) {
     const roadParts = [];
@@ -153,22 +153,22 @@ function buildLocationLabel(address: any): string | null {
   } else if (address.place || address.locality) {
     parts.push(address.place || address.locality);
   }
-  
+
   // Add neighborhood/suburb
   if (address.suburb || address.neighbourhood || address.quarter) {
     parts.push(address.suburb || address.neighbourhood || address.quarter);
   }
-  
+
   // Add city/regency
   if (address.city || address.town || address.village || address.regency) {
     parts.push(address.city || address.town || address.village || address.regency);
   }
-  
+
   // Add province/state
   if (address.state) {
     parts.push(address.state);
   }
-  
+
   // Add postal code if available
   if (address.postcode) {
     parts.push(address.postcode);
@@ -182,21 +182,21 @@ function buildLocationLabel(address: any): string | null {
  */
 function calculateConfidenceScore(item: any): number {
   let score = 0;
-  
+
   // Boost score for complete addresses
   if (item.address?.house_number) score += 10;
   if (item.address?.road) score += 8;
   if (item.address?.suburb || item.address?.neighbourhood) score += 6;
   if (item.address?.city || item.address?.town || item.address?.village) score += 4;
   if (item.address?.state) score += 2;
-  
+
   // Boost for certain place types
   if (item.type === 'place' && item.class === 'place') score += 5;
   if (item.type === 'highway') score += 3;
-  
+
   // Boost for populated areas (higher importance)
   if (item.importance && item.importance > 0.5) score += 3;
-  
+
   return score;
 }
 
@@ -205,17 +205,17 @@ function calculateConfidenceScore(item: any): number {
  */
 export function calculateDistanceKm(origin: LatLng, destination: LatLng): number {
   const R = 6371; // Earth's radius in kilometers
-  
+
   const dLat = toRadians(destination.lat - origin.lat);
   const dLng = toRadians(destination.lng - origin.lng);
-  
+
   const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
     Math.cos(toRadians(origin.lat)) * Math.cos(toRadians(destination.lat)) *
     Math.sin(dLng / 2) * Math.sin(dLng / 2);
-  
+
   const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   const distance = R * c;
-  
+
   return Math.round(distance * 100) / 100; // Round to 2 decimal places
 }
 
@@ -230,14 +230,14 @@ function toRadians(degrees: number): number {
  * Enhanced distance calculation with road-based option
  */
 export async function calculateDistanceWithRoadOption(
-  origin: LatLng, 
+  origin: LatLng,
   destination: LatLng,
   useRoadDistance: boolean = false
 ): Promise<number> {
   if (!useRoadDistance) {
     return calculateDistanceKm(origin, destination);
   }
-  
+
   try {
     // Import dynamically to avoid circular dependencies
     const { calculateRoadDistance } = await import('./roadRouting');
@@ -245,7 +245,7 @@ export async function calculateDistanceWithRoadOption(
       excludeTolls: true,
       fallbackToHaversine: true
     });
-    
+
     return roadDistance || calculateDistanceKm(origin, destination);
   } catch (error) {
     console.warn('[NOMINATIM] Road distance calculation failed, falling back to Haversine:', error);

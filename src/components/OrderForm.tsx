@@ -767,7 +767,7 @@ export default function OrderForm() {
         setDeliveryInfo(null);
       }
     }, 2000); // 2 second debounce
-  }, [detailedAddress, deliveryMethod, hasCompletedDeliveryCalculation, cart, getTotalPrice, form, deliveryInfo?.isValid]);
+  }, [detailedAddress, deliveryMethod, cart, getTotalPrice, form, deliveryDistance]);
 
   useEffect(() => {
     // Only trigger calculation if all fields are complete (using new address system)
