@@ -79,8 +79,8 @@ export const generateInvoicePDF = (
   const lightGray = [156, 152, 180]; // #9C98B4
 
   // Header - Logo bulat saja (highly optimized)
-  const logoSize = 20; // Smaller logo size
-  const logoUrl = 'https://res.cloudinary.com/dodmwwp1w/image/upload/c_limit,w_50,h_50,q_10,e_imagemin/v1763574652/logo-purple_dlshle.png';
+  const logoSize = 25; // Adjusted size for better visibility
+  const logoUrl = 'https://res.cloudinary.com/dodmwwp1w/image/upload/v1770742943/New_Logo_Tiny_Bitty_20260130_104635_0001_dsaafx_e_background_removal_f_png_cyeeux.png';
   
   // Tambahkan logo bulat
   try {
@@ -91,7 +91,7 @@ export const generateInvoicePDF = (
     // Tambahkan logo dengan optimasi
     doc.addImage(logoUrl, 'PNG', margin, yPosition, logoSize, logoSize, undefined, 'FAST');
     
-    yPosition += logoSize + 15;
+    yPosition += logoSize + 10;
   } catch (error) {
     // Fallback jika logo gagal - gunakan teks saja untuk mengurangi ukuran
     doc.setFontSize(18);
