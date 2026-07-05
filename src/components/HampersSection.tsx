@@ -28,9 +28,53 @@ import { Plus, Minus, Check, Star } from 'lucide-react';
 import { fbPixelTrack } from '@/lib/fbpixel';
 import CookieFallingAnimation from './CookieFallingAnimation';
 import { cldThumb } from '@/lib/cdn';
+import { supabase } from '@/lib/supabase';
+import type { HamperRow } from '@/types/supabase-models';
 
-// Seasonal hamper data with Eid theme
-const seasonalHampers = [
+// ---------------------------------------------------------------------------
+// Types for the in-component hamper shape used by HamperCard
+// ---------------------------------------------------------------------------
+type HamperCardData = {
+  id: string;
+  name: string;
+  description: string;
+  price?: number;
+  price_large?: number;
+  price_small?: number;
+  image: string;
+  images: string[];
+  rating: number;
+  sales: string;
+  seasonal: string;
+  whatsIncluded: string[];
+};
+
+// Map a DB HamperRow to the legacy HamperCardData shape
+function toHamperCardData(row: HamperRow): HamperCardData {
+  const isMulti = row.hamper_variants.length > 0;
+  return {
+    id: row.id,
+    name: row.name,
+    description: row.description,
+    price: isMulti ? undefined : (row.price ?? undefined),
+    // eid-d style: keep legacy price_large / price_small for backward compat
+    price_large: isMulti && row.hamper_variants.length >= 2
+      ? Math.max(...row.hamper_variants.map((v) => v.price))
+      : undefined,
+    price_small: isMulti && row.hamper_variants.length >= 2
+      ? Math.min(...row.hamper_variants.map((v) => v.price))
+      : undefined,
+    image: row.image,
+    images: row.images,
+    rating: row.rating,
+    sales: row.sales,
+    seasonal: row.seasonal,
+    whatsIncluded: row.whats_included,
+  };
+}
+
+// Fallback static hamper data — used if Supabase is unavailable during development
+const fallbackHampers: HamperCardData[] = [
   {
     id: 'eid-1',
     name: 'Eid Hampers A',
@@ -174,7 +218,7 @@ const seasonalHampers = [
   }
 ];
 
-function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
+function HamperCard({ hamper }: { hamper: HamperCardData }) {
   const [selectedSize, setSelectedSize] = useState<
     'pouch' | 'three-juices' | 'five-juices'
   >('pouch');
@@ -380,14 +424,11 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
   return (
     <>
       <Card
-        className={`flex flex-col border border-muted/30 rounded-3xl bg-white p-3 md:p-4transition-shadow duration-300 overflow-hidden mx-auto min-h-[494.5px] max-h-[600px]`}
-        style={{ width: '281.96px' }}
+        className={`flex flex-col border border-muted/30 rounded-3xl bg-white p-3 md:p-4 transition-shadow duration-300 overflow-hidden w-full min-h-[494px] max-h-[600px]`}
         onClick={(e) => {
-          // Prevent all clicks from bubbling up to carousel or other components
           e.stopPropagation();
         }}
         onMouseDown={(e) => {
-          // Prevent mouse events that might trigger unwanted interactions
           e.stopPropagation();
         }}
       >
@@ -816,12 +857,52 @@ function HamperCard({ hamper }: { hamper: typeof seasonalHampers[0] }) {
 }
 
 export default function HampersSection() {
+  const [hampers, setHampers] = useState<HamperCardData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function fetchHampers() {
+      setLoading(true);
+      setFetchError(null);
+
+      const { data, error } = await supabase
+        .from('hampers')
+        .select('*')
+        .order('name');
+
+      if (cancelled) return;
+
+      if (error) {
+        // Fall back to static data during development if Supabase isn't configured
+        if (!import.meta.env.VITE_SUPABASE_URL || import.meta.env.VITE_SUPABASE_URL.includes('your-project-ref')) {
+          setHampers(fallbackHampers);
+        } else {
+          setFetchError('Hampers could not be loaded. Please refresh the page.');
+        }
+      } else {
+        setHampers((data ?? []).map(toHamperCardData));
+      }
+
+      setLoading(false);
+    }
+
+    fetchHampers();
+    return () => { cancelled = true; };
+  }, []);
+
+  const visibleHampers = hampers.filter((h) => {
+    if ('price_large' in h && h.price_large !== undefined) {
+      return (h.price_large ?? 0) > 0 || (h.price_small ?? 0) > 0;
+    }
+    return (h.price ?? 0) > 0;
+  });
+
   return (
     <section id="hampers-section" className="mb-6 md:mb-8 relative font-montserrat">
       <div className="border border-secondary/20 rounded-2xl md:rounded-3xl p-3 md:p-4 lg:p-6 relative overflow-hidden" style={{ backgroundColor: '#FBF0D0' }}>
-        {/* <div className="hidden md:block">
-          <CookieFallingAnimation />
-        </div> */}
         <div className="relative z-10">
           <div className="text-left mb-6 md:mb-8 relative z-10">
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#F1ABA2] mb-1 font-montserrat-heading">
@@ -833,53 +914,70 @@ export default function HampersSection() {
             <div className="h-1 w-16 bg-gradient-to-r from-secondary to-muted rounded-full"></div>
           </div>
 
-          {/* Responsive Layout - Mobile: 50:50, Desktop: 36:64 */}
-          <div className="grid grid-cols-1 lg:grid-cols-11 gap-4 md:gap-6 lg:gap-8">
+          {/* Loading state */}
+          {loading && (
+            <div className="flex gap-4 overflow-hidden">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="flex-shrink-0 w-[282px] h-[494px] rounded-3xl bg-white/50 animate-pulse" />
+              ))}
+            </div>
+          )}
 
-            {/* Left Side - Image (36% on desktop, 50% on mobile) */}
-            <div className="hidden lg:col-span-4 lg:block">
-              <div className="aspect-square rounded-2xl overflow-hidden">
-                <img
-                  src={cldThumb(
-                    "https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FAF0D1/f_png/v1771164854/Gemini_Generated_Image_dk03yydk03yydk03_xr2ajp.png",
-                    { width: 700, quality: "auto:eco" },
-                  )}
-                  alt="Tiny Bitty Hampers Collection"
-                  className="w-full h-full object-cover"
-                  loading="lazy"
-                  decoding="async"
-                />
+          {/* Error state */}
+          {!loading && fetchError && (
+            <div className="rounded-xl bg-red-50 border border-red-200 p-4 text-center">
+              <p className="text-sm text-red-700">{fetchError}</p>
+            </div>
+          )}
+
+          {/* Loaded content */}
+          {!loading && !fetchError && (
+            <div className="grid grid-cols-1 lg:grid-cols-11 gap-4 md:gap-6 lg:gap-8">
+              {/* Left Side - Image (36% on desktop) */}
+              <div className="hidden lg:col-span-4 lg:block">
+                <div className="aspect-square rounded-2xl overflow-hidden">
+                  <img
+                    src={cldThumb(
+                      "https://res.cloudinary.com/dodmwwp1w/image/upload/e_background_removal/b_rgb:FAF0D1/f_png/v1771164854/Gemini_Generated_Image_dk03yydk03yydk03_xr2ajp.png",
+                      { width: 700, quality: "auto:eco" },
+                    )}
+                    alt="Tiny Bitty Hampers Collection"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
+                </div>
+              </div>
+
+              {/* Right Side - Carousel */}
+              <div className="lg:col-span-7">
+                {visibleHampers.length === 0 ? (
+                  <div className="flex items-center justify-center h-32 text-muted-foreground text-sm">
+                    No hampers available at this time.
+                  </div>
+                ) : (
+                  <Carousel
+                    opts={{ align: "start", slidesToScroll: 1 }}
+                    className="w-full overflow-visible"
+                  >
+                    <CarouselContent className="-ml-2 md:-ml-2 lg:-ml-2">
+                      {visibleHampers.map((hamper) => (
+                        <CarouselItem key={hamper.id} className="pl-2 md:pl-2 lg:pl-2 basis-[78%] sm:basis-[60%] md:basis-[45%] lg:basis-[36%]">
+                          <div className="h-full flex justify-center">
+                            <HamperCard hamper={hamper} />
+                          </div>
+                        </CarouselItem>
+                      ))}
+                    </CarouselContent>
+                    <div className="hidden md:block">
+                      <CarouselPrevious className="!left-[2%] h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-md text-primary hover:bg-primary hover:text-white transition-all duration-300 z-50 transform hover:scale-110" />
+                      <CarouselNext className="!right-[2%] h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-xl text-primary hover:bg-primary hover:text-white transition-all duration-300 z-50 transform hover:scale-110" />
+                    </div>
+                  </Carousel>
+                )}
               </div>
             </div>
-
-            {/* Right Side - Square Carousel (64% on desktop, 50% on mobile) */}
-            <div className="lg:col-span-7">
-              <Carousel
-                opts={{
-                  align: "start",
-                  slidesToScroll: 1,
-                }}
-                className="w-full overflow-visible"
-              >
-                <CarouselContent className="-ml-2 md:-ml-2 lg:-ml-2">
-                  {seasonalHampers.map((hamper, index) => (
-                    <CarouselItem key={hamper.id} className="pl-2 md:pl-2 lg:pl-2 basis-[85%] md:basis-[75%] lg:basis-[36%]">
-                      <div className="h-full flex justify-center">
-                        <HamperCard hamper={hamper} />
-                      </div>
-                    </CarouselItem>
-                  ))}
-                </CarouselContent>
-
-                {/* Carousel Navigation */}
-                <div className="hidden md:block">
-                  <CarouselPrevious className="!left-[2%] h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-md text-primary hover:bg-primary hover:text-white transition-all duration-300 z-50 transform hover:scale-110" />
-                  <CarouselNext className="!right-[2%] h-10 w-10 rounded-full bg-white/80 backdrop-blur-sm border-none shadow-xl text-primary hover:bg-primary hover:text-white transition-all duration-300 z-50 transform hover:scale-110" />
-                </div>
-              </Carousel>
-            </div>
-
-          </div>
+          )}
         </div>
       </div>
     </section>

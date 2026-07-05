@@ -795,103 +795,102 @@ export default function OrderForm() {
   }, [debouncedDeliveryCalculation]);
 
   // Function to generate and download PDF invoice
-  const handleDownloadInvoice = async () => {
-    if (!orderData) return;
+const handleDownloadInvoice = async (): Promise<boolean> => {
+  if (!orderData) return false;
 
-    setIsGeneratingPDF(true);
+  setIsGeneratingPDF(true);
 
-    try {
-      // Map delivery method to proper label
-      const getDeliveryMethodLabel = (method: string) => {
-        switch (method) {
-          case 'gosend': return 'GoSend Instant';
-          case 'gosendsameday': return 'GoSend Same Day';
-          case 'grab': return 'GrabExpress Instant';
-          case 'grabsameday': return 'GrabExpress Same Day';
-          case 'paxel': return 'Paxel';
-          default: return method || 'Not specified';
-        }
-      };
-
-      downloadInvoicePDF(
-        orderData,
-        cart,
-        orderTotal,
-        0, // Exclude ongkir cost since it's estimated and will be confirmed via WhatsApp
-        getDeliveryMethodLabel(deliveryMethod || '')
-      );
-
-      toast({
-        title: 'Invoice downloaded!',
-        description: 'Invoice has been downloaded to your device',
-      });
-    } catch (error) {
-      console.error('Error generating invoice:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to generate invoice. Please try again.',
-        variant: 'destructive',
-      });
-    } finally {
-      setIsGeneratingPDF(false);
-    }
-  };
-
-  const handleWhatsAppRedirect = () => {
-    if (!orderData) return;
-
-    // Track Purchase event for Facebook Pixel before redirect
-    const pixelData = {
-      content_ids: cart.map(item => item.productId),
-      content_type: 'product',
-      currency: 'IDR',
-      value: orderTotal,
-      customer_name: orderData.name,
-      customer_phone: orderData.phone,
+  try {
+    const getDeliveryMethodLabel = (method: string) => {
+      switch (method) {
+        case 'gosend': return 'GoSend Instant';
+        case 'gosendsameday': return 'GoSend Same Day';
+        case 'grab': return 'GrabExpress Instant';
+        case 'grabsameday': return 'GrabExpress Same Day';
+        case 'paxel': return 'Paxel';
+        default: return method || 'Not specified';
+      }
     };
 
-    // console.log('🔍 [FB PIXEL] Purchase tracking:', {
-    //   event: 'Purchase',
-    //   data: pixelData,
-    //   customerName: orderData.name,
-    //   customerPhone: orderData.phone,
-    //   cartItemsCount: cart.length,
-    //   orderTotal: orderTotal,
-    //   deliveryCost: deliveryInfo?.cost || 0,
-    //   totalWithDelivery: orderTotal + (deliveryInfo?.cost || 0),
-    //   productIds: cart.map(item => item.productId),
-    //   productNames: cart.map(item => item.productName),
-    //   whatsappNumber: WHATSAPP_NUMBER,
-    //   timestamp: new Date().toISOString()
-    // });
-
-    fbPixelTrack('Purchase', pixelData);
-
-    // console.log('✅ [FB PIXEL] Purchase event tracked successfully - Redirecting to WhatsApp');
-
-    const message = buildWhatsAppMessage(orderData, cart, orderTotal, 0, isDistanceTooFar, deliveryDistance);
-
-    sendWhatsAppOrder(message, WHATSAPP_NUMBER);
-
-    setShowThankYouModal(false);
-    setOrderData(null);
-    setOrderTotal(0);
-    setDeliveryInfo(null);
-    clearCart();
-    form.reset();
+    downloadInvoicePDF(
+      orderData,
+      cart,
+      orderTotal,
+      0,
+      getDeliveryMethodLabel(deliveryMethod || '')
+    );
 
     toast({
-      title: 'WhatsApp opened!',
-      description: 'Please send the message to complete your order',
+      title: 'Invoice downloaded!',
+      description: 'Invoice has been downloaded to your device',
     });
 
-    setTimeout(() => {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      setTimeout(() => {
-        window.location.reload();
-      }, 3000);
-    }, 1000);
+    return true;
+  } catch (error) {
+    console.error(error);
+
+    toast({
+      title: 'Error',
+      description: 'Failed to generate invoice. Please try again.',
+      variant: 'destructive',
+    });
+
+    return false;
+  } finally {
+    setIsGeneratingPDF(false);
+  }
+};
+
+const handleWhatsAppRedirect = async () => {
+  if (!orderData) return;
+
+  // Download invoice first
+  const downloaded = await handleDownloadInvoice();
+
+  if (!downloaded) return;
+
+  // Track Purchase event for Facebook Pixel
+  const pixelData = {
+    content_ids: cart.map(item => item.productId),
+    content_type: 'product',
+    currency: 'IDR',
+    value: orderTotal,
+    customer_name: orderData.name,
+    customer_phone: orderData.phone,
   };
+
+  fbPixelTrack('Purchase', pixelData);
+
+  const message = buildWhatsAppMessage(
+    orderData,
+    cart,
+    orderTotal,
+    0,
+    isDistanceTooFar,
+    deliveryDistance
+  );
+
+  sendWhatsAppOrder(message, WHATSAPP_NUMBER);
+
+  setShowThankYouModal(false);
+  setOrderData(null);
+  setOrderTotal(0);
+  setDeliveryInfo(null);
+  clearCart();
+  form.reset();
+
+  toast({
+    title: 'WhatsApp opened!',
+    description: 'Please send the message to complete your order',
+  });
+
+  setTimeout(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    setTimeout(() => {
+      window.location.reload();
+    }, 3000);
+  }, 1000);
+};
 
   const onSubmit = (data: OrderFormData) => {
     if (cart.length === 0) {
@@ -1809,18 +1808,19 @@ export default function OrderForm() {
                   </p>
                 </div>
 
-                <Button
-                  onClick={handleWhatsAppRedirect}
-                  className="relative w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2 overflow-hidden group shadow-lg hover:shadow-[#25D366]/20 transition-all duration-300"
-                >
-                  <div className="relative z-10 flex items-center justify-center gap-2">
-                    <MessagesSquare className="w-5 h-5" />
-                    Buka WhatsApp
-                  </div>
-                  <span className="absolute inset-0 z-0 bg-white/20 scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
-                </Button>
+              <Button
+                onClick={handleWhatsAppRedirect}
+                disabled={isGeneratingPDF}
+                className="relative w-full bg-[#25D366] hover:bg-[#25D366]/90 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2 overflow-hidden group shadow-lg hover:shadow-[#25D366]/20 transition-all duration-300 disabled:opacity-70"
+              >
+                <div className="relative z-10 flex items-center justify-center gap-2">
+                  <MessagesSquare className="w-5 h-5" />
+                  {isGeneratingPDF ? "Generating Invoice..." : "Buka WhatsApp"}
+                </div>
+                <span className="absolute inset-0 z-0 bg-white/20 scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
+              </Button>
 
-                <Button
+                {/* <Button
                   onClick={handleDownloadInvoice}
                   disabled={isGeneratingPDF}
                   className="relative w-full bg-foreground text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 mb-2 overflow-hidden group shadow-lg hover:shadow-primary/20 transition-all duration-300"
@@ -1830,7 +1830,7 @@ export default function OrderForm() {
                     {isGeneratingPDF ? 'Generating...' : 'Download Invoice'}
                   </div>
                   <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
-                </Button>
+                </Button> */}
 
                 <p className="text-secondary/70 text-xs">
                   Klik tombol WhatsApp untuk konfirmasi pesanan, dan download invoice untuk menyimpan ke perangkat kamu.
