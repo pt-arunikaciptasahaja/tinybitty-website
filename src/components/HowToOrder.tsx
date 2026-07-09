@@ -7,44 +7,44 @@ export default function HowToOrder() {
         {
             id: 1,
             icon: ShoppingBasket,
-            title: "Pilih Menu",
-            desc: "Tambahkan cookies, juice, atau pasta favoritmu ke keranjang.",
+            title: "Pick Your Treats",
+            desc: "Load up your cart with cookie bundles and fresh sips.",
         },
         {
             id: 2,
             icon: UserRoundPen,
-            title: "Isi Data",
-            desc: "Lengkapi nama, nomor WhatsApp, dan alamat pengiriman.",
+            title: "Tell Us Where to Deliver",
+            desc: "Share your name, WhatsApp, and address so we can bring the goodies to you.",
         },
+        // {
+        //     id: 3,
+        //     icon: Motorbike,
+        //     title: "Check Shipping",
+        //     desc: "Select a courier service to calculate the delivery cost instantly.",
+        // },
         {
             id: 3,
-            icon: Motorbike,
-            title: "Cek Ongkir",
-            desc: "Pilih kurir dan lihat estimasi ongkir otomatis.",
-        },
-        {
-            id: 4,
             icon: Smartphone,
             title: "Order via WhatsApp",
-            desc: "Kami akan hubungi kamu untuk konfirmasi & pembayaran.",
+            desc: "We’ll buzz you on WhatsApp to confirm the order and seal the sweet deal.",
         },
     ];
 
     return (
         <section
             id="how-to-order"
-            className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-secondary/5 border border-secondary/10"
+            className="mb-8 md:mb-10 py-16 rounded-3xl bg-[#E9EDE2] border"
         >
             <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
                 <Card className="rounded-3xl overflow-hidden border-none shadow-xl bg-white">
                     <CardHeader className="bg-white pb-2">
-                        <CardTitle className="text-2xl md:text-3xl font-bold text-primary flex items-center justify-center gap-2 font-montserrat-heading">
-                            <CircleQuestionMark className="w-6 h-6 text-primary" />
+                        <CardTitle className="text-2xl md:text-3xl font-bold text-[#559082] flex items-center justify-center gap-2 font-montserrat-heading">
+                            <CircleQuestionMark className="w-6 h-6 text-[primary]" />
                             How to Order
                         </CardTitle>
-                        <CardDescription className="text-secondary/70 text-center text-sm md:text-base">
-                            Empat langkah mudah buat menikmati menu Tiny Bitty di rumah. ✨
-                        </CardDescription>
+                        {/* <CardDescription className="text-secondary/70 text-center text-sm md:text-base">
+                            Four super-simple steps to bring Tiny Bitty happiness straight to your door! ✨
+                        </CardDescription> */}
                     </CardHeader>
 
                     <CardContent className="w-full max-w-none p-3 md:p-4 lg:p-6">
@@ -60,12 +60,12 @@ export default function HowToOrder() {
                                             <span className="w-4 h-4 flex items-center justify-center rounded-full bg-white text-secondary text-[10px] font-bold">
                                                 {step.id}
                                             </span>
-                                            <span>Langkah {step.id}</span>
+                                            <span>Step {step.id}</span>
                                         </div>
                                     </div>
 
                                     {/* Icon */}
-                                    <div className="mt-6 mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-primary shadow-lg shadow-primary/25">
+                                    <div className="mt-6 mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#E9EDE2]">
                                         <step.icon className="h-8 w-8 text-white" />
                                     </div>
 
@@ -85,8 +85,7 @@ export default function HowToOrder() {
                             <div className="flex flex-col items-center gap-2 text-center text-secondary/70 md:flex-row md:justify-center">
                                 <Lightbulb className="w-5 h-5 text-primary" />
                                 <p className="text-xs md:text-sm font-medium">
-                                    Isi data selengkap & sejelas mungkin ya — supaya konfirmasi & pengiriman bisa diproses lebih cepat.
-                                    ✨
+                                    Pro Tip: Tell us your address nice and neat so your goodies arrive fast and fresh! ✨
                                 </p>
                             </div>
                         </div>
@@ -99,10 +98,10 @@ export default function HowToOrder() {
                         >
                             <a
                                 href="#products"
-                                className="relative rounded-full px-10 py-4 text-sm md:text-base font-bold tracking-wide uppercase transition-all duration-300 overflow-hidden group bg-foreground text-white shadow-lg hover:shadow-primary/20 flex items-center justify-center"
+                                className="relative rounded-full px-8 py-3.5 text-sm md:text-base font-bold tracking-wide uppercase transition-all duration-300 overflow-hidden group bg-foreground text-white shadow-lg hover:shadow-primary/20 flex items-center justify-center"
                             >
                                 <span className="relative z-10 block pointer-events-none">
-                                    Mulai Order
+                                    Grab the Goodies
                                 </span>
                                 <span className="absolute inset-0 z-0 bg-primary scale-0 rounded-full transition-transform duration-500 ease-out group-hover:scale-150 origin-center" />
                             </a>

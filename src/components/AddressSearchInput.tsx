@@ -21,7 +21,7 @@ interface SearchState {
 
 export default function AddressSearchInput({ 
   onSelect, 
-  placeholder = "Ketik nama area atau kode pos",
+  placeholder = "Cilandak, Jakarta Selatan",
   disabled = false,
   className = ""
 }: AddressSearchInputProps) {
@@ -292,7 +292,7 @@ export default function AddressSearchInput({
       {/* Help Text */}
       {!searchState.hasSearched && query.length === 0 && (
         <div className="mt-2 text-xs text-[#8978B4]">
-         💡 Ketik nama area (contoh: "Lebak Bulus") atau kode pos (contoh: "12430")
+         💡 Area name (eg: "Lebak Bulus") or postal code (eg: "12430")
         </div>
       )}
     </div>

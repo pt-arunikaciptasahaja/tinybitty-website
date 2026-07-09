@@ -24,7 +24,7 @@ import {
 
 export default function OurStoryPage() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F5EEE8' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FAF8F2' }}>
       <Header />
 
       <main className="content-section md:!pt-[6rem]" style={{ paddingTop: 'var(--mobile-header-height-2)' }}>

@@ -34,7 +34,5 @@ export interface OrderFormData {
   kecamatan?: string;
   kelurahan?: string;
   detailedAddress?: string; // For street, building number, etc.
-  deliveryMethod: 'gosend' | 'gosendsameday' | 'grab' | 'grabsameday' | 'paxel' | 'pickup';
-  paymentMethod: 'transfer' | 'cod' | 'ewallet';
   notes?: string;
 }

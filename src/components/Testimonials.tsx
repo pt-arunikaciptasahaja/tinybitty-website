@@ -42,7 +42,7 @@ const customTestimonials: CustomTestimonial[] = [
     id: '1',
     name: 'Danielle Mottoh',
     handle: '@dani_elle',
-    text: "Cookiesnya enak banget… rasanya comforting gitu loh 😭✨ Abis lari pagi cici bawa ke kantor, buka laptop bentar doang, eh udah abis aja. Cici manja approved! 🤌💼💖",
+    text: "These cookies are insanely good… so comforting and nostalgic! 😭✨ Brought a box to the office after my morning run, opened my laptop for literally two seconds, and boom—all gone. Total office favorite! 🤌💼💖",
     rating: 5,
     product: 'Heavenly Bites',
     avatar: cldThumb(
@@ -54,7 +54,7 @@ const customTestimonials: CustomTestimonial[] = [
     id: '2',
     name: 'Fajar Tri S',
     handle: '@kapten_kawan',
-    text: "Cookiesnya enak parah sih… crunchy di luar, lembut di dalem. Dimakan sambil nyetem gitar langsung auto-ludes 😭🔥 Rasanya tuh kayak chord yang pas—nggak perlu mikir, tinggal nikmatin.",
+    text: "Bake-perfection at its finest… super crunchy on the outside, incredibly gooey inside. Hand-picked cookies and a guitar session make the absolute perfect chord. No thoughts, just pure bliss! 😭🔥",
     rating: 5,
     product: 'Golden Crunch',
     avatar: cldThumb(
@@ -66,7 +66,7 @@ const customTestimonials: CustomTestimonial[] = [
     id: '3',
     name: 'Al Saputra',
     handle: '@al_saputra',
-    text: 'Juice-nya seger banget, mau dijadiin pre-run boost atau recovery abis lari juga masuk banget. Bikin badan auto-ready buat ngegas pace 5 🤙',
+    text: "Super refreshing juices! Whether as a pre-run energizer or post-run recovery boost, it hits the spot perfectly. Keeps my energy levels topped up and ready to go! 🥤🏃‍♂️💨",
     rating: 5,
     product: 'Strawberry Juice',
     avatar: cldThumb(
@@ -400,7 +400,7 @@ const InstagramPostCard = ({ instagram }: { instagram: InstagramTestimonial }) =
 export default function Testimonials({ className = '' }: TestimonialsProps) {
   return (
     <section id="testimonials"
-      className="mt-8 lg:-mt-22 md:mt-16 mb-12 md:mb-16 py-16 rounded-3xl bg-secondary/5 border border-secondary/10">
+      className="mb-8 md:mb-10 py-16 rounded-3xl bg-secondary/5 border border-secondary/20">
       <div className="container mx-auto px-2 sm:px-4 md:px-7 max-w-none">
         <Card className="rounded-3xl overflow-hidden border-none shadow-xl">
           <CardContent className="w-full max-w-none p-3 md:p-4 lg:p-6">
@@ -444,7 +444,7 @@ export default function Testimonials({ className = '' }: TestimonialsProps) {
                 href="https://www.instagram.com/tiny.bitty"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="relative inline-flex items-center px-8 py-3 bg-foreground text-white font-bold rounded-full transition-all duration-300 shadow-lg hover:shadow-primary/20 overflow-hidden group"
+                className="relative inline-flex items-center px-8 py-3.5 bg-foreground text-white font-bold rounded-full tracking-wide uppercase transition-all duration-300 shadow-lg hover:shadow-primary/20 overflow-hidden group"
               >
                 <div className="relative z-10 flex items-center">
                   <svg className="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">

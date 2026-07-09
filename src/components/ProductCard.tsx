@@ -30,32 +30,14 @@ interface ProductCardProps {
 export default function ProductCard({ product, className = '' }: ProductCardProps) {
   // Default to appropriate size based on product type
   const getDefaultVariantIndex = (product: Product) => {
-    // Check if this is a Tokyo Crumb product (bread products)
-    const isTokyoCrumb = product.ingredients &&
-      product.ingredients.includes('High-Protein Flour') &&
-      (product.ingredients.includes('Butter') || product.ingredients.includes('Margarine'));
+    // Find index of size 'M' or variant with 'M' in it (case-insensitive)
+    const mSizeIndex = product.variants.findIndex(variant => {
+      const sizeStr = variant.size.trim().toUpperCase();
+      return sizeStr === 'M' || sizeStr.includes('MEDIUM') || sizeStr.startsWith('M ');
+    });
+    if (mSizeIndex !== -1) return mSizeIndex;
 
-    if (isTokyoCrumb) {
-      // For Tokyo Crumb products, default to "2-slice pack"
-      const slicePackIndex = product.variants.findIndex(variant =>
-        variant.size.toLowerCase().includes('slice pack') ||
-        variant.size.toLowerCase().includes('2-slice')
-      );
-      return slicePackIndex !== -1 ? slicePackIndex : 0;
-    }
-
-    // For cookie products, default to Mini/XS variant
-    if (product.ingredients && product.ingredients.includes('Flour') &&
-      product.ingredients.includes('Eggs') &&
-      product.ingredients.includes('Australian Butter')) {
-      const miniIndex = product.variants.findIndex(variant =>
-        variant.size.toLowerCase().includes('mini') ||
-        variant.size.toLowerCase().includes('30gr')
-      );
-      return miniIndex !== -1 ? miniIndex : 0;
-    }
-
-    // Default to first variant for other products
+    // Fallback to first available variant
     return 0;
   };
 
@@ -407,7 +389,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           />
         </div>
         {product.isNew && (
-          <Badge className="absolute top-2 right-2 bg-accent text-secondary text-[10px] px-2 py-0.5 shadow-md">
+          <Badge className="absolute top-2 right-2 bg-accent text-[#FFF] text-[10px] px-2 py-0.5 shadow-md">
             NEW
           </Badge>
         )}
@@ -420,7 +402,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
           }}
           className="absolute bottom-2 right-2 text-secondary hover:text-secondary hover:bg-secondary/10 px-2 py-1 h-auto text-[11px] font-medium shadow-md bg-white/90 backdrop-blur-sm"
         >
-          Detail produk
+          Click to see more
         </Button>
       </div>
 
@@ -440,12 +422,12 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
         {/* Star rating and sales info */}
         <div className="flex items-center gap-2">
-          <div className="flex items-center gap-1">
+          {/* <div className="flex items-center gap-1">
             <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
             <span className="text-xs font-medium text-foreground">{productRating}</span>
           </div>
-          <span className="text-xs text-foreground/60">•</span>
-          <span className="text-xs text-foreground/60">terjual {productSales}</span>
+          <span className="text-xs text-foreground/60">•</span> */}
+          {/* <span className="text-xs text-foreground/60">{productSales}+ sold</span> */}
         </div>
 
         {/* Size section - dropdown for multi-size, plain text for single-size */}
@@ -557,7 +539,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
             </Select>
           ) : (
             /* Plain text for single-size products (juice) */
-            <div className="flex items-center justify-center w-full h-8 rounded-full bg-accent text-secondary text-[10px] font-semibold">
+            <div className="flex items-center justify-center w-full h-8 rounded-full bg-accent text-[#fff] text-[10px] font-semibold">
               {selectedVariant.size}
             </div>
           )}
@@ -674,12 +656,12 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                 <div className="space-y-3 md:space-y-4 pb-4">
                   {/* Rating and Sales */}
                   <div className="flex items-center gap-2">
-                    <div className="flex items-center gap-1">
+                    {/* <div className="flex items-center gap-1">
                       <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                       <span className="text-sm font-semibold text-foreground">{productRating}</span>
                     </div>
-                    <span className="text-sm text-foreground/60">•</span>
-                    <span className="text-sm text-foreground/60">terjual {productSales}</span>
+                    <span className="text-sm text-foreground/60">•</span> */}
+                    {/* <span className="text-sm text-foreground/60">{productSales}+ sold</span> */}
                   </div>
 
                   {/* Price */}
@@ -689,7 +671,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                   {/* Description */}
                   <div className="space-y-2">
-                    <h3 className="text-sm font-semibold text-foreground">Deskripsi Produk</h3>
+                    {/* <h3 className="text-sm font-semibold text-foreground">Product Description</h3> */}
                     <p className="text-sm text-foreground/75 leading-relaxed">
                       {product.description}
                     </p>
@@ -697,7 +679,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
 
                   {/* Size Info */}
                   <div className="space-y-2 w-full">
-                    <h3 className="text-sm font-semibold text-foreground">Pilihan Size</h3>
+                    <h3 className="text-sm font-semibold text-foreground">Available Sizes</h3>
                     <div className="flex flex-wrap gap-2 w-full max-w-full">
                       {product.variants.map((variant, index) => {
                         const meta = getSizeMeta(variant.size);
@@ -722,7 +704,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   {/* Ingredients */}
                   {product.ingredients && product.ingredients.length > 0 && (
                     <div className="space-y-2 w-full">
-                      <h3 className="text-sm font-semibold text-foreground">Ingredients:</h3>
+                      <h3 className="text-sm font-semibold text-foreground">Ingredients</h3>
                       <div className="flex flex-wrap gap-1.5 w-full max-w-full">
                         {product.ingredients.map((ingredient, index) => (
                           <Badge
@@ -740,7 +722,7 @@ export default function ProductCard({ product, className = '' }: ProductCardProp
                   {/* Toppings */}
                   {product.toppings && product.toppings.length > 0 && (
                     <div className="space-y-2 w-full">
-                      <h3 className="text-sm font-semibold text-foreground">Topping</h3>
+                      <h3 className="text-sm font-semibold text-foreground">Toppings</h3>
                       <div className="flex flex-wrap gap-1.5 w-full max-w-full">
                         {product.toppings.map((topping, index) => (
                           <Badge

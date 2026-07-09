@@ -43,14 +43,14 @@ const CATEGORIES: CategoryConfig[] = [
     title: 'Cookies',
     displayTitle: 'Sweet Bites',
     description:
-      'Kue kering lezat yang crunchy, ideal untuk cemilan harian atau sebagai hampers istimewa.',
+      'Super crunchy, melt-in-your-mouth delicious cookies baked fresh daily. Perfect for a quick snack break or a sweet gift!',
   },
   {
     key: 'juice',
     title: 'Tiny Juice',
     displayTitle: 'Fruity Splash',
     description:
-      'Jus alami tanpa pengawet, diolah dari buah segar berkualitas—cocok diminum kapan pun kamu butuh penyegar yang alami.',
+      '100% natural, preservative-free juice squeezed straight from fresh fruits. The ultimate refreshing pick-me-up!',
   },
 ];
 
@@ -85,6 +85,10 @@ export default function ProductSection() {
     const grouped: Record<Category, Product[]> = { cookies: [], juice: [] };
 
     for (const row of rows) {
+      // Temporarily hide Desert Crown (Ramadan special)
+      if (row.name.toLowerCase().includes('desert crown')) {
+        continue;
+      }
       if (row.category === 'cookies' || row.category === 'juice') {
         // Show isNew items first within each category
         grouped[row.category].push(toProduct(row));
@@ -110,8 +114,8 @@ export default function ProductSection() {
 
   if (loading) {
     return (
-      <section id="products" className="mb-6 md:mb-8 font-montserrat">
-        <div className="border border-secondary/20 rounded-3xl p-3 md:p-4 lg:p-6 bg-secondary/5">
+      <section id="products" className="mb-8 md:mb-10 font-montserrat">
+        <div className="border rounded-3xl p-3 md:p-4 lg:p-6 bg-[#EAEEE3]">
           <div className="text-left mb-6">
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#F1ABA2] mb-1 font-montserrat-heading">
               Our Products
@@ -132,8 +136,8 @@ export default function ProductSection() {
 
   if (error) {
     return (
-      <section id="products" className="mb-6 md:mb-8 font-montserrat">
-        <div className="border border-secondary/20 rounded-3xl p-6 bg-secondary/5 text-center space-y-3">
+      <section id="products" className="mb-8 md:mb-10 font-montserrat">
+        <div className="border rounded-3xl p-6 bg-[#EAEEE3] text-center space-y-3">
           <p className="text-muted-foreground text-sm">{error}</p>
           <button
             onClick={fetchProducts}
@@ -151,8 +155,8 @@ export default function ProductSection() {
 
   if (!hasAnyProducts) {
     return (
-      <section id="products" className="mb-6 md:mb-8 font-montserrat">
-        <div className="border border-secondary/20 rounded-3xl p-8 bg-secondary/5 text-center">
+      <section id="products" className="mb-8 md:mb-10 font-montserrat">
+        <div className="border rounded-3xl p-8 bg-[#E9EDE2] text-center">
           <p className="text-muted-foreground text-sm">No products available yet.</p>
         </div>
       </section>
@@ -163,8 +167,8 @@ export default function ProductSection() {
   const activeCategories = CATEGORIES.filter((c) => productsByCategory[c.key].length > 0);
 
   return (
-    <section id="products" className="mb-6 md:mb-8 font-montserrat">
-      <div className="border border-secondary/20 rounded-3xl md:rounded-3xl p-3 md:p-4 lg:p-6 bg-secondary/5">
+    <section id="products" className="mb-8 md:mb-10 font-montserrat">
+      <div className="border rounded-3xl md:rounded-3xl p-3 md:p-4 lg:p-6 bg-[#E9EDE2]">
         <div className="text-left mb-6 md:block">
           <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-[#F1ABA2] mb-1 font-montserrat-heading">
             Our Products

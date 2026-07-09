@@ -11,7 +11,7 @@ import { Toaster } from '@/components/ui/toaster';
 
 export default function Home() {
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F5EEE8' }}>
+    <div className="min-h-screen" style={{ backgroundColor: '#FAF8F2' }}>
       <Header />
       <Hero />
 
@@ -25,7 +25,7 @@ export default function Home() {
 
       <HowToOrder />
 
-      <Testimonials />
+      {/* <Testimonials /> */}
 
       <OrderForm />
 
